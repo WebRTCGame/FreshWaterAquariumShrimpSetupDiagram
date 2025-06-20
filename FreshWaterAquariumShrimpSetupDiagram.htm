@@ -1,0 +1,729 @@
+<html>
+  <head>
+    <style type="text/css">
+      #mySvgId {
+        height: 90%;
+        width: 90%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="graphDiv"></div>
+    <script src="https://bumbu.me/svg-pan-zoom/dist/svg-pan-zoom.js"></script>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm'
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default'
+      });
+      // Example of using the render function
+      const drawDiagram = async function () {
+        const element = document.querySelector('#graphDiv');
+        const graphDefinition = `
+flowchart
+direction LR
+ subgraph LEGEND["LEGEND / KEY"]
+    direction LR
+        LEG_TANK(["Tank"])
+        LEG_EQUIP[["Equipment"]]
+        LEG_INST{{"Instrument"}}
+        LEG_VALVE{{"Valve"}}
+        LEG_SUBSTRATE(["Substrate"])
+        LEG_PLANTS(["Plants"])
+        LEG_BACT(["Bacteria Zone"])
+        LEG_SHRIMP(["Shrimp Zone"])
+        LEG_DOSING["Dosing"]
+        LEG_ACCESS(["Access Point"])
+        LEG_LIGHT(["Lighting"])
+        LEG_ALARM(["Alarm"])
+        LEG_POWER(["Power"])
+        LEG_FLOW_OUTPUT(["Flow Output"])
+        LEG_ELEC["LEG_ELEC"]
+        LEG_WATER_FLOW["LEG_WATER_FLOW"]
+        LEG_SIGNAL["LEG_SIGNAL"]
+        LEG_AIR_FLOW["LEG_AIR_FLOW"]
+        LEG_RECIRC["Recirculation/Return"]
+        LEG_OVERFLOW["Overflow/Drain"]
+        LEG_FILTRATION["Filtration Loop"]
+        LEG_CHILLER["Chiller Loop"]
+        LEG_WC["Water Change"]
+        LEG_ATO["Auto Top-Off"]
+        LEG_QUAR["Quarantine"]
+  end
+ subgraph OVERVIEW["SYSTEM OVERVIEW - WATER FLOW"]
+    direction LR
+        OV_TANK["MAIN TANK<br>125 GAL"]
+        OV_INT["INTERNAL<br>FILTERS"]
+        OV_PUMP(("CIRCULATION<br>PUMP<br>400 GPH, 30W, Shrimp-Safe"))
+        OV_PRE["MECHANICAL<br>FILTER<br>Dual-Density Foam, 100μm"]
+        OV_BIO["BIOLOGICAL<br>FILTER<br>Matrix + Bio Rings"]
+        OV_BUF["pH BUFFER<br>TOWER<br>Crushed Coral/Aragonite"]
+        OV_REDOX["CHEMICAL<br>FILTER<br>Zeolite + Purigen"]
+        OV_DEG["DEGASSER<br>UNIT<br>Trickle Tower, Bio Balls"]
+        TEE_OV1["TEE-OV1<br>1IN PVC TEE"]
+        TEE_OV2["TEE-OV2<br>1IN PVC TEE"]
+        TEE_OV3["TEE-OV3<br>1IN PVC TEE"]
+  end
+ subgraph MAIN_TANK["MAIN TANK & DIRECT COMPONENTS"]
+    direction LR
+        TK_101[("MAIN TANK-101<br>6 ft × 18 in × 24 in<br>125 GAL Freshwater Planted")]
+        TK_ACC["TK-ACC-1<br>Access Cover"]
+        TK_OVF["TK-OVF-1<br>Overflow Protection<br>Standpipe"]
+  end
+ subgraph INSIDE_MAIN_TANK["INSIDE MAIN TANK"]
+    direction LR
+        MAIN_TANK
+        SUBSTRATE["SUBSTRATE"]
+        PLT_ZONE["PLT_ZONE"]
+        INT_FIL["INT_FIL"]
+        HABITAT["HABITAT"]
+  end
+ subgraph OUTSIDE_MAIN_TANK["OUTSIDE MAIN TANK"]
+    direction LR
+        EXT_FIL["EXT_FIL"]
+        PUMP["PUMP"]
+        AIR_SYS["AIR_SYS"]
+        DOS["DOS"]
+        HEAT["HEAT"]
+        CO2["CO2"]
+        ATO["ATO"]
+        WC["WC"]
+        FEEDER_101["FD-101<br>Auto Feeder"]
+        QUAR["QUAR"]
+  end
+ subgraph ELECTRICAL_DIST["ELECTRICAL DISTRIBUTION"]
+    direction LR
+        PWR_101["PWR-101<br>Main Power<br>GFCI Protected"]
+        PWR_102["PWR-102<br>Battery Backup"]
+        PWR_TMR["PWR-TMR<br>Timer Hub"]
+        OUTLET_PUMP["OUTLET-PUMP"]
+        OUTLET_AIR1["OUTLET-AIR1"]
+        OUTLET_AIR2["OUTLET-AIR2"]
+        OUTLET_HTR1["OUTLET-HTR1"]
+        OUTLET_HTR2["OUTLET-HTR2"]
+        OUTLET_CHILLER["OUTLET-CHILLER"]
+        OUTLET_FEEDER["OUTLET-FEEDER"]
+        OUTLET_DOS1["OUTLET-DOS1"]
+        OUTLET_DOS2["OUTLET-DOS2"]
+        OUTLET_CO2["OUTLET-CO2"]
+        OUTLET_ATO["OUTLET-ATO"]
+        OUTLET_TMR["OUTLET-TMR"]
+  end
+ subgraph CONTROL_MONITORING["CONTROL & MONITORING"]
+    direction LR
+        INST["INST"]
+        PAR_101["PAR-101<br>PAR Sensor"]
+        DATA["DATA"]
+  end
+ subgraph LIGHT["LIGHTING SYSTEM"]
+    direction LR
+        LGT_101["LGT-101<br>LED Lighting<br>Full Spectrum<br>Plant Growth"]
+        LGT_CON["LGT-CON<br>Light Controller"]
+        LGT_TMR["LGT-TMR<br>Photoperiod Timer"]
+  end
+ subgraph SUBSTRATE["SUBSTRATE LAYERS"]
+    direction LR
+        SUB_01["SB-101: Cap Layer<br>Fine Sand"]
+        SUB_02["SB-102: Middle Layer<br>Mineralized Soil"]
+        SUB_03["SB-103: Buffer Layer<br>Safe-T-Sorb/Fluorite"]
+        SUB_04["SB-104: Mesh Screen<br>Fine Nylon Mesh"]
+        PLM_01["PL-101: Plenum Chamber<br>0.5-1 in Gap<br>Denitrifying Zone"]
+        PLM_02["PL-102: Lava Rock<br>Bacterial Surface Area"]
+        PLM_ACC["PL-ACC-1<br>Plenum Access Port"]
+  end
+ subgraph PLT_ZONE["PLANT ZONES"]
+    direction LR
+        PLT_01["PLT-101: Root Zone<br>Crypts, Swords<br>Root Oxygenation"]
+        PLT_02["PLT-102: Midground<br>Stems, Java Fern"]
+        PLT_03["PLT-103: Carpet Zone<br>Moss, Monte Carlo"]
+        PLT_04["PLT-104: Floating Plants<br>Frogbit, Surface Cover"]
+  end
+ subgraph LCORNER_MOD["LEFT CORNER SPONGE - MECHANICAL"]
+    direction LR
+        FIL_101_IN["FIL-101-IN<br>Water Intake"]
+        FIL_101["FIL-101<br>Corner Sponge<br>Left Side<br>Dual-Density Foam<br>30-45 PPI"]
+        FIL_101_1["FIL-V-101<br>Sponge Clean Access"]
+        FIL_101_OUT["FIL-101-OUT<br>Filtered Output"]
+  end
+ subgraph RCORNER_MOD["RIGHT CORNER SPONGE - BIOLOGICAL"]
+    direction LR
+        FIL_102_IN["FIL-102-IN<br>Water Intake"]
+        FIL_102["FIL-102<br>Corner Sponge<br>Right Side<br>Biomedia Chamber<br>Matrix Mini + Foam"]
+        FIL_102_1["FIL-V-102<br>Media Access"]
+        FIL_102_OUT["FIL-102-OUT<br>Filtered Output"]
+  end
+ subgraph MATTEN_MOD["MATTEN FILTER - COMBINED FILTRATION"]
+    direction LR
+        FIL_103_IN["FIL-103-IN<br>Water Intake"]
+        FIL_103["FIL-103<br>Matten Filter<br>PPI-20 Foam Wall<br>6 inch Height<br>Air-Driven Flow"]
+        FIL_103_1["FIL-V-103<br>Matten Clean Access"]
+        FIL_103_OUT["FIL-103-OUT<br>Filtered Output"]
+        FIL_103_BIO["FIL-103-BIO<br>Biofilm Layer"]
+  end
+ subgraph PRE_FILTER["PRE-FILTER MODULE"]
+    direction LR
+        PRE_IN["PRE-IN-201<br>Filter Inlet"]
+        PRE_FIL["FIL-201<br>Prefilter Pod<br>Dual-Density Foam<br>+ Fine Floss<br>100μm Rating"]
+        PRE_ACC["FIL-V-201<br>Prefilter Clean Access"]
+        PRE_S["PRE-S-201<br>Pressure Sensor"]
+        PRE_V["PRE-V-201<br>Isolation Valve"]
+        PRE_OUT["PRE-OUT-201<br>Filter Outlet"]
+  end
+ subgraph INT_FIL["INTERNAL FILTRATION"]
+    direction LR
+        LCORNER_MOD
+        RCORNER_MOD
+        MATTEN_MOD
+  end
+ subgraph SUPPLY_MANIFOLD["SUPPLY MANIFOLD (TEE FITTINGS)"]
+    direction LR
+        
+        SUP_TEE2["SUP-TEE-2<br>1IN PVC TEE"]
+        SUP_TEE3["SUP-TEE-3<br>1IN PVC TEE"]
+        SUP_TEE4["SUP-TEE-4<br>1IN PVC TEE"]
+  end
+ subgraph RETURN_MANIFOLD["RETURN MANIFOLD (TEE FITTINGS)"]
+    direction LR
+        
+        RET_TEE2["RET-TEE-2<br>1IN PVC TEE"]
+        RET_TEE3["RET-TEE-3<br>1IN PVC TEE"]
+        RET_TEE4["RET-TEE-4<br>1IN PVC TEE"]
+  end
+ subgraph BIO_MOD["BIOREACTOR MODULE - NITRIFICATION"]
+    direction LR
+        BIO_IN["BIO-IN-201<br>Reactor Inlet"]
+        BIO_RX["BIO-201<br>Bioreactor Column<br>Matrix + Bio Rings<br>+ Ceramic Media<br>20-30 GPH Flow"]
+        BIO_ACC["BIO-V-201<br>Media Access Port"]
+        BIO_V["BIO-V-201<br>Isolation Valve"]
+        BIO_OUT["BIO-OUT-201<br>Reactor Outlet"]
+        BIO_S["BIO-S-201<br>Flow Indicator"]
+  end
+ subgraph MIN_MOD["BUFFER TOWER MODULE - pH STABILIZATION"]
+    direction LR
+        MIN_IN["MIN-IN-301<br>Buffer Inlet"]
+        MIN_RX["MIN-301<br>GH/KH Buffer Tower<br>Crushed Coral + Aragonite<br>Partial Flow Bypass<br>pH 6.8-7.0 Target"]
+        MIN_ACC["MIN-V-301<br>Media Access Port"]
+        MIN_V["MIN-V-301<br>Isolation Valve"]
+        MIN_OUT["MIN-OUT-301<br>Buffer Outlet"]
+        MIN_S["MIN-S-301<br>pH Sensor"]
+  end
+ subgraph OX_MOD["REDOX REACTOR MODULE - CHEMICAL FILTRATION"]
+    direction LR
+        OX_IN["OX-IN-401<br>Redox Inlet"]
+        OX_RX["OX-401<br>Redox Reactor<br>Layered Design:<br>Zeolite + Purigen"]
+        OX_ACC["OX-V-401<br>Media Access Port"]
+        OX_V["OX-V-401<br>Isolation Valve"]
+        OX_OUT["OX-OUT-401<br>Redox Outlet"]
+        OX_S["OX-S-401<br>Redox Sensor"]
+  end
+ subgraph DEG_MOD["DEGASSER MODULE - GAS EXCHANGE"]
+    direction LR
+        DEG_IN["DEG-IN-501<br>Degasser Inlet"]
+        DEG_COL["DEG-501<br>Trickling Degasser<br>Cascading Water Flow<br>Bio Balls + Air Gap<br>CO₂ Reduction"]
+        DEG_ACC["DEG-V-501<br>Media Access Port"]
+        DEG_V["DEG-V-501<br>Isolation Valve"]
+        DEG_OUT["DEG-OUT-501<br>Degasser Outlet"]
+        DEG_S["DEG-S-501<br>Dissolved Gas Sensor"]
+        DEG_AIR["DEG-AIR-501<br>Air Vent"]
+  end
+ subgraph EXT_FIL["EXTERNAL FILTRATION SYSTEM"]
+    direction LR
+        SUPPLY_MANIFOLD
+        RETURN_MANIFOLD
+        PRE_FILTER
+        BIO_MOD
+        MIN_MOD
+        OX_MOD
+        DEG_MOD
+        FV_202["FV-202<br>Return Valve"]
+  end
+ subgraph PUMP["MAIN PUMP SYSTEM"]
+    direction LR
+        %% Mermaid v11+ image node syntax for P_201 (example pump icon, replace with your own if desired)
+        P_201[P-201<br>Main Circulation Pump<br>400 GPH, 30W, Shrimp-Safe]
+        P_PRE["P-PRE-201<br>Pump Prefilter<br>0.5mm Mesh"]
+        P_BYP["P-BYP-201<br>Bypass Valve"]
+        FV_201["FV-201<br>Flow Control"]
+        P_ISO_1["P-ISO-201<br>Inlet Isolation"]
+        P_ISO_2["P-ISO-202<br>Outlet Isolation"]
+        P_GRID["P-GRID-201<br>Strainer 0.5mm<br>Shrimp-Safe"]
+  end
+ subgraph AIR_SYS["AIR SUPPLY SYSTEM"]
+    direction LR
+        AIR_101["AC-101<br>Main Air Compressor"]
+        AIR_102["AC-102<br>Backup USB Air Pump"]
+        AIR_CHK["AV-101<br>Check Valve"]
+        AIR_SPL["ASP-101<br>6-Way Air Manifold"]
+        AIR_FLT["AF-101<br>Air Filter<br>HEPA Grade"]
+        AIR_DRY["AD-101<br>Air Dryer<br>Moisture Trap"]
+  end
+ subgraph INST["INSTRUMENTATION"]
+    direction LR
+        PH_101["pH-101<br>pH Sensor"]
+        TDS_102["TDS-102<br>TDS Meter"]
+        TE_103["TE-103<br>Temperature Probe"]
+        FI_104["FI-104<br>Flow Indicator"]
+        ORP_105["ORP-105<br>Redox Potential"]
+        DO_106["DO-106<br>Dissolved Oxygen"]
+        LVL_107["LVL-107<br>Water Level Sensor"]
+        ALM_101["ALM-101<br>Low Water Alarm"]
+        ALM_102["ALM-102<br>High Temp Alarm"]
+        CONT_101["CONT-101<br>Parameter Controller<br>Display"]
+  end
+ subgraph DOS["DOSING SYSTEM"]
+    direction LR
+        DOS_101["DOS-101<br>Mineral Doser<br>GH/KH+"]
+        DOS_102["DOS-102<br>Plant Fertilizer<br>Micro/Macro"]
+        TEE_DOS2["TEE-DOS2<br>1/8IN TEE"]
+        DOS_PMP_1["DOS-P-101<br>Dosing Pump<br>1-5 mL/min, Peristaltic<br>1/8IN Tubing"]
+        DOS_PMP_2["DOS-P-102<br>Dosing Pump<br>1-5 mL/min, Peristaltic<br>1/8IN Tubing"]
+        DOS_TMR["DOS-TMR<br>Timer Controller"]
+  end
+ subgraph HEAT["HEATING SYSTEM"]
+    direction LR
+        HTR_101["HTR-101<br>Main Heater<br>200W"]
+        HTR_102["HTR-102<br>Backup Heater<br>100W"]
+        HTR_CONT["HTR-CONT<br>Temperature Controller"]
+        HTR_THRM["HTR-THRM<br>Thermal Cutoff"]
+  end
+ subgraph HABITAT["SHRIMP HABITAT ZONES"]
+    direction LR
+        SH_MOSS["SH-101<br>Moss Fields<br>Grazing Area<br>Java + Christmas Moss"]
+        SH_CAVES["SH-102<br>Rock Caves<br>Hiding &amp; Molting Area<br>Cholla Wood + Lava Rock"]
+        SH_BREED["SH-103<br>Breeding Colony<br>Quiet Corner<br>Dense Plant Cover"]
+        SH_FEED["SH-104<br>Feeding Station<br>Supplemental Area<br>Feeding Dishes"]
+  end
+ subgraph CO2["CO₂ INJECTION SYSTEM"]
+    direction LR
+        CO2_CYL["CO₂-201<br>CO₂ Cylinder"]
+        CO2_REG["CO₂-202<br>Regulator<br>Dual Stage, Solenoid<br>0-60 psi, CGA320"]
+        CO2_SOL["CO₂-203<br>Solenoid Valve<br>12V DC, 1/8IN NPT"]
+        CO2_BUB["CO₂-204<br>Bubble Counter"]
+        CO2_DIFF["CO₂-205<br>Diffuser"]
+        CO2_PH_CTRL["CO₂-206<br>pH Controller"]
+  end
+ subgraph ATO["AUTO TOP-OFF SYSTEM"]
+    direction LR
+        ATO_RES["ATO-201<br>Reservoir"]
+        TEE_ATO1["TEE-ATO1<br>1/4IN TEE"]
+        ATO_PMP(("ATO-202<br>Pump<br>50 GPH, Submersible"))
+        ATO_SNS["ATO-203<br>Float Sensor"]
+  end
+ subgraph WC["WATER CHANGE SYSTEM"]
+    direction LR
+        WC_MIX["WC-201<br>Mixing/Storage Tank<br>20 GAL, HDPE"]
+        TEE_WC1["TEE-WC1<br>1/2IN TEE"]
+        WC_PMP(("WC-202<br>Change Pump<br>200 GPH, Submersible"))
+        TEE_WC2["TEE-WC2<br>1/2IN TEE"]
+        WC_DRAIN["WC-203<br>Drain Valve"]
+        WC_FILL["WC-204<br>Fill Valve"]
+  end
+ subgraph DATA["DATA LOGGING & REMOTE MONITORING"]
+    direction LR
+        DATA_101["DATA-101<br>WiFi/Cloud Module"]
+        DATA_102["DATA-102<br>Data Logger"]
+  end
+ subgraph QUAR["QUARANTINE/ISOLATION SYSTEM"]
+    direction LR
+        QT_TANK["QT-101<br>Quarantine Tank<br>10 GAL, Glass"]
+        QT_FIL["QT-102<br>Filter"]
+        QT_HTR["QT-103<br>Heater"]
+        QT_PMP(("QT-104<br>Pump<br>100 GPH, Sponge Safe"))
+  end
+    LEG_ELEC -. Electrical Connection .-> LEG_POWER
+    LEG_WATER_FLOW ==> LEG_TANK
+    LEG_SIGNAL --- LEG_INST
+    LEG_AIR_FLOW -.-> LEG_EQUIP
+    OV_TANK == 1IN NPS, 3ft, 400 GPH ==> TEE_OV1
+    TEE_OV1 == 1IN NPS, 2ft, 400 GPH ==> OV_PUMP
+    TEE_OV1 == 1IN NPS, 2ft, 200 GPH ==> OV_INT
+    OV_PUMP == 1IN NPS, 2ft, 400 GPH ==> TEE_OV2
+    TEE_OV2 == 1IN NPS, 2ft, 400 GPH ==> OV_PRE & TEE_OV3
+    TEE_OV3 == 1IN NPS, 2ft, 400 GPH ==> OV_BIO & OV_BUF
+    OV_BIO == 1IN NPS, 2ft, 400 GPH ==> OV_BUF
+    OV_BUF == 1IN NPS, 2ft, 400 GPH ==> OV_REDOX
+    OV_REDOX == 1IN NPS, 2ft, 400 GPH ==> OV_DEG
+    OV_DEG == 1IN NPS, 3ft, 395 GPH ==> OV_TANK
+    TK_101 --- TK_ACC & TK_OVF
+    PWR_101 -. Electrical Connection .-> OUTLET_PUMP & OUTLET_AIR1 & OUTLET_AIR2 & OUTLET_HTR1 & OUTLET_HTR2 & OUTLET_CHILLER & OUTLET_FEEDER & OUTLET_DOS1 & OUTLET_DOS2 & OUTLET_CO2 & OUTLET_ATO & OUTLET_TMR
+    PWR_102 -. Electrical Connection .-> OUTLET_AIR2
+    OUTLET_TMR -. Electrical Connection .-> PWR_TMR & PWR_TMR
+    SUB_01 -.-> SUB_02
+    SUB_02 -.-> SUB_03
+    SUB_03 -.-> SUB_04
+    SUB_04 -.-> PLM_01
+    PLM_02 -.-> PLM_01
+    PLM_01 -.-> PLM_ACC
+    FIL_101_IN --> FIL_101
+    FIL_101 --- FIL_101_1
+    FIL_101 --> FIL_101_OUT
+    FIL_102_IN --> FIL_102
+    FIL_102 --- FIL_102_1
+    FIL_102 --> FIL_102_OUT
+    FIL_103_IN --> FIL_103
+    FIL_103 --- FIL_103_1 & FIL_103_BIO
+    FIL_103 --> FIL_103_OUT
+    PRE_FIL --- PRE_ACC & PRE_S
+    BIO_RX --- BIO_ACC & BIO_S
+    MIN_RX --- MIN_ACC & MIN_S
+    OX_RX --- OX_ACC & OX_S
+    DEG_COL --- DEG_ACC & DEG_S
+    DEG_COL -.-> DEG_AIR
+    SUP_TEE2 == 1IN NPS, 2ft, 400 GPH ==> BIO_IN
+    SUP_TEE3 == 1IN NPS, 2ft, 400 GPH ==> MIN_IN
+    SUP_TEE4 == 1IN NPS, 2ft, 400 GPH ==> OX_IN
+    BIO_OUT == 1IN NPS, 2ft, 400 GPH ==> RET_TEE2
+    MIN_OUT == 1IN NPS, 2ft, 400 GPH ==> RET_TEE3
+    OX_OUT == 1IN NPS, 2ft, 400 GPH ==> RET_TEE4
+    DEG_OUT == 1IN NPS, 3ft, 395 GPH ==> FV_202
+    FV_202 == 1IN NPS, 3ft, 395 GPH ==> TK_101
+    SH_MOSS -.-> SH_CAVES
+    SH_CAVES -.-> SH_BREED
+    SH_FEED -.-> SH_MOSS
+    TK_101 == 1_5IN NPS, 1ft, 400 GPH ==> TK_OVF
+    TK_OVF == 1_5IN NPS, 2ft, 400 GPH ==> P_GRID
+    P_GRID == 1IN NPS, 1ft, 400 GPH ==> P_ISO_1
+    P_ISO_1 == 1IN NPS, 2ft, 400 GPH ==> P_PRE
+    P_PRE == 1IN NPS, 1ft, 400 GPH ==> P_201
+    P_201 == 1IN NPS, 2ft, 400 GPH ==> P_ISO_2
+    P_ISO_2 == 1IN NPS, 2ft, 400 GPH ==> FV_201 & P_BYP
+    P_BYP == "1IN NPS, 2ft, 400 GPH - RETURN TO TANK" ==> TK_101
+    
+    
+    PRE_IN == 1IN NPS, 2ft, 400 GPH ==> PRE_FIL
+    PRE_FIL == 1IN NPS, 1ft, 400 GPH ==> PRE_V
+    PRE_V == 1IN NPS, 1ft, 400 GPH ==> PRE_OUT
+    
+
+    BIO_IN == 1IN NPS, 2ft, 400 GPH ==> BIO_RX
+    BIO_RX == 1IN NPS, 1ft, 400 GPH ==> BIO_V
+    BIO_V == 1IN NPS, 1ft, 400 GPH ==> BIO_OUT
+    MIN_IN == 1IN NPS, 2ft, 400 GPH ==> MIN_RX
+    MIN_RX == 1IN NPS, 1ft, 400 GPH ==> MIN_V
+    MIN_V == 1IN NPS, 1ft, 400 GPH ==> MIN_OUT
+    OX_IN == 1IN NPS, 2ft, 400 GPH ==> OX_RX
+    OX_RX == 1IN NPS, 1ft, 400 GPH ==> OX_V
+    OX_V == 1IN NPS, 1ft, 400 GPH ==> OX_OUT
+    DEG_IN == 1IN NPS, 2ft, 395 GPH ==> DEG_COL
+    DEG_COL == 1IN NPS, 1ft, 395 GPH ==> DEG_V
+    DEG_V == 1IN NPS, 1ft, 395 GPH ==> DEG_OUT
+    DOS_PMP_1 -.-> DOS_TMR
+    DOS_PMP_2 -.-> DOS_TMR
+    DOS_PMP_1 ==> TEE_DOS2
+    DOS_PMP_2 ==> TEE_DOS2
+    TEE_DOS2 ==> TK_101
+    PWR_101 -.-> AIR_101
+    PWR_102 -.-> AIR_102
+    AIR_101 -.-> AIR_CHK
+    AIR_102 -.-> AIR_CHK
+    AIR_CHK -.-> AIR_FLT
+    AIR_FLT -.-> AIR_DRY
+    AIR_DRY -.-> AIR_SPL
+    OUTLET_PUMP -. Electrical Connection .-> P_201
+    OUTLET_AIR1 -. Electrical Connection .-> AIR_101
+    OUTLET_AIR2 -. Electrical Connection .-> AIR_102
+    OUTLET_HTR1 -. Electrical Connection .-> HTR_101
+    OUTLET_HTR2 -. Electrical Connection .-> HTR_102
+    OUTLET_FEEDER -. Electrical Connection .-> FEEDER_101
+    OUTLET_DOS1 -. Electrical Connection .-> DOS_PMP_1
+    OUTLET_DOS2 -. Electrical Connection .-> DOS_PMP_2
+    OUTLET_CO2 -. Electrical Connection .-> CO2_SOL
+    OUTLET_ATO -. Electrical Connection .-> ATO_PMP
+    PWR_TMR -. Electrical Connection .-> LGT_CON & DOS_TMR & CONT_101 & HTR_CONT
+    CONT_101 --- PH_101 & TDS_102 & TE_103 & ORP_105 & DO_106 & LVL_107 & ALM_101 & ALM_102 & DATA_101 & DATA_102
+    TK_101 -.-> SUBSTRATE & PLT_ZONE & INT_FIL & HABITAT
+    CO2_CYL --> CO2_REG
+    CO2_REG --> CO2_SOL
+    CO2_SOL --> CO2_BUB
+    CO2_BUB --> CO2_DIFF
+    CO2_DIFF ==> TK_101
+    CO2_PH_CTRL --- CO2_SOL
+    ATO_RES --> ATO_PMP
+    ATO_PMP --> TEE_ATO1
+    TEE_ATO1 ==> TK_101
+    ATO_SNS --- CONT_101
+    WC_MIX --> WC_PMP
+    WC_PMP --> TEE_WC1
+    TEE_WC1 --> WC_FILL
+    WC_FILL --> TEE_WC2
+    TEE_WC2 ==> TK_101
+    TK_101 ==> WC_DRAIN
+    FEEDER_101 ==> TK_101
+    PAR_101 --- CONT_101
+    QT_TANK ==> QT_FIL & QT_HTR
+    QT_FIL ==> QT_PMP
+    QT_PMP ==> QT_TANK
+    RETURN_MANIFOLD --> DEG_IN
+    DOS_102 --> DOS_PMP_2
+    DOS_101 --> DOS_PMP_1
+    PRE_OUT --> SUPPLY_MANIFOLD
+    FV_201 --> PRE_IN
+    LEG_FLOWLOSS["\u26A0\uFE0F  Flow loss (GPH drop) is only shown at open-to-atmosphere filters (e.g., degasser, matten, sponge). Closed filters are assumed to have negligible loss in a well-balanced system."]
+
+     LEG_TANK["Tank"]:::tank
+     LEG_EQUIP[["Equipment"]]:::equipment
+     LEG_INST{{"Instrument"}}:::instrument
+     LEG_VALVE{{"Valve"}}:::valve
+     LEG_SUBSTRATE["Substrate"]:::substrate
+     LEG_PLANTS["Plants"]:::plants
+     LEG_BACT["Bacteria Zone"]:::bacteria
+     LEG_SHRIMP(["Shrimp Zone"]):::shrimp
+     LEG_DOSING>"Dosing"]:::dosing
+     LEG_ACCESS["Access Point"]:::access
+     LEG_LIGHT["Lighting"]:::light
+     LEG_ALARM>"Alarm"]:::alarm
+     LEG_POWER["Power"]:::power
+     LEG_FLOW_OUTPUT(["Flow Output"]):::flow_output
+     LEG_RECIRC(["Recirculation/Return"]):::flow_output
+     LEG_OVERFLOW(["Overflow/Drain"]):::flow_output
+     LEG_FILTRATION(["Filtration Loop"]):::flow_output
+     LEG_CHILLER(["Chiller Loop"]):::flow_output
+     LEG_WC(["Water Change"]):::flow_output
+     LEG_ATO(["Auto Top-Off"]):::flow_output
+     LEG_QUAR(["Quarantine"]):::flow_output
+
+     OV_TANK["MAIN TANK<br>125 GAL"]:::tank
+     OV_INT[["INTERNAL<br>FILTERS"]]:::equipment
+     OV_PUMP(("CIRCULATION<br>PUMP<br>400 GPH, 30W, Shrimp-Safe")):::equipment
+     OV_PRE[["MECHANICAL<br>FILTER<br>Dual-Density Foam, 100μm"]]:::equipment
+     OV_BIO[["BIOLOGICAL<br>FILTER<br>Matrix + Bio Rings"]]:::equipment
+     OV_BUF[["pH BUFFER<br>TOWER<br>Crushed Coral/Aragonite"]]:::equipment
+     OV_REDOX[["CHEMICAL<br>FILTER<br>Zeolite + Purigen"]]:::equipment
+     OV_DEG[["DEGASSER<br>UNIT<br>Trickle Tower, Bio Balls"]]:::equipment
+     TEE_OV1[["TEE-OV1<br>1IN PVC TEE"]]:::equipment
+     TEE_OV2[["TEE-OV2<br>1IN PVC TEE"]]:::equipment
+     TEE_OV3[["TEE-OV3<br>1IN PVC TEE"]]:::equipment
+     TK_101["MAIN TANK-101<br>6 ft × 18 in × 24 in<br>125 GAL Freshwater Planted"]:::tank
+     TK_ACC["TK-ACC-1<br>Access Cover"]:::access
+     TK_OVF[["TK-OVF-1<br>Overflow Protection<br>Standpipe"]]:::equipment
+     FEEDER_101["FD-101<br>Auto Feeder"]:::feeder
+     PWR_101["PWR-101<br>Main Power<br>GFCI Protected"]:::power
+     PWR_102["PWR-102<br>Battery Backup"]:::power
+     PWR_TMR{{"PWR-TMR<br>Timer Hub"}}:::valve
+     OUTLET_PUMP["OUTLET-PUMP"]:::power
+     OUTLET_AIR1["OUTLET-AIR1"]:::power
+     OUTLET_AIR2["OUTLET-AIR2"]:::power
+     OUTLET_HTR1["OUTLET-HTR1"]:::power
+     OUTLET_HTR2["OUTLET-HTR2"]:::power
+     OUTLET_CHILLER["OUTLET-CHILLER"]:::power
+     OUTLET_FEEDER["OUTLET-FEEDER"]:::power
+     OUTLET_DOS1["OUTLET-DOS1"]:::power
+     OUTLET_DOS2["OUTLET-DOS2"]:::power
+     OUTLET_CO2["OUTLET-CO2"]:::power
+     OUTLET_ATO["OUTLET-ATO"]:::power
+     OUTLET_TMR["OUTLET-TMR"]:::power
+     PAR_101(["PAR-101<br>PAR Sensor"]):::par
+     LGT_101["LGT-101<br>LED Lighting<br>Full Spectrum<br>Plant Growth"]:::light
+     LGT_CON[["LGT-CON<br>Light Controller"]]:::equipment
+     LGT_TMR{{"LGT-TMR<br>Photoperiod Timer"}}:::valve
+     SUB_01["SB-101: Cap Layer<br>Fine Sand"]:::substrate
+     SUB_02["SB-102: Middle Layer<br>Mineralized Soil"]:::substrate
+     SUB_03["SB-103: Buffer Layer<br>Safe-T-Sorb/Fluorite"]:::substrate
+     SUB_04["SB-104: Mesh Screen<br>Fine Nylon Mesh"]:::substrate
+     PLM_01["PL-101: Plenum Chamber<br>0.5-1 in Gap<br>Denitrifying Zone"]:::bacteria
+     PLM_02["PL-102: Lava Rock<br>Bacterial Surface Area"]:::bacteria
+     PLM_ACC["PL-ACC-1<br>Plenum Access Port"]:::access
+     PLT_01["PLT-101: Root Zone<br>Crypts, Swords<br>Root Oxygenation"]:::plants
+     PLT_02["PLT-102: Midground<br>Stems, Java Fern"]:::plants
+     PLT_03["PLT-103: Carpet Zone<br>Moss, Monte Carlo"]:::plants
+     PLT_04["PLT-104: Floating Plants<br>Frogbit, Surface Cover"]:::plants
+     FIL_101_IN(["FIL-101-IN<br>Water Intake"]):::flow_output
+     FIL_101[["FIL-101<br>Corner Sponge<br>Left Side<br>Dual-Density Foam<br>30-45 PPI"]]:::equipment
+     FIL_101_1["FIL-V-101<br>Sponge Clean Access"]:::access
+     FIL_101_OUT(["FIL-101-OUT<br>Filtered Output"]):::flow_output
+     FIL_102_IN(["FIL-102-IN<br>Water Intake"]):::flow_output
+     FIL_102[["FIL-102<br>Corner Sponge<br>Right Side<br>Biomedia Chamber<br>Matrix Mini + Foam"]]:::equipment
+     FIL_102_1["FIL-V-102<br>Media Access"]:::access
+     FIL_102_OUT(["FIL-102-OUT<br>Filtered Output"]):::flow_output
+     FIL_103_IN(["FIL-103-IN<br>Water Intake"]):::flow_output
+     FIL_103[["FIL-103<br>Matten Filter<br>PPI-20 Foam Wall<br>6 inch Height<br>Air-Driven Flow"]]:::equipment
+     FIL_103_1["FIL-V-103<br>Matten Clean Access"]:::access
+     FIL_103_OUT(["FIL-103-OUT<br>Filtered Output"]):::flow_output
+     FIL_103_BIO["FIL-103-BIO<br>Biofilm Layer"]:::bacteria
+     SUP_TEE1[["SUP-TEE-1"]]:::equipment
+     SUP_TEE2[["SUP-TEE-2<br>1IN PVC TEE"]]:::equipment
+     SUP_TEE3[["SUP-TEE-3<br>1IN PVC TEE"]]:::equipment
+     SUP_TEE4[["SUP-TEE-4<br>1IN PVC TEE"]]:::equipment
+     RET_TEE1[["RET-TEE-1"]]:::equipment
+     RET_TEE2[["RET-TEE-2<br>1IN PVC TEE"]]:::equipment
+     RET_TEE3[["RET-TEE-3<br>1IN PVC TEE"]]:::equipment
+     RET_TEE4[["RET-TEE-4<br>1IN PVC TEE"]]:::equipment
+     BIO_IN(["BIO-IN-201<br>Reactor Inlet"]):::flow_output
+     BIO_RX[["BIO-201<br>Bioreactor Column<br>Matrix + Bio Rings<br>+ Ceramic Media<br>20-30 GPH Flow"]]:::equipment
+     BIO_ACC["BIO-V-201<br>Media Access Port"]:::access
+     BIO_V{{"BIO-V-201<br>Isolation Valve"}}:::valve
+     BIO_OUT(["BIO-OUT-201<br>Reactor Outlet"]):::flow_output
+     BIO_S{{"BIO-S-201<br>Flow Indicator"}}:::instrument
+     MIN_IN(["MIN-IN-301<br>Buffer Inlet"]):::flow_output
+     MIN_RX[["MIN-301<br>GH/KH Buffer Tower<br>Crushed Coral + Aragonite<br>Partial Flow Bypass<br>pH 6.8-7.0 Target"]]:::equipment
+     MIN_ACC["MIN-V-301<br>Media Access Port"]:::access
+     MIN_V{{"MIN-V-301<br>Isolation Valve"}}:::valve
+     MIN_OUT(["MIN-OUT-301<br>Buffer Outlet"]):::flow_output
+     MIN_S{{"MIN-S-301<br>pH Sensor"}}:::instrument
+     OX_IN(["OX-IN-401<br>Redox Inlet"]):::flow_output
+     OX_RX[["OX-401<br>Redox Reactor<br>Layered Design:<br>Zeolite + Purigen"]]:::equipment
+     OX_ACC["OX-V-401<br>Media Access Port"]:::access
+     OX_V{{"OX-V-401<br>Isolation Valve"}}:::valve
+     OX_OUT(["OX-OUT-401<br>Redox Outlet"]):::flow_output
+     OX_S{{"OX-S-401<br>Redox Sensor"}}:::instrument
+     DEG_IN(["DEG-IN-501<br>Degasser Inlet"]):::flow_output
+     DEG_COL[["DEG-501<br>Trickling Degasser<br>Cascading Water Flow<br>Bio Balls + Air Gap<br>CO₂ Reduction"]]:::equipment
+     DEG_ACC["DEG-V-501<br>Media Access Port"]:::access
+     DEG_V{{"DEG-V-501<br>Isolation Valve"}}:::valve
+     DEG_OUT(["DEG-OUT-501<br>Degasser Outlet"]):::flow_output
+     DEG_S{{"DEG-S-501<br>Dissolved Gas Sensor"}}:::instrument
+     DEG_AIR(["DEG-AIR-501<br>Air Vent"]):::flow_output
+     FV_202{{"FV-202<br>Return Valve"}}:::valve
+     P_201(("P-201<br>Main Circulation Pump<br>400 GPH, 30W, Shrimp-Safe")):::equipment
+     P_PRE[["P-PRE-201<br>Pump Prefilter<br>0.5mm Mesh"]]:::equipment
+     P_BYP{{"P-BYP-201<br>Bypass Valve"}}:::valve
+     FV_201{{"FV-201<br>Flow Control"}}:::valve
+     P_ISO_1{{"P-ISO-201<br>Inlet Isolation"}}:::valve
+     P_ISO_2{{"P-ISO-202<br>Outlet Isolation"}}:::valve
+     P_GRID[["P-GRID-201<br>Strainer 0.5mm<br>Shrimp-Safe"]]:::equipment
+     AIR_101[["AC-101<br>Main Air Compressor"]]:::equipment
+     AIR_102[["AC-102<br>Backup USB Air Pump"]]:::equipment
+     AIR_CHK{{"AV-101<br>Check Valve"}}:::valve
+     AIR_SPL{{"ASP-101<br>6-Way Air Manifold"}}:::valve
+     AIR_FLT[["AF-101<br>Air Filter<br>HEPA Grade"]]:::equipment
+     AIR_DRY[["AD-101<br>Air Dryer<br>Moisture Trap"]]:::equipment
+     PH_101{{"pH-101<br>pH Sensor"}}:::instrument
+     TDS_102{{"TDS-102<br>TDS Meter"}}:::instrument
+     TE_103{{"TE-103<br>Temperature Probe"}}:::instrument
+     FI_104{{"FI-104<br>Flow Indicator"}}:::instrument
+     ORP_105{{"ORP-105<br>Redox Potential"}}:::instrument
+     DO_106{{"DO-106<br>Dissolved Oxygen"}}:::instrument
+     LVL_107{{"LVL-107<br>Water Level Sensor"}}:::instrument
+     ALM_101>"ALM-101<br>Low Water Alarm"]:::alarm
+     ALM_102>"ALM-102<br>High Temp Alarm"]:::alarm
+     CONT_101[["CONT-101<br>Parameter Controller<br>Display"]]:::equipment
+     DOS_101>"DOS-101<br>Mineral Doser<br>GH/KH+"]:::dosing
+     DOS_102>"DOS-102<br>Plant Fertilizer<br>Micro/Macro"]:::dosing
+     TEE_DOS2[["TEE-DOS2<br>1/8IN TEE"]]:::equipment
+     DOS_PMP_1(("DOS-P-101<br>Dosing Pump<br>1-5 mL/min, Peristaltic<br>1/8IN Tubing")):::equipment
+     DOS_PMP_2(("DOS-P-102<br>Dosing Pump<br>1-5 mL/min, Peristaltic<br>1/8IN Tubing")):::equipment
+     DOS_TMR{{"DOS-TMR<br>Timer Controller"}}:::valve
+     HTR_101[["HTR-101<br>Main Heater<br>200W"]]:::equipment
+     HTR_102[["HTR-102<br>Backup Heater<br>100W"]]:::equipment
+     HTR_CONT{{"HTR-CONT<br>Temperature Controller"}}:::valve
+     HTR_THRM[["HTR-THRM<br>Thermal Cutoff"]]:::equipment
+     SH_MOSS(["SH-101<br>Moss Fields<br>Grazing Area<br>Java + Christmas Moss"]):::shrimp
+     SH_CAVES(["SH-102<br>Rock Caves<br>Hiding & Molting Area<br>Cholla Wood + Lava Rock"]):::shrimp
+     SH_BREED(["SH-103<br>Breeding Colony<br>Quiet Corner<br>Dense Plant Cover"]):::shrimp
+     SH_FEED(["SH-104<br>Feeding Station<br>Supplemental Area<br>Feeding Dishes"]):::shrimp
+     CO2_CYL[["CO₂-201<br>CO₂ Cylinder"]]:::co2
+     CO2_REG[["CO₂-202<br>Regulator<br>Dual Stage, Solenoid<br>0-60 psi, CGA320"]]:::co2
+     CO2_SOL{{"CO₂-203<br>Solenoid Valve<br>12V DC, 1/8IN NPT"}}:::valve
+     CO2_BUB{{"CO₂-204<br>Bubble Counter"}}:::instrument
+     CO2_DIFF[["CO₂-205<br>Diffuser"]]:::co2
+     CO2_PH_CTRL{{"CO₂-206<br>pH Controller"}}:::instrument
+     ATO_RES[["ATO-201<br>Reservoir"]]:::ato
+     TEE_ATO1[["TEE-ATO1<br>1/4IN TEE"]]:::equipment
+     ATO_PMP(("ATO-202<br>Pump<br>50 GPH, Submersible")):::ato
+     ATO_SNS{{"ATO-203<br>Float Sensor"}}:::instrument
+     WC_MIX[["WC-201<br>Mixing/Storage Tank<br>20 GAL, HDPE"]]:::wc
+     TEE_WC1[["TEE-WC1<br>1/2IN TEE"]]:::equipment
+     WC_PMP(("WC-202<br>Change Pump<br>200 GPH, Submersible")):::wc
+     TEE_WC2[["TEE-WC2<br>1/2IN TEE"]]:::equipment
+     WC_DRAIN{{"WC-203<br>Drain Valve"}}:::valve
+     WC_FILL{{"WC-204<br>Fill Valve"}}:::valve
+     DATA_101(["DATA-101<br>WiFi/Cloud Module"]):::data
+     DATA_102(["DATA-102<br>Data Logger"]):::data
+     QT_TANK["QT-101<br>Quarantine Tank<br>10 GAL, Glass"]:::quarantine
+     QT_FIL[["QT-102<br>Filter"]]:::quarantine
+     QT_HTR[["QT-103<br>Heater"]]:::quarantine
+     QT_PMP(("QT-104<br>Pump<br>100 GPH, Sponge Safe")):::quarantine
+     PRE_FIL[["FIL-201<br>Prefilter Pod<br>Dual-Density Foam<br>+ Fine Floss<br>100μm Rating"]]:::equipment
+     PRE_ACC["FIL-V-201<br>Prefilter Clean Access"]:::access
+     PRE_S{{"PRE-S-201<br>Pressure Sensor"}}:::instrument
+     PRE_IN(["PRE-IN-201<br>Filter Inlet"]):::flow_output
+     PRE_V{{"PRE-V-201<br>Isolation Valve"}}:::valve
+     PRE_OUT(["PRE-OUT-201<br>Filter Outlet"]):::flow_output
+     LEG_FLOWLOSS>"⚠️  Flow loss (GPH drop) is only shown at open-to-atmosphere filters (e.g., degasser, matten, sponge). Closed filters are assumed to have negligible loss in a well-balanced system."]:::alarm
+
+    classDef co2 fill:#B0E0E6,stroke:#000,stroke-width:2px
+    classDef ato fill:#E0FFFF,stroke:#000,stroke-width:2px
+    classDef wc fill:#F5DEB3,stroke:#000,stroke-width:2px
+    classDef feeder fill:#FFFACD,stroke:#000,stroke-width:2px
+    classDef chiller fill:#B0C4DE,stroke:#000,stroke-width:2px
+    classDef par fill:#FFD700,stroke:#000,stroke-width:2px
+    classDef data fill:#C0C0C0,stroke:#000,stroke-width:2px
+    classDef quarantine fill:#F08080,stroke:#000,stroke-width:2px
+    classDef tank fill:#ADD8E6,stroke:#000,stroke-width:2px
+    classDef equipment fill:#E6E6FA,stroke:#000,stroke-width:2px
+    classDef instrument fill:#FFF8DC,stroke:#000,stroke-width:1px
+    classDef valve fill:#98FB98,stroke:#000,stroke-width:1px
+    classDef substrate fill:#D2B48C,stroke:#000
+    classDef plants fill:#90EE90,stroke:#000
+    classDef bacteria fill:#FFB6C1,stroke:#000
+    classDef shrimp fill:#FFC0CB,stroke:#000,stroke-width:2px,stroke-dasharray:5
+    classDef dosing fill:#FFDAB9,stroke:#000,stroke-width:1px
+    classDef access fill:#F0E68C,stroke:#000,stroke-width:1px,stroke-dasharray:3
+    classDef light fill:#FFFF99,stroke:#000,stroke-width:1px
+    classDef alarm fill:#FF6347,stroke:#000,stroke-width:1px
+    classDef power fill:#D8BFD8,stroke:#000,stroke-width:1px
+    classDef flow_output fill:#E0FFFF,stroke:#1E90FF,stroke-width:1px
+    style LEG_DOSING stroke:#FF69B4,stroke-width:4px
+    style LEG_RECIRC stroke:#1E90FF,stroke-width:4px
+    style LEG_OVERFLOW stroke:#8B0000,stroke-width:4px
+    style LEG_FILTRATION stroke:#228B22,stroke-width:4px
+    style LEG_CHILLER stroke:#00CED1,stroke-width:4px
+    style LEG_WC stroke:#8B4513,stroke-width:4px
+    style LEG_ATO stroke:#4682B4,stroke-width:4px
+    style LEG_QUAR stroke:#A020F0,stroke-width:4px
+    linkStyle 0 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 1 stroke:#228B22,stroke-width:3px,fill:none
+    linkStyle 2 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 3 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 4 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 5 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 6 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 7 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 8 stroke:#1E90FF,stroke-width:3px,fill:none
+    linkStyle 9 stroke:#8B0000,stroke-width:3px  %% Overflow,fill:none
+    linkStyle 10 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 11 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 12 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 13 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 14 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 15 stroke:#1E90FF,stroke-width:3px  %% Recirc,fill:none
+    linkStyle 16 stroke:#1E90FF,stroke-width:3px  %% Recirc,fill:none
+    linkStyle 17 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 18 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 19 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 20 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 21 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 22 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 23 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 24 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 25 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 26 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 27 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 28 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 29 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 30 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 31 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 33 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 34 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 35 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 36 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 37 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 38 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 39 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+    linkStyle 40 stroke:#228B22,stroke-width:3px  %% Filtration,fill:none
+
+
+        `;
+        const { svg } = await mermaid.render('mySvgId', graphDefinition.trim());
+        element.innerHTML = svg.replace(/[ ]*max-width:[ 0-9\.]*px;/i , '');
+        var panZoomTiger = svgPanZoom('#mySvgId', {
+          zoomEnabled: true,
+          controlIconsEnabled: true,
+          fit: true,
+          center: true
+        })
+      };
+      await drawDiagram();
+    </script>
+  </body>
+</html>

@@ -146,7 +146,11 @@ export function extractComponentInfo(text, elementId, element) {
     // exact numeric match (e.g., 201 -> matches component with 201)
     const cNum = numericPart(componentId) || numericPart(componentData.id) || numericPart(componentData.elementId || '');
     const eNum = numericPart(elId) || numericPart(txt);
-    if (cNum && eNum && cNum === eNum) score += 80;
+    if (cNum && eNum && cNum === eNum) {
+      // prefer numeric match only when there is supporting evidence (token matches or exact normalized equality)
+      if (tokenMatches > 0 || (eNorm && cNorm && eNorm === cNorm)) score += 80;
+      else score += 20; // weaker match when only the numeric portion aligns (avoids P_201 matching all *-201 ids)
+    }
 
     // all component tokens appear in element tokens (strong match)
     const tokenMatches = cTokens.filter(t => t.length > 2 && eTokens.includes(t)).length;

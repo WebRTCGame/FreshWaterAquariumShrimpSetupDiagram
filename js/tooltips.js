@@ -154,7 +154,7 @@ export function extractComponentInfo(text, elementId, element) {
     else score += Math.min(30, tokenMatches * 20);
 
     // element contains component id as whole word (respect separators)
-    const regex = new RegExp('(?:^|[\s\-_])' + cNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:$|[\s\-_])');
+    const regex = new RegExp('(?:^|[\\s\\-_])' + cNorm.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&') + '(?:$|[\\s\\-_])');
     if (eNorm && regex.test(eNorm)) score += 85;
 
     // text-based name matching (less reliable)
@@ -446,7 +446,7 @@ export function testTooltips() {
           const tokenMatches = cTokens.filter(t => t.length > 2 && eTokens.includes(t)).length;
           if (tokenMatches === cTokens.length && tokenMatches > 0) score += 90;
           else score += Math.min(30, tokenMatches * 20);
-          const regex = new RegExp('(?:^|[\s\-_])' + cNorm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:$|[\s\-_])');
+          const regex = new RegExp('(?:^|[\\s\\-_])' + cNorm.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&') + '(?:$|[\\s\\-_])');
           if (eNorm && regex.test(eNorm)) score += 85;
           const name = (componentData.name||'').toLowerCase();
           const words = name.split(/\s|\-|\(|\)/).filter(Boolean);

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Freshwater Aquarium Shrimp Setup</title>
+    <meta name="description" content="Diagram and component reference for a freshwater shrimp aquarium setup." />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="sidebar">
+      <div id="sidebar-header">
+        Component Navigator
+        <div style="font-size: 11px; font-weight: normal; margin-top: 6px; padding-top: 6px; border-top: 1px solid #495057; color: #e9ecef;">
+          <div style="margin-bottom: 6px;">💡 <strong>Hover</strong> over diagram components for quick info</div>
+          <div style="margin-bottom: 8px;">🖱️ <strong>Click</strong> diagram items to focus & zoom</div>
+          <button onclick="testTooltips()" style="background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; margin-top: 4px;">🔧 Debug Tooltips</button>
+        </div>
+        <div style="font-size: 12px; font-weight: normal; margin-top: 8px; padding-top: 8px; border-top: 1px solid #495057;">
+          <div style="color: #28a745;">💡 Total System Operating Cost:</div>
+          <div style="color: #ffc107; font-weight: bold;">Monthly: ~$21.84</div>
+          <div style="color: #ffc107; font-weight: bold;">Yearly: ~$273.27</div>
+          <div style="font-size: 10px; color: #adb5bd; margin-top: 4px;">Based on $0.14/kWh electricity rate</div>
+        </div>
+      </div>
+      <div id="component-list"></div>
+    </div>
+
+    <div id="main-container">
+      <button id="toggle-sidebar" aria-expanded="true">☰ Toggle Sidebar</button>
+      <div id="graphDiv"></div>
+      <div id="component-tooltip" class="component-tooltip" aria-hidden="true"></div>
+    </div>
+
+    <script src="https://bumbu.me/svg-pan-zoom/dist/svg-pan-zoom.js"></script>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

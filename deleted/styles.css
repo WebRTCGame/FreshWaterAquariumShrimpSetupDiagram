@@ -1,0 +1,280 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  height: 100vh;
+}
+
+#sidebar {
+  width: 300px;
+  background: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: margin-left 0.3s ease;
+}
+
+#sidebar.collapsed {
+  margin-left: -300px;
+}
+
+#sidebar-header {
+  padding: 15px;
+  background: #343a40;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#component-list {
+  padding: 10px;
+}
+
+.component-category {
+  margin-bottom: 15px;
+}
+
+.category-title {
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: #e9ecef;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.category-title:hover {
+  background: #dee2e6;
+}
+
+.component-item {
+  padding: 6px 12px;
+  margin: 2px 0;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #495057;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.component-item:hover {
+  background: #e3f2fd;
+  border-left-color: #2196f3;
+  color: #1976d2;
+}
+
+.category-items {
+  padding-left: 15px;
+}
+
+.category-items.collapsed {
+  display: none;
+}
+
+.component-details {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 3px;
+  font-size: 12px;
+  border-left: 2px solid #dee2e6;
+  display: none;
+}
+
+.component-details.expanded {
+  display: block;
+}
+
+.detail-section {
+  margin-bottom: 10px;
+}
+
+.detail-title {
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.detail-content {
+  padding-left: 16px;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-operational { background: #28a745; }
+.status-maintenance { background: #ffc107; }
+.status-critical { background: #dc3545; }
+
+.price-range {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.brand-preferred {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.brand-alternative {
+  color: #6c757d;
+}
+
+.maintenance-freq {
+  background: #e3f2fd;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  margin: 2px 0;
+  display: inline-block;
+}
+
+.operating-cost {
+  background: #e8f5e8;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  margin: 2px 0;
+  display: inline-block;
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.component-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.expand-arrow {
+  font-size: 10px;
+  color: #6c757d;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.expand-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+#main-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#toggle-sidebar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background: #343a40;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#toggle-sidebar:hover {
+  background: #495057;
+}
+
+#graphDiv {
+  flex: 1;
+  position: relative;
+}
+
+#mySvgId {
+  height: 100%;
+  width: 100%;
+}
+
+/* Tooltip Styles */
+.component-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.3;
+  max-width: 320px;
+  min-width: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 10000;
+  pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid #555;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  word-wrap: break-word;
+  backdrop-filter: blur(2px);
+}
+
+.component-tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip-title {
+  font-weight: bold;
+  color: #4fc3f7;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.tooltip-desc {
+  color: #e0e0e0;
+  margin-bottom: 8px;
+}
+
+.tooltip-cost {
+  background: #1b5e20;
+  padding: 4px 8px;
+  border-radius: 3px;
+  margin-bottom: 6px;
+  color: #a5d6a7;
+  font-size: 11px;
+}
+
+.tooltip-status {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.tooltip-status.operational {
+  background: #2e7d32;
+  color: #c8e6c9;
+}
+
+.tooltip-status.maintenance {
+  background: #f57c00;
+  color: #fff3e0;
+}
+
+.tooltip-status.critical {
+  background: #c62828;
+  color: #ffcdd2;
+}

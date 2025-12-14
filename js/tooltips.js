@@ -116,34 +116,88 @@ export function updateTooltipPosition(event, tooltip) {
 }
 
 export function extractComponentInfo(text, elementId, element) {
-  if (window.sidebarComponents) {
-    if (elementId && window.sidebarComponents[elementId]) {
-      return window.sidebarComponents[elementId];
+  // Preferably match by ID using a scored approach to avoid accidental substring matches
+  function normalizeId(id) {
+    return (id || '').toString().toLowerCase().replace(/^flowchart-/, '').replace(/[^a-z0-9\-]+/g, ' ').trim();
+  }
+
+  function tokensFromId(id) {
+    return normalizeId(id).split(/\s|\-|_/).filter(Boolean);
+  }
+
+  function numericPart(id) {
+    const m = id && id.match(/(\d{2,})/);
+    return m ? m[1] : null;
+  }
+
+  function scoreMatch(componentId, componentData, elId, txt) {
+    const cNorm = normalizeId(componentId);
+    const eNorm = normalizeId(elId);
+    const cTokens = tokensFromId(componentId);
+    const eTokens = tokensFromId(elId);
+
+    let score = 0;
+
+    if (!elId && !txt) return 0;
+
+    // exact normalized equality
+    if (eNorm && cNorm && eNorm === cNorm) score += 100;
+
+    // exact numeric match (e.g., 201 -> matches component with 201)
+    const cNum = numericPart(componentId) || numericPart(componentData.id) || numericPart(componentData.elementId || '');
+    const eNum = numericPart(elId) || numericPart(txt);
+    if (cNum && eNum && cNum === eNum) score += 80;
+
+    // all component tokens appear in element tokens (strong match)
+    const tokenMatches = cTokens.filter(t => t.length > 2 && eTokens.includes(t)).length;
+    if (tokenMatches === cTokens.length && tokenMatches > 0) score += 90;
+    else score += Math.min(30, tokenMatches * 20);
+
+    // element contains component id as whole word (respect separators)
+    const regex = new RegExp('(?:^|[\s\-_])' + cNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:$|[\s\-_])');
+    if (eNorm && regex.test(eNorm)) score += 85;
+
+    // text-based name matching (less reliable)
+    if (txt && componentData.name) {
+      const name = componentData.name.toLowerCase();
+      const words = name.split(/\s|\-|\(|\)/).filter(Boolean);
+      const textLower = txt.toLowerCase();
+      const textMatches = words.filter(w => w.length > 3 && textLower.includes(w)).length;
+      score += Math.min(40, textMatches * 15);
     }
 
+    // penalize matches that are based only on very short tokens
+    const shortTokenPenalty = cTokens.filter(t => t.length <= 2).length * 10;
+    score -= shortTokenPenalty;
+
+    return score;
+  }
+
+  if (window.sidebarComponents) {
+    // if exact id is present as key, return immediately
+    if (elementId && window.sidebarComponents[elementId]) return window.sidebarComponents[elementId];
+
+    let best = { score: 0, data: null, id: null };
+
     for (const [componentId, componentData] of Object.entries(window.sidebarComponents)) {
-      if (elementId && (elementId.includes(componentId) || componentId.includes(elementId))) {
-        return componentData;
-      }
+      const s = scoreMatch(componentId, componentData, elementId, text);
+      if (s > best.score) best = { score: s, data: componentData, id: componentId };
+    }
 
-      if (text && text.includes(componentId)) return componentData;
+    // Accept a match only if it is reasonably strong
+    if (best.score >= 60) return best.data;
 
-      if (text && componentData.name) {
-        const nameParts = componentData.name.toLowerCase().split(/[\s\-\(\)]+/);
-        const textLower = text.toLowerCase();
-        const matchCount = nameParts.filter(part => part.length > 2 && textLower.includes(part)).length;
-        if (matchCount >= 2) return componentData;
-      }
-
+    // Fallback: try variations and loose text match but score them lower
+    for (const [componentId, componentData] of Object.entries(window.sidebarComponents)) {
       const variations = getComponentVariations(componentId, componentData);
       for (const variation of variations) {
-        if ((elementId && (elementId.includes(variation) || variation.includes(elementId))) || (text && text.toLowerCase().includes(variation.toLowerCase()))) {
-          return componentData;
-        }
+        if (elementId && elementId.toLowerCase() === variation.toLowerCase()) return componentData;
+        if (text && text.toLowerCase().includes(variation.toLowerCase())) return componentData;
       }
     }
   }
 
+  // As last resort, use intelligent detection (based on heuristics) if element text seems meaningful
   if (text && text.length > 2) {
     return createIntelligentComponentInfo(text, elementId, element);
   }
@@ -371,6 +425,42 @@ export function testTooltips() {
       tooltip.style.left = '50%'; tooltip.style.top = '50%'; tooltip.style.transform = 'translate(-50%, -50%)'; tooltip.style.opacity = '1'; tooltip.classList.add('visible');
       setTimeout(() => { tooltip.classList.remove('visible'); tooltip.style.transform = ''; }, 4000);
     }
+
+    // Debug helper: show best N matches for a selected element
+    window.debugTooltipMatches = (elementIdOrText, topN = 6) => {
+      const candidates = Object.entries(window.sidebarComponents || {}).map(([componentId, componentData]) => {
+        const s = (function cScore() {
+          // reuse scoring but avoid duplication of logic here by calling extractComponentInfo's score via trying to match
+          // we'll use the same local scoring routine by constructing a fake call
+          // duplicate minimal scoring for quick debug
+          const normalizeId = id => (id||'').toString().toLowerCase().replace(/^flowchart-/, '').replace(/[^a-z0-9\-]+/g, ' ').trim();
+          const cNorm = normalizeId(componentId);
+          const eNorm = normalizeId(elementIdOrText);
+          let score = 0;
+          if (eNorm && cNorm && eNorm === cNorm) score += 100;
+          const cNum = (componentId.match(/(\d{2,})/)||[])[1];
+          const eNum = (elementIdOrText.match(/(\d{2,})/)||[])[1];
+          if (cNum && eNum && cNum === eNum) score += 80;
+          const cTokens = cNorm.split(/[\s\-_]/).filter(Boolean);
+          const eTokens = eNorm.split(/[\s\-_]/).filter(Boolean);
+          const tokenMatches = cTokens.filter(t => t.length > 2 && eTokens.includes(t)).length;
+          if (tokenMatches === cTokens.length && tokenMatches > 0) score += 90;
+          else score += Math.min(30, tokenMatches * 20);
+          const regex = new RegExp('(?:^|[\s\-_])' + cNorm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(?:$|[\s\-_])');
+          if (eNorm && regex.test(eNorm)) score += 85;
+          const name = (componentData.name||'').toLowerCase();
+          const words = name.split(/\s|\-|\(|\)/).filter(Boolean);
+          const textMatches = words.filter(w => w.length > 3 && elementIdOrText.toLowerCase().includes(w)).length;
+          score += Math.min(40, textMatches * 15);
+          score -= cTokens.filter(t => t.length <= 2).length * 10;
+          return score;
+        })();
+        return { componentId, score: s, name: componentData.name };
+      }).sort((a,b) => b.score - a.score).slice(0, topN);
+
+      console.log('🔎 Best matches for', elementIdOrText, candidates);
+      return candidates;
+    };
   }
 
   console.log('🔄 Re-initializing tooltips...');

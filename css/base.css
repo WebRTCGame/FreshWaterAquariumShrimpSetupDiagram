@@ -1,0 +1,66 @@
+/* css/base.css - layout, resets, typography */
+:root{
+  --bg:#f8f9fa;
+  --muted:#6c757d;
+  --primary:#007bff;
+  --sidebar-bg:#f8f9fa;
+  --header-bg:#343a40;
+  --header-fg:#fff;
+  --accent:#2196f3;
+}
+html,body{height:100%;}
+body{margin:0;padding:0;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;display:flex;height:100vh;background:var(--bg)}
+#sidebar{width:300px;background:var(--sidebar-bg);border-right:1px solid #dee2e6;overflow-y:auto;flex-shrink:0;transition:margin-left .3s ease}
+#sidebar.collapsed{margin-left:-300px}
+#sidebar-header{padding:15px;background:var(--header-bg);color:var(--header-fg);font-weight:bold;position:sticky;top:0;z-index:100}
+#component-list{padding:10px}
+.component-category{margin-bottom:15px}
+.category-title{font-weight:bold;color:#495057;margin-bottom:8px;padding:8px 12px;background:#e9ecef;border-radius:4px;cursor:pointer;user-select:none}
+.category-title:hover{background:#dee2e6}
+.component-item{padding:6px 12px;margin:2px 0;border-radius:3px;font-size:13px;color:#495057;border-left:3px solid transparent;transition:all .2s ease}
+.component-item:hover{background:#e3f2fd;border-left-color:var(--accent);color:#1976d2}
+.category-items{padding-left:15px}
+.category-items.collapsed{display:none}
+.component-details{margin-top:8px;padding:8px;background:var(--bg);border-radius:3px;font-size:12px;border-left:2px solid #dee2e6;display:none}
+.component-details.expanded{display:block}
+.detail-section{margin-bottom:10px}
+.detail-title{font-weight:bold;color:#495057;margin-bottom:4px;display:flex;align-items:center}
+.detail-content{padding-left:16px;color:var(--muted);line-height:1.4}
+.status-indicator{width:8px;height:8px;border-radius:50%;margin-right:6px}
+.status-operational{background:#28a745}
+.status-maintenance{background:#ffc107}
+.status-critical{background:#dc3545}
+.price-range{font-weight:bold;color:#28a745}
+.brand-preferred{color:#007bff;font-weight:bold}
+.brand-alternative{color:#6c757d}
+.maintenance-freq{background:#e3f2fd;padding:2px 6px;border-radius:2px;font-size:11px;margin:2px 0;display:inline-block}
+.operating-cost{background:#e8f5e8;padding:2px 6px;border-radius:2px;font-size:11px;margin:2px 0;color:#2e7d32;font-weight:bold}
+.component-item-header{display:flex;justify-content:space-between;align-items:center;width:100%}
+.expand-arrow{font-size:10px;color:#6c757d;transition:transform .2s ease;cursor:pointer}
+.expand-arrow.expanded{transform:rotate(180deg)}
+#main-container{flex:1;position:relative;display:flex;flex-direction:column}
+#toggle-sidebar{position:absolute;top:10px;left:10px;z-index:1000;background:#343a40;color:white;border:none;padding:10px 12px;border-radius:4px;cursor:pointer;font-size:14px}
+#toggle-sidebar:hover{background:#495057}
+
+/* Bottom panel for toggles */
+.bottom-panel{position:fixed;left:8px;right:8px;bottom:8px;background:rgba(20,20,20,.95);color:#e9ecef;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.6);z-index:12000;overflow:hidden;transition:max-height .25s ease, transform .2s ease;padding:0}
+.bottom-panel.collapsed{max-height:40px}
+.bottom-panel:not(.collapsed){max-height:360px}
+.bottom-panel-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.bottom-panel .panel-title{font-weight:700}
+.bottom-panel .panel-actions{display:flex;align-items:center;gap:8px}
+.bottom-panel .panel-actions input{padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#fff}
+.bottom-panel .panel-actions button{background:transparent;border:0;color:#e9ecef;cursor:pointer;padding:6px}
+.bottom-panel-body{padding:10px 12px;overflow:auto}
+.panel-controls{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.panel-controls button{background:#2b2f33;border:1px solid rgba(255,255,255,.04);color:#e9ecef;padding:6px 8px;border-radius:6px;cursor:pointer}
+.panel-list{max-height:240px;overflow:auto;border-top:1px solid rgba(255,255,255,.02);padding-top:8px}
+.panel-list .panel-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:6px;margin-bottom:4px;background:rgba(255,255,255,.01)}
+.panel-list .panel-item .meta{font-size:12px;color:#cfd8dc}
+.panel-list .panel-item input[type="checkbox"]{transform:scale(1.05);margin-right:8px}
+
+@media (max-width:680px){
+  .bottom-panel{left:6px;right:6px}
+}
+
+```})->{

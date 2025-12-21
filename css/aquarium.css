@@ -1,0 +1,9 @@
+/* css/aquarium.css - diagram container, svg rules */
+#graphDiv{flex:1;position:relative}
+#mySvgId{height:100%;width:100%}
+/* Ensure SVG elements use CSS classes rather than inline styles */
+/* Example node styling fallback */
+.mermaid .node rect{transition:stroke .2s ease,fill .2s ease}
+.mermaid .edgePath path{transition:stroke .2s ease}
+/* small utility */
+.hidden{display:none}

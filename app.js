@@ -148,6 +148,7 @@ function populateComponentList(panZoom, manifest) {
   
   // Verify sidebar was populated
   console.log('✅ Sidebar populated with', componentList.children.length, 'categories');
+}
 
 function focusOnComponent(panZoom, componentId) {
   // Close sidebar on mobile so the graph is fully visible

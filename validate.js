@@ -109,7 +109,7 @@ for (const entry of manifest) {
   try {
     data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (e) {
-    console.error(`❌ ${entry.id}: invalid JSON – ${e.message}`);
+    console.error(`❌ ${entry.id}: invalid JSON in ${filePath} - ${e.message}`);
     totalErrors++;
     continue;
   }

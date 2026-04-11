@@ -315,7 +315,7 @@ async function loadAndExpandDetails(itemDiv, arrow, componentId) {
   }
 
   // First expand: show spinner, fetch, render
-  detailsDiv.innerHTML = '<div class="detail-section"><div class="detail-content loading-details" aria-live="polite" aria-label="Loading details">⏳ Loading details…</div></div>';
+  detailsDiv.innerHTML = '<div class="detail-section"><div class="detail-content loading-details" aria-live="polite" aria-label="Loading details">⏳ Loading details...</div></div>';
   detailsDiv.classList.add('expanded');
   arrow.classList.add('expanded');
 

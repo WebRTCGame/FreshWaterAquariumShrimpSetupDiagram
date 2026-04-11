@@ -1,0 +1,20 @@
+{
+  "id": "LVL_107",
+  "name": "Water Level Sensor (LVL-107)",
+  "desc": "Tank Level Monitoring",
+  "status": "operational",
+  "details": {
+    "specs": "Optical or float sensor, normally open/closed contacts",
+    "priceRange": "$25-60",
+    "preferredBrands": "Neptune, Hydros, Tunze",
+    "alternatives": "Manual level checking, Overflow protection only",
+    "maintenance": {
+      "monthly": "Clean sensor lens/float",
+      "quarterly": "Test alarm functionality",
+      "as-needed": "Adjust sensor position"
+    },
+    "notes": "Prevents pump damage from low water. Essential for ATO.",
+    "suppliers": "BRS, Amazon, Neptune Systems"
+  },
+  "category": "Sensors & Instruments"
+}

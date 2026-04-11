@@ -1,0 +1,20 @@
+{
+  "id": "QT_TANK",
+  "name": "Quarantine Tank (QT-101)",
+  "desc": "10 GAL Glass",
+  "status": "operational",
+  "details": {
+    "specs": "10-20 gallon tank, bare bottom, easy cleaning",
+    "priceRange": "$15-40",
+    "preferredBrands": "Aqueon, MarineLand, Petco brand",
+    "alternatives": "Plastic tubs, Hospital tanks",
+    "maintenance": {
+      "after-use": "Sterilize with bleach solution",
+      "monthly": "Inspect for cracks",
+      "storage": "Keep dry and clean when unused"
+    },
+    "notes": "Essential for new livestock. Prevents disease spread.",
+    "suppliers": "Petco, PetSmart, Local stores"
+  },
+  "category": "Quarantine"
+}

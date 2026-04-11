@@ -1,0 +1,20 @@
+{
+  "id": "TDS_102",
+  "name": "TDS Meter (TDS-102)",
+  "desc": "Total Dissolved Solids",
+  "status": "operational",
+  "details": {
+    "specs": "Digital conductivity meter, 0-2000 ppm range, ATC",
+    "priceRange": "$15-40",
+    "preferredBrands": "HM Digital, Hanna, Milwaukee",
+    "alternatives": "GH/KH test kits, Conductivity pen",
+    "maintenance": {
+      "monthly": "Calibrate with standard solution",
+      "as-needed": "Clean probe tip",
+      "yearly": "Replace if drift occurs"
+    },
+    "notes": "Shrimp prefer 150-250 TDS. Monitor after water changes.",
+    "suppliers": "Amazon, eBay, Aquarium stores"
+  },
+  "category": "Sensors & Instruments"
+}

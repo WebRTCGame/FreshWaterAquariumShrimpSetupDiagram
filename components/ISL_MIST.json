@@ -1,0 +1,24 @@
+{
+  "id": "ISL_MIST",
+  "name": "Island Misting System (ISL-MIST-401)",
+  "desc": "Pump + Nozzle + Tubing",
+  "status": "operational",
+  "details": {
+    "specs": "Dedicated misting pump, 1 nozzle, 1/4\" tubing, burst-style misting cycles",
+    "priceRange": "$40-70",
+    "operatingCost": {
+      "monthly": "$0.21 (5W × 10min cycles × 6×/day × 30days × $0.14/kWh)",
+      "yearly": "$2.52 (intermittent mist cycles)"
+    },
+    "preferredBrands": "Repti Zoo TR09, Exo Terra Monsoon Nano",
+    "alternatives": "DIY atomizer, Zoo Med ReptiRain, Manual misting",
+    "maintenance": {
+      "monthly": "Check nozzle for mineral buildup",
+      "quarterly": "Flush lines with distilled water",
+      "yearly": "Replace nozzle if clogged"
+    },
+    "notes": "Raises island humidity when humidity controller signals low. Use RO/distilled water to prevent mineral deposits on lava rock.",
+    "suppliers": "Reptile specialty stores, Amazon, Petco"
+  },
+  "category": "Island System"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "PWR_TMR",
+  "name": "Timer Hub (PWR-TMR)",
+  "desc": "Scheduling Control",
+  "status": "operational",
+  "details": {
+    "specs": "Digital timer outlets, 24hr/7day programming, backup battery",
+    "priceRange": "$20-50 each",
+    "preferredBrands": "Woods, Intermatic, BN-Link",
+    "alternatives": "Smart plugs, Mechanical timers",
+    "maintenance": {
+      "semi-annually": "Adjust for daylight saving time",
+      "yearly": "Replace backup battery",
+      "as-needed": "Update schedules seasonally"
+    },
+    "notes": "Consistency critical for livestock health.",
+    "suppliers": "Home Depot, Amazon, Hardware stores"
+  },
+  "category": "Power & Control"
+}

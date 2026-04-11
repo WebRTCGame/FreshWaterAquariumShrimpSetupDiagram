@@ -1,0 +1,24 @@
+{
+  "id": "CONT_101",
+  "name": "Parameter Controller (CONT-101)",
+  "desc": "Main System Controller",
+  "status": "operational",
+  "details": {
+    "specs": "pH, temp, conductivity monitoring, data logging, WiFi enabled",
+    "priceRange": "$150-300",
+    "operatingCost": {
+      "monthly": "$0.52 (5W × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$6.13 (continuous monitoring)"
+    },
+    "preferredBrands": "Neptune Apex Jr, Hydros Control",
+    "alternatives": "ReefPi (DIY), Basic pH controllers",
+    "maintenance": {
+      "monthly": "Calibrate probes, clean sensors",
+      "quarterly": "Replace probe solutions",
+      "yearly": "Replace pH and conductivity probes"
+    },
+    "notes": "Essential for automated systems. Choose expandable platform.",
+    "suppliers": "BRS, Marine Depot, Neptune Systems"
+  },
+  "category": "Main Systems"
+}

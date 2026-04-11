@@ -1,0 +1,20 @@
+{
+  "id": "ISL_WLVL",
+  "name": "Waterfall Reservoir Level Sensor (ISL-LVL-801)",
+  "desc": "Float Switch, Pump Protection",
+  "status": "operational",
+  "details": {
+    "specs": "Normally-open float switch, 0.5A rated, pump cut-off on low water",
+    "priceRange": "$8-15",
+    "preferredBrands": "Generic float switch, Seaflo",
+    "alternatives": "Optical level sensor, Electronic float",
+    "maintenance": {
+      "monthly": "Test by manually lowering float",
+      "quarterly": "Clean float mechanism",
+      "yearly": "Replace if sticking"
+    },
+    "notes": "Protects waterfall pump from running dry. Mounted in tank at minimum safe level for pump intake.",
+    "suppliers": "Amazon, Hardware stores, Plumbing supply"
+  },
+  "category": "Island System"
+}

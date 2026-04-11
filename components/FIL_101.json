@@ -1,0 +1,20 @@
+{
+  "id": "FIL_101",
+  "name": "Left Corner Sponge (FIL-101)",
+  "desc": "Mechanical Filtration",
+  "status": "operational",
+  "details": {
+    "specs": "Dual-density sponge, 30-45 PPI foam",
+    "priceRange": "$15-35",
+    "preferredBrands": "ATI Hydro Sponge, Fluval Edge",
+    "alternatives": "DIY with aquarium foam, Aquaclear sponges",
+    "maintenance": {
+      "weekly": "Squeeze clean in tank water",
+      "monthly": "Rinse thoroughly",
+      "quarterly": "Replace if deteriorating"
+    },
+    "notes": "Never use tap water to clean. Gentle maintenance only.",
+    "suppliers": "LFS, Amazon, Aquarium Co-op"
+  },
+  "category": "Filtration"
+}

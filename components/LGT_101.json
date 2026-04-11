@@ -1,0 +1,24 @@
+{
+  "id": "LGT_101",
+  "name": "LED Lighting (LGT-101)",
+  "desc": "Full Spectrum Plant Growth",
+  "status": "operational",
+  "details": {
+    "specs": "Full spectrum LED, 6500K + red, 0.5-1W per gallon",
+    "priceRange": "$100-300",
+    "operatingCost": {
+      "monthly": "$3.63 (80W × 8hr photoperiod × 30days × $0.14/kWh)",
+      "yearly": "$42.78 (8-hour daily photoperiod)"
+    },
+    "preferredBrands": "Fluval Plant 3.0, Finnex, Nicrew",
+    "alternatives": "T5HO fluorescent, Basic LED strips",
+    "maintenance": {
+      "monthly": "Clean LED lenses",
+      "quarterly": "Check for dead LEDs",
+      "yearly": "Replace if significant light loss"
+    },
+    "notes": "Plants need 30-50 PAR for healthy growth. Timer essential.",
+    "suppliers": "BRS, Amazon, Planted tank specialists"
+  },
+  "category": "Lighting"
+}

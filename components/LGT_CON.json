@@ -1,0 +1,20 @@
+{
+  "id": "LGT_CON",
+  "name": "Light Controller",
+  "desc": "Lighting Control System",
+  "status": "operational",
+  "details": {
+    "specs": "Programmable controller, sunrise/sunset simulation, app control",
+    "priceRange": "$50-150",
+    "preferredBrands": "Kessil, AI, Current USA",
+    "alternatives": "Basic timers, Manual on/off",
+    "maintenance": {
+      "monthly": "Update schedules seasonally",
+      "quarterly": "Clean controller screen",
+      "as-needed": "Update firmware"
+    },
+    "notes": "Gradual lighting changes prevent plant shock.",
+    "suppliers": "BRS, Amazon, Lighting manufacturers"
+  },
+  "category": "Lighting"
+}

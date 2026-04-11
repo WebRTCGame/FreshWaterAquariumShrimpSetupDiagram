@@ -1,0 +1,20 @@
+{
+  "id": "PAR_101",
+  "name": "PAR Sensor (PAR-101)",
+  "desc": "Light Intensity Monitoring",
+  "status": "operational",
+  "details": {
+    "specs": "Quantum sensor, 400-700nm range, waterproof probe",
+    "priceRange": "$200-500",
+    "preferredBrands": "Apogee, Li-Cor, Seneye",
+    "alternatives": "PAR meter rental, Phone apps (approximate)",
+    "maintenance": {
+      "monthly": "Clean sensor lens",
+      "quarterly": "Calibrate if available",
+      "as-needed": "Check cable connections"
+    },
+    "notes": "Measures actual light plants receive. Professional tool.",
+    "suppliers": "BRS, Scientific suppliers, Seneye"
+  },
+  "category": "Lighting"
+}

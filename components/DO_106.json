@@ -1,0 +1,20 @@
+{
+  "id": "DO_106",
+  "name": "Dissolved Oxygen (DO-106)",
+  "desc": "Oxygen Level Monitoring",
+  "status": "operational",
+  "details": {
+    "specs": "Optical DO sensor, 0-20 mg/L range, temperature compensated",
+    "priceRange": "$200-400",
+    "preferredBrands": "Hanna, YSI, Atlas Scientific",
+    "alternatives": "Drop checker, Surface agitation observation",
+    "maintenance": {
+      "monthly": "Check calibration",
+      "quarterly": "Replace sensor cap",
+      "yearly": "Full sensor replacement"
+    },
+    "notes": "Target 6-8 mg/L. Essential for high bioload systems.",
+    "suppliers": "Hanna Direct, BRS, Laboratory suppliers"
+  },
+  "category": "Sensors & Instruments"
+}

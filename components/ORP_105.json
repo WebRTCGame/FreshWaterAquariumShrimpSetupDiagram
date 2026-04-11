@@ -1,0 +1,20 @@
+{
+  "id": "ORP_105",
+  "name": "Redox Potential (ORP-105)",
+  "desc": "Oxidation-Reduction Potential",
+  "status": "operational",
+  "details": {
+    "specs": "Platinum electrode, -2000 to +2000 mV range",
+    "priceRange": "$80-150",
+    "preferredBrands": "Milwaukee, Hanna, Neptune",
+    "alternatives": "Water quality test strips, Visual water assessment",
+    "maintenance": {
+      "monthly": "Clean electrode with soft brush",
+      "quarterly": "Calibrate with standard solutions",
+      "yearly": "Replace electrode if needed"
+    },
+    "notes": "Target 300-450 mV for healthy system. Indicates water quality.",
+    "suppliers": "BRS, Hanna Direct, Marine Depot"
+  },
+  "category": "Sensors & Instruments"
+}

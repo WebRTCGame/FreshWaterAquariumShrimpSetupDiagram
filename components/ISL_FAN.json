@@ -1,0 +1,24 @@
+{
+  "id": "ISL_FAN",
+  "name": "Island Fan (ISL-FAN-301)",
+  "desc": "Micro USB Fan, Humidity Control",
+  "status": "operational",
+  "details": {
+    "specs": "Small 5V USB or 12V DC fan, 40-80mm, directed at island area",
+    "priceRange": "$8-25",
+    "operatingCost": {
+      "monthly": "$0.10 (3W × 8hr/day × 30days × $0.14/kWh)",
+      "yearly": "$1.23 (intermittent dehumidify cycles)"
+    },
+    "preferredBrands": "Noctua, Arctic, Generic USB mini fans",
+    "alternatives": "Small clip-on aquarium fans, Computer case fans",
+    "maintenance": {
+      "monthly": "Clean fan blades",
+      "quarterly": "Check bearing noise",
+      "yearly": "Replace if bearings worn"
+    },
+    "notes": "Controlled by humidity controller. Activates to reduce humidity when threshold exceeded. Prevents mold on island.",
+    "suppliers": "Amazon, Electronics stores, Computer supply"
+  },
+  "category": "Island System"
+}

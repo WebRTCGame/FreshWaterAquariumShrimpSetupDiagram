@@ -1,0 +1,20 @@
+{
+  "id": "TK_101",
+  "name": "Main Tank (TK-101)",
+  "desc": "125 GAL Freshwater Planted",
+  "status": "operational",
+  "details": {
+    "specs": "Glass aquarium, 72\" × 18\" × 24\", rimless preferred",
+    "priceRange": "$200-400",
+    "preferredBrands": "Waterbox, Red Sea, Innovative Marine",
+    "alternatives": "Aqueon, MarineLand, Custom builds",
+    "maintenance": {
+      "daily": "Visual inspection, feeding",
+      "weekly": "Water testing, algae cleaning",
+      "monthly": "Deep clean, equipment check"
+    },
+    "notes": "Choose low-iron glass for better clarity. Ensure level placement.",
+    "suppliers": "Local fish stores, BRS, Amazon"
+  },
+  "category": "Main Systems"
+}

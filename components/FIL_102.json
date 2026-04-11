@@ -1,0 +1,20 @@
+{
+  "id": "FIL_102",
+  "name": "Right Corner Sponge (FIL-102)",
+  "desc": "Biological Filtration",
+  "status": "operational",
+  "details": {
+    "specs": "Biomedia chamber, Matrix Mini + coarse foam",
+    "priceRange": "$20-45",
+    "preferredBrands": "Seachem Matrix Mini, ATI Hydro Sponge",
+    "alternatives": "Ceramic rings, Bio-balls, Lava rock",
+    "maintenance": {
+      "monthly": "Light rinse in tank water only",
+      "quarterly": "Replace outer foam if needed",
+      "yearly": "Replace 25% of biomedia"
+    },
+    "notes": "Primary biological filtration. Handle with care.",
+    "suppliers": "BRS, Amazon, Local stores"
+  },
+  "category": "Filtration"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "WC_PMP",
+  "name": "Water Change Pump (WC-202)",
+  "desc": "200 GPH Submersible",
+  "status": "operational",
+  "details": {
+    "specs": "Utility pump, 200+ GPH, 1/2\" output, portable",
+    "priceRange": "$30-60",
+    "preferredBrands": "Little Giant, Aqueon, Danner",
+    "alternatives": "Siphon systems, Manual water changes",
+    "maintenance": {
+      "after-use": "Rinse and dry pump",
+      "monthly": "Check impeller condition",
+      "as-needed": "Replace worn seals"
+    },
+    "notes": "Automates water changes. Store dry between uses.",
+    "suppliers": "Home Depot, Amazon, Aquarium stores"
+  },
+  "category": "Water Management"
+}

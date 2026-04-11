@@ -1,0 +1,20 @@
+{
+  "id": "ISL_TEMP_CTRL",
+  "name": "Island Temp Controller (ISL-TC-501)",
+  "desc": "Inkbird Digital, ±0.5°F",
+  "status": "operational",
+  "details": {
+    "specs": "Dual relay controller, heating/cooling outputs, ±0.5°F accuracy, 110V outlet switched",
+    "priceRange": "$35-45",
+    "preferredBrands": "Inkbird ITC-306A, Ranco ETC",
+    "alternatives": "Basic bimetallic thermostat, Johnson Controls A419",
+    "maintenance": {
+      "monthly": "Verify setpoint accuracy with reference thermometer",
+      "quarterly": "Test alarm outputs",
+      "yearly": "Recalibrate if drift observed"
+    },
+    "notes": "Controls basking spot lamp (heat) to maintain island air temperature. Setpoint: 82-88°F ambient island air.",
+    "suppliers": "Amazon, eBay, HVAC supply"
+  },
+  "category": "Island System"
+}

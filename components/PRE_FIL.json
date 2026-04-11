@@ -1,0 +1,20 @@
+{
+  "id": "PRE_FIL",
+  "name": "Prefilter (FIL-201)",
+  "desc": "Dual-Density Foam, 100μm",
+  "status": "maintenance",
+  "details": {
+    "specs": "100μm mechanical filtration, easy access design",
+    "priceRange": "$30-60",
+    "preferredBrands": "Fluval, Eheim pre-filter",
+    "alternatives": "DIY PVC housing, Aquaclear",
+    "maintenance": {
+      "weekly": "Rinse foam in tank water",
+      "monthly": "Replace fine filter floss",
+      "quarterly": "Replace foam media"
+    },
+    "notes": "Critical for protecting pump. Size for 2x flow rate.",
+    "suppliers": "LFS, Amazon, Chewy"
+  },
+  "category": "Filtration"
+}

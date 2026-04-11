@@ -1,0 +1,20 @@
+{
+  "id": "CO2_REG",
+  "name": "CO₂ Regulator (CO₂-202)",
+  "desc": "Dual Stage, Solenoid",
+  "status": "operational",
+  "details": {
+    "specs": "Dual-stage regulator, 0-60 psi working pressure, CGA320",
+    "priceRange": "$80-200",
+    "preferredBrands": "Milwaukee, CO2Art, Aquatek",
+    "alternatives": "Single-stage regulators, DIY yeast systems",
+    "maintenance": {
+      "monthly": "Check for leaks with soapy water",
+      "quarterly": "Verify pressure accuracy",
+      "yearly": "Service diaphragms and seals"
+    },
+    "notes": "Dual-stage prevents pressure fluctuations. Essential for stability.",
+    "suppliers": "BRS, CO2Art, Amazon"
+  },
+  "category": "CO₂ System"
+}

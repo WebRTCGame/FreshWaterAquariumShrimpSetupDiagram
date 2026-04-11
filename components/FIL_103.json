@@ -1,0 +1,20 @@
+{
+  "id": "FIL_103",
+  "name": "Matten Filter (FIL-103)",
+  "desc": "Combined Filtration",
+  "status": "operational",
+  "details": {
+    "specs": "PPI-20 foam wall, 6\" height, air-driven flow",
+    "priceRange": "$25-50",
+    "preferredBrands": "Poret foam, Swiss Tropicals",
+    "alternatives": "Aquarium foam sheets, DIY setup",
+    "maintenance": {
+      "monthly": "Vacuum detritus from base",
+      "quarterly": "Squeeze foam gently in tank water",
+      "yearly": "Replace foam if degraded"
+    },
+    "notes": "Excellent for shrimp tanks. Very gentle flow.",
+    "suppliers": "Swiss Tropicals, eBay, Amazon"
+  },
+  "category": "Filtration"
+}

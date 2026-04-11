@@ -1,0 +1,24 @@
+{
+  "id": "DOS_PMP_2",
+  "name": "Fertilizer Dosing Pump (DOS-P-102)",
+  "desc": "Plant Fertilizer",
+  "status": "operational",
+  "details": {
+    "specs": "Separate pump for plant nutrients, corrosion resistant",
+    "priceRange": "$40-80",
+    "operatingCost": {
+      "monthly": "$0.16 (1.5W × 2hrs/day × 30days × $0.14/kWh)",
+      "yearly": "$1.84 (intermittent operation)"
+    },
+    "preferredBrands": "Jebao, Neptune DOS, Kamoer",
+    "alternatives": "Manual fertilizer dosing, Root tabs only",
+    "maintenance": {
+      "weekly": "Check for fertilizer crystallization",
+      "monthly": "Flush lines with RO water",
+      "quarterly": "Replace tubing and check valve"
+    },
+    "notes": "Use separate pump to avoid contamination. Dilute fertilizers.",
+    "suppliers": "BRS, Amazon, Planted tank stores"
+  },
+  "category": "Dosing System"
+}

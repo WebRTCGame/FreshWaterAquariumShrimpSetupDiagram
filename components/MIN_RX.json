@@ -1,0 +1,20 @@
+{
+  "id": "MIN_RX",
+  "name": "pH Buffer Tower (MIN-301)",
+  "desc": "Crushed Coral + Aragonite",
+  "status": "operational",
+  "details": {
+    "specs": "Calcium carbonate media, slow flow for dissolution",
+    "priceRange": "$15-30 per bag",
+    "preferredBrands": "CaribSea Aragonite, Seachem Reef Buffer",
+    "alternatives": "Crushed oyster shell, Limestone chips",
+    "maintenance": {
+      "monthly": "Check media level, test KH",
+      "quarterly": "Top up media as dissolved",
+      "yearly": "Replace all media"
+    },
+    "notes": "Essential for soft water areas. Monitor pH carefully.",
+    "suppliers": "Marine stores, Amazon, BRS"
+  },
+  "category": "Filtration"
+}

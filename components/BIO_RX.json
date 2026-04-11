@@ -1,0 +1,20 @@
+{
+  "id": "BIO_RX",
+  "name": "Bioreactor (BIO-201)",
+  "desc": "Matrix + Bio Rings",
+  "status": "operational",
+  "details": {
+    "specs": "High-surface area biomedia, 20-30 GPH flow rate",
+    "priceRange": "$40-80 (media), $20-50 (reactor)",
+    "preferredBrands": "Seachem Matrix, Fluval BioMax",
+    "alternatives": "Ceramic rings, Lava rock, K1 media",
+    "maintenance": {
+      "monthly": "Light rinse in tank water",
+      "quarterly": "Replace 25% of media",
+      "yearly": "Full media replacement"
+    },
+    "notes": "Never over-clean. Bacteria need stable environment.",
+    "suppliers": "BRS, Amazon, Petco"
+  },
+  "category": "Filtration"
+}

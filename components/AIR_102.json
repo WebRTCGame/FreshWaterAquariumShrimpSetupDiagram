@@ -1,0 +1,24 @@
+{
+  "id": "AIR_102",
+  "name": "Backup Air Pump (AC-102)",
+  "desc": "USB Backup Air",
+  "status": "operational",
+  "details": {
+    "specs": "USB powered, battery backup, 2-4 L/min output",
+    "priceRange": "$25-50",
+    "operatingCost": {
+      "monthly": "$0.31 (3W × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$3.68 (standby + occasional use)"
+    },
+    "preferredBrands": "Hygger, KEDSUM, Pawfly",
+    "alternatives": "Battery-powered pumps, Manual aeration",
+    "maintenance": {
+      "monthly": "Test battery backup function",
+      "quarterly": "Charge/replace batteries",
+      "as-needed": "Clean USB connections"
+    },
+    "notes": "Essential during power outages. Keep batteries charged.",
+    "suppliers": "Amazon, eBay, Aquarium stores"
+  },
+  "category": "Air System"
+}

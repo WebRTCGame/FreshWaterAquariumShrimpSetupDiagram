@@ -1,11 +1,42 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm';
 import { graphDefinition } from './diagram.js';
-import { components } from './components.js';
 
 mermaid.initialize({
   startOnLoad: false,
   theme: 'default'
 });
+
+async function loadManifest() {
+  const res = await fetch('./components/manifest.json');
+  if (!res.ok) throw new Error(`Failed to load manifest: ${res.status}`);
+  return res.json();
+}
+
+async function loadComponentDetails(id) {
+  if (window.sidebarComponents[id]?.details) {
+    return window.sidebarComponents[id];
+  }
+  const res = await fetch(`./components/${id}.json`);
+  if (!res.ok) throw new Error(`Failed to load component ${id}: ${res.status}`);
+  const data = await res.json();
+  window.sidebarComponents[id] = data;
+  return data;
+}
+
+function prefetchAllComponents(manifest) {
+  if (!('requestIdleCallback' in window)) return;
+  let i = 0;
+  const fetchNext = (deadline) => {
+    while (i < manifest.length && deadline.timeRemaining() > 5) {
+      const item = manifest[i++];
+      if (!window.sidebarComponents[item.id]?.details) {
+        loadComponentDetails(item.id).catch(() => {});
+      }
+    }
+    if (i < manifest.length) requestIdleCallback(fetchNext);
+  };
+  requestIdleCallback(fetchNext);
+}
 
 // Example of using the render function
 const drawDiagram = async function () {
@@ -26,8 +57,10 @@ const drawDiagram = async function () {
   // Store panZoom instance globally for tooltip functionality
   window.panZoomInstance = panZoomTiger;
   
-  // Populate component list after diagram is rendered
-  populateComponentList(panZoomTiger);
+  // Load manifest and populate component list
+  const manifest = await loadManifest();
+  populateComponentList(panZoomTiger, manifest);
+  prefetchAllComponents(manifest);
   
   // Initialize tooltips after diagram is rendered with delay to ensure SVG is fully processed
   setTimeout(() => {
@@ -35,15 +68,13 @@ const drawDiagram = async function () {
   }, 1000);
 };
 
-function populateComponentList(panZoom) {
+function populateComponentList(panZoom, manifest) {
   console.log('📋 Starting to populate component list...');
   
-  // Store components globally for tooltip reuse
+  // Seed globals from slim manifest data (no details yet)
   window.sidebarComponents = {};
-  Object.entries(components).forEach(([category, items]) => {
-    items.forEach(component => {
-      window.sidebarComponents[component.id] = component;
-    });
+  manifest.forEach(item => {
+    window.sidebarComponents[item.id] = item;
   });
   
   console.log('📦 Stored', Object.keys(window.sidebarComponents).length, 'components globally for tooltips');
@@ -51,7 +82,19 @@ function populateComponentList(panZoom) {
   const componentList = document.getElementById('component-list');
   componentList.innerHTML = '';
   
-  Object.entries(components).forEach(([category, items]) => {
+  // Group manifest items by category, preserving order
+  const categories = [];
+  const categoryMap = {};
+  manifest.forEach(item => {
+    if (!categoryMap[item.category]) {
+      categoryMap[item.category] = [];
+      categories.push(item.category);
+    }
+    categoryMap[item.category].push(item);
+  });
+  
+  categories.forEach(category => {
+    const items = categoryMap[category];
     const categoryDiv = document.createElement('div');
     categoryDiv.className = 'component-category';
     
@@ -78,17 +121,17 @@ function populateComponentList(panZoom) {
       expandArrow.innerHTML = '▼';
       expandArrow.onclick = (e) => {
         e.stopPropagation();
-        toggleComponentDetails(itemDiv, expandArrow, component);
+        loadAndExpandDetails(itemDiv, expandArrow, component.id);
       };
       
       headerDiv.appendChild(mainContent);
       headerDiv.appendChild(expandArrow);
       itemDiv.appendChild(headerDiv);
       
-      if (component.details) {
-        const detailsDiv = createComponentDetails(component);
-        itemDiv.appendChild(detailsDiv);
-      }
+      // Empty placeholder — details loaded on first expand
+      const detailsDiv = document.createElement('div');
+      detailsDiv.className = 'component-details';
+      itemDiv.appendChild(detailsDiv);
       
       itemsDiv.appendChild(itemDiv);
     });
@@ -254,15 +297,35 @@ function createComponentDetails(component) {
   return detailsDiv;
 }
 
-function toggleComponentDetails(itemDiv, arrow, component) {
+async function loadAndExpandDetails(itemDiv, arrow, componentId) {
   const detailsDiv = itemDiv.querySelector('.component-details');
-  
+
+  // Collapse if already expanded
   if (detailsDiv.classList.contains('expanded')) {
     detailsDiv.classList.remove('expanded');
     arrow.classList.remove('expanded');
-  } else {
+    return;
+  }
+
+  // Already loaded — just expand
+  if (detailsDiv.dataset.loaded === 'true') {
     detailsDiv.classList.add('expanded');
     arrow.classList.add('expanded');
+    return;
+  }
+
+  // First expand: show spinner, fetch, render
+  detailsDiv.innerHTML = '<div class="detail-section"><div class="detail-content loading-details" aria-live="polite" aria-label="Loading details">⏳ Loading details…</div></div>';
+  detailsDiv.classList.add('expanded');
+  arrow.classList.add('expanded');
+
+  try {
+    const component = await loadComponentDetails(componentId);
+    const tempDiv = createComponentDetails(component);
+    detailsDiv.innerHTML = tempDiv.innerHTML;
+    detailsDiv.dataset.loaded = 'true';
+  } catch (err) {
+    detailsDiv.innerHTML = '<div class="detail-section"><div class="detail-content" style="color:#f44336;" aria-live="assertive">Error: Failed to load details.</div></div>';
   }
 }
 

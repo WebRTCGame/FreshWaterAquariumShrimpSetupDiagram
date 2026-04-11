@@ -1,0 +1,20 @@
+{
+  "id": "ISL_WF_TUB",
+  "name": "Waterfall Tubing (ISL-T-201)",
+  "desc": "1/4\" Silicone Tubing",
+  "status": "operational",
+  "details": {
+    "specs": "1/4\" ID silicone tubing, flexible, UV-resistant, 2-4 ft run",
+    "priceRange": "$5-15",
+    "preferredBrands": "Aqueon, Zoo Med, Generic aquarium silicone tubing",
+    "alternatives": "Vinyl airline tubing (less durable), Rigid PVC (less flexible)",
+    "maintenance": {
+      "monthly": "Check for kinks or blockages",
+      "quarterly": "Flush tubing with clean water",
+      "yearly": "Replace if discolored or stiff"
+    },
+    "notes": "Routes water from waterfall pump up through island to cascade down the lava rock face.",
+    "suppliers": "Amazon, Pet stores, Hardware stores"
+  },
+  "category": "Island System"
+}

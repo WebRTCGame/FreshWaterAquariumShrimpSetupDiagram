@@ -1,0 +1,20 @@
+{
+  "id": "PWR_101",
+  "name": "Main Power (PWR-101)",
+  "desc": "GFCI Protected",
+  "status": "operational",
+  "details": {
+    "specs": "GFCI outlet strip, 15A capacity, aquarium rated",
+    "priceRange": "$30-80",
+    "preferredBrands": "Coralife, Current USA, APC",
+    "alternatives": "Individual GFCI outlets, Standard power strips",
+    "maintenance": {
+      "monthly": "Test GFCI function",
+      "quarterly": "Check for corrosion",
+      "as-needed": "Replace if tripping frequently"
+    },
+    "notes": "GFCI required by code near water. Safety first.",
+    "suppliers": "BRS, Home Depot, Electrical supply"
+  },
+  "category": "Power & Control"
+}

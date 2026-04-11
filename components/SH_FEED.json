@@ -1,0 +1,20 @@
+{
+  "id": "SH_FEED",
+  "name": "Feeding Station (SH-104)",
+  "desc": "Supplemental Area",
+  "status": "operational",
+  "details": {
+    "specs": "Glass feeding dish, easy cleanup, designated area",
+    "priceRange": "$5-15",
+    "preferredBrands": "Glass petri dishes, Ceramic plates",
+    "alternatives": "Flat rocks, Dedicated feeding spots",
+    "maintenance": {
+      "after-feeding": "Remove uneaten food after 2 hours",
+      "weekly": "Clean feeding dish",
+      "as-needed": "Relocate if flow issues"
+    },
+    "notes": "Prevents overfeeding. Essential for water quality.",
+    "suppliers": "Amazon, Laboratory supply, Pet stores"
+  },
+  "category": "Shrimp Habitat"
+}

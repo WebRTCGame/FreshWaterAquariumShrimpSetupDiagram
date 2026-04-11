@@ -860,6 +860,214 @@ export const components = {
       }
     }
   ],
+  'Island System': [
+    {
+      id: 'ISL_ROCK',
+      name: 'Lava Rock Island (ISL-101)',
+      desc: 'Lava Rock Structure',
+      status: 'operational',
+      details: {
+        specs: 'Porous lava rock formation, above waterline, partially submerged base',
+        priceRange: '$20-60',
+        preferredBrands: 'Natural lava rock, Zoo Med, Aquatic Arts',
+        alternatives: 'Dragon stone, Seiryu stone, Cork bark',
+        maintenance: {
+          monthly: 'Rinse surface debris, inspect for algae growth',
+          quarterly: 'Deep clean with soft brush, check structural stability',
+          yearly: 'Reseal base if needed'
+        },
+        notes: 'Lava rock is inert and porous — safe for shrimp and beneficial bacteria. Provides basking surface.',
+        suppliers: 'Local fish stores, Amazon, Reptile specialty stores'
+      }
+    },
+    {
+      id: 'ISL_BASK',
+      name: 'Basking Spot (ISL-102)',
+      desc: 'Heat Lamp / Basking Light',
+      status: 'operational',
+      details: {
+        specs: 'Focused spot bulb, 40-60W, directed at island surface, adjustable arm mount',
+        priceRange: '$15-40',
+        operatingCost: {
+          monthly: '$2.42 (50W mid-range × 8hr/day × 30days × $0.14/kWh)',
+          yearly: '$29.02 (8hr daily operation)'
+        },
+        preferredBrands: 'Zoo Med Repti Basking Spot, Exo Terra Sun Glo',
+        alternatives: 'Ceramic heat emitters, Halogen bulbs, LED basking bulbs',
+        maintenance: {
+          monthly: 'Check bulb output with thermometer',
+          quarterly: 'Clean fixture reflector',
+          yearly: 'Replace bulb (lifespan ~2000hrs)'
+        },
+        notes: 'Creates warm microclimate on island surface (90-95°F). Controlled via ISL temperature controller.',
+        suppliers: 'Petco, Amazon, Reptile specialty stores'
+      }
+    },
+    {
+      id: 'ISL_WF_PMP',
+      name: 'Waterfall Pump (ISL-P-201)',
+      desc: '50-80 GPH Submersible',
+      status: 'operational',
+      details: {
+        specs: 'Submersible mini pump, 50-80 GPH, 1/4" output, low voltage',
+        priceRange: '$15-35',
+        operatingCost: {
+          monthly: '$0.36 (8W × 24hrs × 30days × $0.14/kWh)',
+          yearly: '$4.30 (continuous recirculation)'
+        },
+        preferredBrands: 'Cobalt MJ Series, Aquatop, Tetra Pond',
+        alternatives: 'Air-driven waterfall systems, Powerhead with attachment',
+        maintenance: {
+          monthly: 'Clean impeller and intake screen',
+          quarterly: 'Descale pump housing',
+          yearly: 'Replace impeller if flow reduced'
+        },
+        notes: 'Recirculates tank water up through tubing to island top, creating waterfall cascade. Adds oxygen and humidity.',
+        suppliers: 'Amazon, Pet stores, Aquarium supply'
+      }
+    },
+    {
+      id: 'ISL_WF_TUB',
+      name: 'Waterfall Tubing (ISL-T-201)',
+      desc: '1/4" Silicone Tubing',
+      status: 'operational',
+      details: {
+        specs: '1/4" ID silicone tubing, flexible, UV-resistant, 2-4 ft run',
+        priceRange: '$5-15',
+        preferredBrands: 'Aqueon, Zoo Med, Generic aquarium silicone tubing',
+        alternatives: 'Vinyl airline tubing (less durable), Rigid PVC (less flexible)',
+        maintenance: {
+          monthly: 'Check for kinks or blockages',
+          quarterly: 'Flush tubing with clean water',
+          yearly: 'Replace if discolored or stiff'
+        },
+        notes: 'Routes water from waterfall pump up through island to cascade down the lava rock face.',
+        suppliers: 'Amazon, Pet stores, Hardware stores'
+      }
+    },
+    {
+      id: 'ISL_FAN',
+      name: 'Island Fan (ISL-FAN-301)',
+      desc: 'Micro USB Fan, Humidity Control',
+      status: 'operational',
+      details: {
+        specs: 'Small 5V USB or 12V DC fan, 40-80mm, directed at island area',
+        priceRange: '$8-25',
+        operatingCost: {
+          monthly: '$0.10 (3W × 8hr/day × 30days × $0.14/kWh)',
+          yearly: '$1.23 (intermittent dehumidify cycles)'
+        },
+        preferredBrands: 'Noctua, Arctic, Generic USB mini fans',
+        alternatives: 'Small clip-on aquarium fans, Computer case fans',
+        maintenance: {
+          monthly: 'Clean fan blades',
+          quarterly: 'Check bearing noise',
+          yearly: 'Replace if bearings worn'
+        },
+        notes: 'Controlled by humidity controller. Activates to reduce humidity when threshold exceeded. Prevents mold on island.',
+        suppliers: 'Amazon, Electronics stores, Computer supply'
+      }
+    },
+    {
+      id: 'ISL_MIST',
+      name: 'Island Misting System (ISL-MIST-401)',
+      desc: 'Pump + Nozzle + Tubing',
+      status: 'operational',
+      details: {
+        specs: 'Dedicated misting pump, 1 nozzle, 1/4" tubing, burst-style misting cycles',
+        priceRange: '$40-70',
+        operatingCost: {
+          monthly: '$0.21 (5W × 10min cycles × 6×/day × 30days × $0.14/kWh)',
+          yearly: '$2.52 (intermittent mist cycles)'
+        },
+        preferredBrands: 'Repti Zoo TR09, Exo Terra Monsoon Nano',
+        alternatives: 'DIY atomizer, Zoo Med ReptiRain, Manual misting',
+        maintenance: {
+          monthly: 'Check nozzle for mineral buildup',
+          quarterly: 'Flush lines with distilled water',
+          yearly: 'Replace nozzle if clogged'
+        },
+        notes: 'Raises island humidity when humidity controller signals low. Use RO/distilled water to prevent mineral deposits on lava rock.',
+        suppliers: 'Reptile specialty stores, Amazon, Petco'
+      }
+    },
+    {
+      id: 'ISL_TEMP_CTRL',
+      name: 'Island Temp Controller (ISL-TC-501)',
+      desc: 'Inkbird Digital, ±0.5°F',
+      status: 'operational',
+      details: {
+        specs: 'Dual relay controller, heating/cooling outputs, ±0.5°F accuracy, 110V outlet switched',
+        priceRange: '$35-45',
+        preferredBrands: 'Inkbird ITC-306A, Ranco ETC',
+        alternatives: 'Basic bimetallic thermostat, Johnson Controls A419',
+        maintenance: {
+          monthly: 'Verify setpoint accuracy with reference thermometer',
+          quarterly: 'Test alarm outputs',
+          yearly: 'Recalibrate if drift observed'
+        },
+        notes: 'Controls basking spot lamp (heat) to maintain island air temperature. Setpoint: 82-88°F ambient island air.',
+        suppliers: 'Amazon, eBay, HVAC supply'
+      }
+    },
+    {
+      id: 'ISL_HUM_CTRL',
+      name: 'Island Humidity Controller (ISL-HC-601)',
+      desc: 'Inkbird IHC-200, Dual Relay',
+      status: 'operational',
+      details: {
+        specs: 'Dual relay: humidify + dehumidify outputs, 1% RH resolution, 110V switched outlets',
+        priceRange: '$55-65',
+        preferredBrands: 'Inkbird IHC-200, Govee Smart Humidity Controller',
+        alternatives: 'Single-relay humidistat, Smart plug + humidity sensor',
+        maintenance: {
+          monthly: 'Calibrate against reference hygrometer',
+          quarterly: 'Test both relay outputs',
+          yearly: 'Replace sensor probe if reading drift'
+        },
+        notes: 'Controls misting system (humidify relay) and island fan (dehumidify relay). Target island RH: 70-80%.',
+        suppliers: 'Amazon, eBay, Greenhouse supply'
+      }
+    },
+    {
+      id: 'ISL_TH_SNS',
+      name: 'Island Temp/Humidity Sensor (ISL-SNS-701)',
+      desc: 'Digital Probe, ±1°F / ±2% RH',
+      status: 'operational',
+      details: {
+        specs: 'Combined temp + humidity probe, waterproof housing, 3ft cable lead',
+        priceRange: '$10-20',
+        preferredBrands: 'Inkbird probe (bundled), SHT20 based probes',
+        alternatives: 'Separate DHT22 + temperature probe, Govee smart sensor',
+        maintenance: {
+          monthly: 'Verify readings vs reference',
+          quarterly: 'Clean probe housing',
+          yearly: 'Replace if reading error exceeds ±3°F or ±5% RH'
+        },
+        notes: 'Placed at island level above water surface. Feeds data to both ISL temp controller and ISL humidity controller.',
+        suppliers: 'Amazon, Inkbird official, Electronics supply'
+      }
+    },
+    {
+      id: 'ISL_WLVL',
+      name: 'Waterfall Reservoir Level Sensor (ISL-LVL-801)',
+      desc: 'Float Switch, Pump Protection',
+      status: 'operational',
+      details: {
+        specs: 'Normally-open float switch, 0.5A rated, pump cut-off on low water',
+        priceRange: '$8-15',
+        preferredBrands: 'Generic float switch, Seaflo',
+        alternatives: 'Optical level sensor, Electronic float',
+        maintenance: {
+          monthly: 'Test by manually lowering float',
+          quarterly: 'Clean float mechanism',
+          yearly: 'Replace if sticking'
+        },
+        notes: 'Protects waterfall pump from running dry. Mounted in tank at minimum safe level for pump intake.',
+        suppliers: 'Amazon, Hardware stores, Plumbing supply'
+      }
+    }
+  ],
   'Power & Control': [
     {
       id: 'PWR_101',

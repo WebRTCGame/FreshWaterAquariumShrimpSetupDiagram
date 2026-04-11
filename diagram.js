@@ -28,6 +28,8 @@ direction LR
         LEG_WC["Water Change"]
         LEG_ATO["Auto Top-Off"]
         LEG_QUAR["Quarantine"]
+        LEG_ISLAND["Island System"]
+        LEG_ISLANDCTRL["Island Controller"]
   end
  subgraph OVERVIEW["SYSTEM OVERVIEW - WATER FLOW"]
     direction LR
@@ -87,6 +89,8 @@ direction LR
         OUTLET_CO2["OUTLET-CO2"]
         OUTLET_ATO["OUTLET-ATO"]
         OUTLET_TMR["OUTLET-TMR"]
+        OUTLET_ISL_WF["OUTLET-ISL-WF"]
+        OUTLET_ISL_CTRL["OUTLET-ISL-CTRL"]
   end
  subgraph CONTROL_MONITORING["CONTROL & MONITORING"]
     direction LR
@@ -309,6 +313,19 @@ direction LR
         QT_HTR["QT-103<br>Heater"]
         QT_PMP(("QT-104<br>Pump<br>100 GPH, Sponge Safe"))
   end
+ subgraph ISLAND["LAVA ROCK ISLAND SYSTEM"]
+     direction LR
+         ISL_ROCK[["ISL-101<br>Lava Rock Island<br>Porous Structure<br>Above Waterline"]]
+         ISL_BASK[["ISL-102<br>Basking Spot<br>40-60W Heat Lamp<br>90-95°F Surface"]]
+         ISL_WF_PMP(("ISL-P-201<br>Waterfall Pump<br>50-80 GPH, Submersible"))
+         ISL_WF_TUB[["ISL-T-201<br>Waterfall Tubing<br>1/4IN Silicone, 2-4ft"]]
+         ISL_FAN[["ISL-FAN-301<br>Island Fan<br>5V USB / 12V DC<br>Dehumidify Control"]]
+         ISL_MIST[["ISL-MIST-401<br>Misting System<br>Pump + Nozzle + Tubing<br>RO Water"]]
+         ISL_TEMP_CTRL{{"ISL-TC-501<br>Island Temp Controller<br>Inkbird ±0.5°F<br>82-88°F Setpoint"}}
+         ISL_HUM_CTRL{{"ISL-HC-601<br>Island Humidity Controller<br>Inkbird IHC-200<br>70-80% RH Target"}}
+         ISL_TH_SNS{{"ISL-SNS-701<br>Temp/Humidity Sensor<br>±1°F / ±2% RH<br>Island Level"}}
+         ISL_WLVL{{"ISL-LVL-801<br>Waterfall Level Sensor<br>Float Switch<br>Pump Protection"}}
+   end
     LEG_ELEC -. Electrical Connection .-> LEG_POWER
     LEG_WATER_FLOW ==> LEG_TANK
     LEG_SIGNAL --- LEG_INST
@@ -437,6 +454,22 @@ direction LR
     DOS_101 --> DOS_PMP_1
     PRE_OUT --> SUPPLY_MANIFOLD
     FV_201 --> PRE_IN
+    PWR_101 -. Electrical Connection .-> OUTLET_ISL_WF & OUTLET_ISL_CTRL
+    OUTLET_ISL_WF -. Electrical Connection .-> ISL_WF_PMP
+    OUTLET_ISL_CTRL -. Electrical Connection .-> ISL_TEMP_CTRL & ISL_HUM_CTRL
+    ISL_TEMP_CTRL --- ISL_TH_SNS
+    ISL_HUM_CTRL --- ISL_TH_SNS
+    ISL_TEMP_CTRL -. Switched Power .-> ISL_BASK
+    ISL_HUM_CTRL -. Switched Power .-> ISL_MIST
+    ISL_HUM_CTRL -. Switched Power .-> ISL_FAN
+    TK_101 == 1/4IN Silicone, 2ft, 60 GPH ==> ISL_WF_PMP
+    ISL_WF_PMP == 1/4IN Silicone, 3ft, 60 GPH ==> ISL_WF_TUB
+    ISL_WF_TUB == Waterfall Cascade ==> ISL_ROCK
+    ISL_ROCK == Returns to tank ==> TK_101
+    ISL_WLVL --- ISL_WF_PMP
+    ISL_MIST -.-> ISL_ROCK
+    ISL_BASK -.-> ISL_ROCK
+    ISL_FAN -.-> ISL_ROCK
     LEG_FLOWLOSS["\u26A0\uFE0F  Flow loss (GPH drop) is only shown at open-to-atmosphere filters (e.g., degasser, matten, sponge). Closed filters are assumed to have negligible loss in a well-balanced system."]
 
      LEG_TANK["Tank"]:::tank
@@ -460,6 +493,8 @@ direction LR
      LEG_WC(["Water Change"]):::flow_output
      LEG_ATO(["Auto Top-Off"]):::flow_output
      LEG_QUAR(["Quarantine"]):::flow_output
+     LEG_ISLAND[["Island System"]]:::island
+     LEG_ISLANDCTRL{{"Island Controller"}}:::islandctrl
 
      OV_TANK["MAIN TANK<br>125 GAL"]:::tank
      OV_INT[["INTERNAL<br>FILTERS"]]:::equipment
@@ -491,6 +526,18 @@ direction LR
      OUTLET_CO2["OUTLET-CO2"]:::power
      OUTLET_ATO["OUTLET-ATO"]:::power
      OUTLET_TMR["OUTLET-TMR"]:::power
+     OUTLET_ISL_WF["OUTLET-ISL-WF"]:::power
+     OUTLET_ISL_CTRL["OUTLET-ISL-CTRL"]:::power
+     ISL_ROCK[["ISL-101<br>Lava Rock Island<br>Porous Structure<br>Above Waterline"]]:::island
+     ISL_BASK[["ISL-102<br>Basking Spot<br>40-60W Heat Lamp<br>90-95°F Surface"]]:::island
+     ISL_WF_PMP(("ISL-P-201<br>Waterfall Pump<br>50-80 GPH, Submersible")):::island
+     ISL_WF_TUB[["ISL-T-201<br>Waterfall Tubing<br>1/4IN Silicone, 2-4ft"]]:::island
+     ISL_FAN[["ISL-FAN-301<br>Island Fan<br>5V USB / 12V DC<br>Dehumidify Control"]]:::island
+     ISL_MIST[["ISL-MIST-401<br>Misting System<br>Pump + Nozzle + Tubing<br>RO Water"]]:::island
+     ISL_TEMP_CTRL{{"ISL-TC-501<br>Island Temp Controller<br>Inkbird ±0.5°F<br>82-88°F Setpoint"}}:::islandctrl
+     ISL_HUM_CTRL{{"ISL-HC-601<br>Island Humidity Controller<br>Inkbird IHC-200<br>70-80% RH Target"}}:::islandctrl
+     ISL_TH_SNS{{"ISL-SNS-701<br>Temp/Humidity Sensor<br>±1°F / ±2% RH<br>Island Level"}}:::instrument
+     ISL_WLVL{{"ISL-LVL-801<br>Waterfall Level Sensor<br>Float Switch<br>Pump Protection"}}:::instrument
      PAR_101(["PAR-101<br>PAR Sensor"]):::par
      LGT_101["LGT-101<br>LED Lighting<br>Full Spectrum<br>Plant Growth"]:::light
      LGT_CON[["LGT-CON<br>Light Controller"]]:::equipment
@@ -642,6 +689,8 @@ direction LR
     classDef alarm fill:#FF6347,stroke:#000,stroke-width:1px
     classDef power fill:#D8BFD8,stroke:#000,stroke-width:1px
     classDef flow_output fill:#E0FFFF,stroke:#1E90FF,stroke-width:1px
+    classDef island fill:#FFE4B5,stroke:#8B4500,stroke-width:2px
+    classDef islandctrl fill:#FFA500,stroke:#8B4500,stroke-width:2px,stroke-dasharray:4
     style LEG_DOSING stroke:#FF69B4,stroke-width:4px
     style LEG_RECIRC stroke:#1E90FF,stroke-width:4px
     style LEG_OVERFLOW stroke:#8B0000,stroke-width:4px

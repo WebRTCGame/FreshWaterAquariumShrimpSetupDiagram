@@ -1,0 +1,20 @@
+{
+  "id": "QT_PMP",
+  "name": "Quarantine Pump (QT-104)",
+  "desc": "100 GPH Sponge Safe",
+  "status": "operational",
+  "details": {
+    "specs": "Small circulation pump, sponge pre-filter, gentle flow",
+    "priceRange": "$15-35",
+    "preferredBrands": "Cobalt, Aquatop, Mini powerheads",
+    "alternatives": "Air stones, Small HOB filters",
+    "maintenance": {
+      "after-use": "Disinfect and dry store",
+      "monthly": "Check impeller condition",
+      "as-needed": "Replace if contaminated"
+    },
+    "notes": "Keep separate from main tank equipment.",
+    "suppliers": "Amazon, Petco, Marine stores"
+  },
+  "category": "Quarantine"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "AIR_101",
+  "name": "Main Air Compressor (AC-101)",
+  "desc": "Primary Air Supply",
+  "status": "operational",
+  "details": {
+    "specs": "Diaphragm compressor, 8-12 L/min, oil-free, quiet operation",
+    "priceRange": "$30-80",
+    "operatingCost": {
+      "monthly": "$1.04 (10W × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$12.26 (continuous operation)"
+    },
+    "preferredBrands": "Tetra Whisper, Marina, Fluval",
+    "alternatives": "Linear piston pumps, Battery backup pumps",
+    "maintenance": {
+      "monthly": "Clean air intake filter",
+      "quarterly": "Check diaphragm condition",
+      "yearly": "Replace air stones and tubing"
+    },
+    "notes": "Critical for aeration and filter operation. Size for depth.",
+    "suppliers": "Petco, Amazon, LFS"
+  },
+  "category": "Air System"
+}

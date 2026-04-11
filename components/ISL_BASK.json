@@ -1,0 +1,24 @@
+{
+  "id": "ISL_BASK",
+  "name": "Basking Spot (ISL-102)",
+  "desc": "Heat Lamp / Basking Light",
+  "status": "operational",
+  "details": {
+    "specs": "Focused spot bulb, 40-60W, directed at island surface, adjustable arm mount",
+    "priceRange": "$15-40",
+    "operatingCost": {
+      "monthly": "$2.42 (50W mid-range × 8hr/day × 30days × $0.14/kWh)",
+      "yearly": "$29.02 (8hr daily operation)"
+    },
+    "preferredBrands": "Zoo Med Repti Basking Spot, Exo Terra Sun Glo",
+    "alternatives": "Ceramic heat emitters, Halogen bulbs, LED basking bulbs",
+    "maintenance": {
+      "monthly": "Check bulb output with thermometer",
+      "quarterly": "Clean fixture reflector",
+      "yearly": "Replace bulb (lifespan ~2000hrs)"
+    },
+    "notes": "Creates warm microclimate on island surface (90-95°F). Controlled via ISL temperature controller.",
+    "suppliers": "Petco, Amazon, Reptile specialty stores"
+  },
+  "category": "Island System"
+}

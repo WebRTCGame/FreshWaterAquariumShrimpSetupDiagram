@@ -1,0 +1,20 @@
+{
+  "id": "SH_CAVES",
+  "name": "Rock Caves (SH-102)",
+  "desc": "Hiding & Molting Area",
+  "status": "operational",
+  "details": {
+    "specs": "Cholla wood, lava rock, ceramic tubes, multiple sizes",
+    "priceRange": "$30-60",
+    "preferredBrands": "SunGrow, Natural materials, Ceramic suppliers",
+    "alternatives": "PVC pipes, Commercial shrimp tubes",
+    "maintenance": {
+      "monthly": "Remove excess detritus",
+      "quarterly": "Boil cholla wood if fungal growth",
+      "as-needed": "Rearrange for variety"
+    },
+    "notes": "Critical for molting success. Provide various sizes.",
+    "suppliers": "Amazon, Shrimp specialty stores, eBay"
+  },
+  "category": "Shrimp Habitat"
+}

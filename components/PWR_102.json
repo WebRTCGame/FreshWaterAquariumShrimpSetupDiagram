@@ -1,0 +1,20 @@
+{
+  "id": "PWR_102",
+  "name": "Battery Backup (PWR-102)",
+  "desc": "Emergency Power",
+  "status": "operational",
+  "details": {
+    "specs": "UPS system, 600-1000VA, modified sine wave acceptable",
+    "priceRange": "$60-150",
+    "preferredBrands": "APC, CyberPower, Tripp Lite",
+    "alternatives": "Car inverters, Portable power stations",
+    "maintenance": {
+      "quarterly": "Test battery capacity",
+      "yearly": "Replace UPS battery",
+      "as-needed": "Update runtime calculations"
+    },
+    "notes": "Size for pumps and heaters only. Skip lights.",
+    "suppliers": "Best Buy, Amazon, Office supply"
+  },
+  "category": "Power & Control"
+}

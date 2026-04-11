@@ -1,0 +1,24 @@
+{
+  "id": "DOS_PMP_1",
+  "name": "Mineral Dosing Pump (DOS-P-101)",
+  "desc": "GH/KH+ Dosing",
+  "status": "operational",
+  "details": {
+    "specs": "Peristaltic pump, 1-5 mL/min, 1/8\" tubing, programmable",
+    "priceRange": "$40-80",
+    "operatingCost": {
+      "monthly": "$0.16 (1.5W × 2hrs/day × 30days × $0.14/kWh)",
+      "yearly": "$1.84 (intermittent operation)"
+    },
+    "preferredBrands": "Jebao, Neptune DOS, Kamoer",
+    "alternatives": "Manual dosing, Seachem remineralizer",
+    "maintenance": {
+      "weekly": "Check tubing for wear",
+      "monthly": "Clean pump head",
+      "quarterly": "Replace peristaltic tubing"
+    },
+    "notes": "Essential for RO water systems. Maintains shrimp mineral needs.",
+    "suppliers": "BRS, Amazon, Marine Depot"
+  },
+  "category": "Dosing System"
+}

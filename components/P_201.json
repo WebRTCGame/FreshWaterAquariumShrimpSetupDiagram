@@ -1,0 +1,24 @@
+{
+  "id": "P_201",
+  "name": "Main Circulation Pump (P-201)",
+  "desc": "400 GPH, 30W, Shrimp-Safe",
+  "status": "operational",
+  "details": {
+    "specs": "Variable speed, 300-500 GPH, ceramic shaft, silent operation",
+    "priceRange": "$80-150",
+    "operatingCost": {
+      "monthly": "$3.11 (30W × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$36.79 (30W continuous operation)"
+    },
+    "preferredBrands": "Sicce Syncra, Eheim Compact+",
+    "alternatives": "Aquatop, Hydor, Danner Mag-Drive",
+    "maintenance": {
+      "monthly": "Clean impeller and housing",
+      "quarterly": "Full disassembly and descale",
+      "yearly": "Replace impeller if needed"
+    },
+    "notes": "Choose ceramic shaft for longevity. Avoid metal impellers with shrimp.",
+    "suppliers": "BRS, Amazon, Marine Depot"
+  },
+  "category": "Main Systems"
+}

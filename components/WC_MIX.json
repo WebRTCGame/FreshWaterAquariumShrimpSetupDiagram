@@ -1,0 +1,20 @@
+{
+  "id": "WC_MIX",
+  "name": "Mixing Tank (WC-201)",
+  "desc": "20 GAL Storage",
+  "status": "operational",
+  "details": {
+    "specs": "20+ gallon HDPE tank, tight lid, drain valve",
+    "priceRange": "$25-50",
+    "preferredBrands": "Rubbermaid Brute, Food grade containers",
+    "alternatives": "Trash cans, Storage totes, Barrel systems",
+    "maintenance": {
+      "after-use": "Empty and air dry",
+      "monthly": "Clean with vinegar solution",
+      "as-needed": "Replace drain valve seals"
+    },
+    "notes": "Pre-mix and age water for stable parameters.",
+    "suppliers": "Home Depot, Walmart, Restaurant supply"
+  },
+  "category": "Water Management"
+}

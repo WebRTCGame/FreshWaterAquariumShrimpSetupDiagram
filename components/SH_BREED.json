@@ -1,0 +1,20 @@
+{
+  "id": "SH_BREED",
+  "name": "Breeding Colony (SH-103)",
+  "desc": "Quiet Corner",
+  "status": "operational",
+  "details": {
+    "specs": "Dense plant cover, minimal flow, stable parameters",
+    "priceRange": "$40-80 for plants and setup",
+    "preferredBrands": "Mixed plant species, Natural setup",
+    "alternatives": "Breeding boxes, Separate breeding tank",
+    "maintenance": {
+      "weekly": "Gentle observation only",
+      "monthly": "Light pruning if needed",
+      "minimal": "Avoid disturbance during breeding"
+    },
+    "notes": "Undisturbed area essential for breeding success.",
+    "suppliers": "Planted tank stores, Online plant sellers"
+  },
+  "category": "Shrimp Habitat"
+}

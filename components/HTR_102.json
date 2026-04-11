@@ -1,0 +1,24 @@
+{
+  "id": "HTR_102",
+  "name": "Backup Heater (HTR-102)",
+  "desc": "100W",
+  "status": "operational",
+  "details": {
+    "specs": "Secondary heater, 100W, separate controller circuit",
+    "priceRange": "$20-40",
+    "operatingCost": {
+      "monthly": "$1.56 (100W × 15% duty cycle × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$18.43 (backup operation only)"
+    },
+    "preferredBrands": "Eheim Jager, Aqueon Pro, Fluval M-Series",
+    "alternatives": "Same brand as primary, Lower wattage models",
+    "maintenance": {
+      "monthly": "Test activation temperature",
+      "quarterly": "Verify controller function",
+      "yearly": "Replace preventively with main heater"
+    },
+    "notes": "Backup prevents cold shock. Set 2°F lower than main.",
+    "suppliers": "Same as main heater suppliers"
+  },
+  "category": "Heating & Climate"
+}

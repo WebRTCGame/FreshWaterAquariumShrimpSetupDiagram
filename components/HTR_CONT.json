@@ -1,0 +1,20 @@
+{
+  "id": "HTR_CONT",
+  "name": "Temperature Controller",
+  "desc": "Heating System Control",
+  "status": "operational",
+  "details": {
+    "specs": "Digital controller, ±0.5°F accuracy, high/low alarms",
+    "priceRange": "$40-80",
+    "preferredBrands": "Inkbird, Ranco, Johnson Controls",
+    "alternatives": "Built-in heater thermostats, Manual monitoring",
+    "maintenance": {
+      "monthly": "Calibrate temperature reading",
+      "quarterly": "Test alarm functions",
+      "as-needed": "Clean probe and housing"
+    },
+    "notes": "Essential safety device. Prevents overheating disasters.",
+    "suppliers": "Amazon, eBay, HVAC suppliers"
+  },
+  "category": "Heating & Climate"
+}

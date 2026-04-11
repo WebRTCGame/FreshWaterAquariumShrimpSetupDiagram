@@ -1,0 +1,20 @@
+{
+  "id": "DEG_COL",
+  "name": "Degasser (DEG-501)",
+  "desc": "Trickling Tower, Bio Balls",
+  "status": "operational",
+  "details": {
+    "specs": "CO₂ outgassing, surface agitation, trickling design",
+    "priceRange": "$50-120",
+    "preferredBrands": "Custom PVC build, Lifegard",
+    "alternatives": "DIY with bio-balls, Air stones",
+    "maintenance": {
+      "weekly": "Clean bio-balls",
+      "monthly": "Check water flow",
+      "as-needed": "Adjust trickle rate"
+    },
+    "notes": "Reduces CO₂ levels. May need bypass for planted tanks.",
+    "suppliers": "DIY build recommended, Amazon for parts"
+  },
+  "category": "Filtration"
+}

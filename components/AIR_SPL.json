@@ -1,0 +1,20 @@
+{
+  "id": "AIR_SPL",
+  "name": "Air Manifold (ASP-101)",
+  "desc": "6-Way Distribution",
+  "status": "operational",
+  "details": {
+    "specs": "6-outlet manifold, individual flow control, check valves",
+    "priceRange": "$15-35",
+    "preferredBrands": "Pawfly, Hygger, Generic aquarium brands",
+    "alternatives": "T-splitters, Individual check valves",
+    "maintenance": {
+      "monthly": "Check valve operation",
+      "quarterly": "Clean valve seats",
+      "as-needed": "Adjust individual flows"
+    },
+    "notes": "Prevents backflow between air lines. Essential for reliability.",
+    "suppliers": "Amazon, Petco, LFS"
+  },
+  "category": "Air System"
+}

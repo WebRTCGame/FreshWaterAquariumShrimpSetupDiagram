@@ -1,0 +1,20 @@
+{
+  "id": "CO2_CYL",
+  "name": "CO₂ Cylinder (CO₂-201)",
+  "desc": "CO₂ Supply",
+  "status": "operational",
+  "details": {
+    "specs": "5-20 lb aluminum cylinder, CGA320 threading, food grade",
+    "priceRange": "$80-150 (new), $15-25 (refill)",
+    "preferredBrands": "Luxfer, Catalina, Local welding supply",
+    "alternatives": "Paintball tanks (smaller), CO₂ cartridges (disposable)",
+    "maintenance": {
+      "monthly": "Check pressure gauge",
+      "as-needed": "Refill when pressure drops to 200 psi",
+      "every-5-years": "Hydrostatic testing (required)"
+    },
+    "notes": "Larger tanks = fewer refills. Get hydro-tested cylinders.",
+    "suppliers": "Welding supply, Airgas, Beverage suppliers"
+  },
+  "category": "CO₂ System"
+}

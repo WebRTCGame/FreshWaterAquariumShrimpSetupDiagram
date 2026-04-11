@@ -1,0 +1,20 @@
+{
+  "id": "SH_MOSS",
+  "name": "Moss Fields (SH-101)",
+  "desc": "Grazing Area",
+  "status": "operational",
+  "details": {
+    "specs": "Java moss, Christmas moss, dense coverage for biofilm",
+    "priceRange": "$20-40 for initial stock",
+    "preferredBrands": "Local aquascapers, Online plant sellers",
+    "alternatives": "Riccia, Fissidens, Artificial moss mats",
+    "maintenance": {
+      "monthly": "Trim overgrown sections",
+      "quarterly": "Remove dead moss",
+      "as-needed": "Propagate to new areas"
+    },
+    "notes": "Primary food source for shrimp. Never use chemicals.",
+    "suppliers": "Aquarium Co-op, eBay, Local hobbyists"
+  },
+  "category": "Shrimp Habitat"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "ISL_WF_PMP",
+  "name": "Waterfall Pump (ISL-P-201)",
+  "desc": "50-80 GPH Submersible",
+  "status": "operational",
+  "details": {
+    "specs": "Submersible mini pump, 50-80 GPH, 1/4\" output, low voltage",
+    "priceRange": "$15-35",
+    "operatingCost": {
+      "monthly": "$0.36 (8W × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$4.30 (continuous recirculation)"
+    },
+    "preferredBrands": "Cobalt MJ Series, Aquatop, Tetra Pond",
+    "alternatives": "Air-driven waterfall systems, Powerhead with attachment",
+    "maintenance": {
+      "monthly": "Clean impeller and intake screen",
+      "quarterly": "Descale pump housing",
+      "yearly": "Replace impeller if flow reduced"
+    },
+    "notes": "Recirculates tank water up through tubing to island top, creating waterfall cascade. Adds oxygen and humidity.",
+    "suppliers": "Amazon, Pet stores, Aquarium supply"
+  },
+  "category": "Island System"
+}

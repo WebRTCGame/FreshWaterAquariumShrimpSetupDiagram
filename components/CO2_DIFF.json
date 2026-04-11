@@ -1,0 +1,20 @@
+{
+  "id": "CO2_DIFF",
+  "name": "CO₂ Diffuser (CO₂-205)",
+  "desc": "CO₂ Injection Point",
+  "status": "operational",
+  "details": {
+    "specs": "Ceramic or glass diffuser, fine bubble production",
+    "priceRange": "$20-50",
+    "preferredBrands": "ADA, CO2Art, Fluval",
+    "alternatives": "Reactor chamber, Powerhead venturi, DIY ladder",
+    "maintenance": {
+      "weekly": "Count bubbles per second",
+      "monthly": "Clean with bleach solution",
+      "quarterly": "Replace if bubble size increases"
+    },
+    "notes": "Place near filter intake for distribution. Target 1-2 bps.",
+    "suppliers": "BRS, Amazon, Planted tank specialists"
+  },
+  "category": "CO₂ System"
+}

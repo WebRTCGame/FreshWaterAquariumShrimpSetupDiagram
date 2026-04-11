@@ -1,0 +1,20 @@
+{
+  "id": "ISL_ROCK",
+  "name": "Lava Rock Island (ISL-101)",
+  "desc": "Lava Rock Structure",
+  "status": "operational",
+  "details": {
+    "specs": "Porous lava rock formation, above waterline, partially submerged base",
+    "priceRange": "$20-60",
+    "preferredBrands": "Natural lava rock, Zoo Med, Aquatic Arts",
+    "alternatives": "Dragon stone, Seiryu stone, Cork bark",
+    "maintenance": {
+      "monthly": "Rinse surface debris, inspect for algae growth",
+      "quarterly": "Deep clean with soft brush, check structural stability",
+      "yearly": "Reseal base if needed"
+    },
+    "notes": "Lava rock is inert and porous — safe for shrimp and beneficial bacteria. Provides basking surface.",
+    "suppliers": "Local fish stores, Amazon, Reptile specialty stores"
+  },
+  "category": "Island System"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "TE_103",
+  "name": "Temperature Probe (TE-103)",
+  "desc": "Temperature Monitoring",
+  "status": "operational",
+  "details": {
+    "specs": "Digital thermistor, ±0.1°C accuracy, waterproof",
+    "priceRange": "$20-50",
+    "preferredBrands": "Neptune, Hydros, OneTemp",
+    "alternatives": "Glass thermometer, Digital aquarium thermometer",
+    "maintenance": {
+      "monthly": "Verify accuracy vs reference thermometer",
+      "as-needed": "Clean probe housing",
+      "yearly": "Recalibrate or replace"
+    },
+    "notes": "Shrimp need stable 72-78°F. Place away from heaters.",
+    "suppliers": "BRS, Marine Depot, Amazon"
+  },
+  "category": "Sensors & Instruments"
+}

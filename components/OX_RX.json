@@ -1,0 +1,20 @@
+{
+  "id": "OX_RX",
+  "name": "Redox Reactor (OX-401)",
+  "desc": "Zeolite + Purigen",
+  "status": "operational",
+  "details": {
+    "specs": "Chemical filtration, ammonia/organic removal",
+    "priceRange": "$25-45 (Purigen), $10-20 (Zeolite)",
+    "preferredBrands": "Seachem Purigen, API Zeolite",
+    "alternatives": "Activated carbon, Chemipure",
+    "maintenance": {
+      "monthly": "Monitor color change",
+      "as-needed": "Regenerate Purigen with bleach",
+      "quarterly": "Replace zeolite"
+    },
+    "notes": "Purigen is regenerable. Zeolite removes ammonia.",
+    "suppliers": "Petco, Amazon, BRS"
+  },
+  "category": "Filtration"
+}

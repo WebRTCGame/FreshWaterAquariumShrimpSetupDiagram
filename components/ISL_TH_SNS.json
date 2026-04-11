@@ -1,0 +1,20 @@
+{
+  "id": "ISL_TH_SNS",
+  "name": "Island Temp/Humidity Sensor (ISL-SNS-701)",
+  "desc": "Digital Probe, ±1°F / ±2% RH",
+  "status": "operational",
+  "details": {
+    "specs": "Combined temp + humidity probe, waterproof housing, 3ft cable lead",
+    "priceRange": "$10-20",
+    "preferredBrands": "Inkbird probe (bundled), SHT20 based probes",
+    "alternatives": "Separate DHT22 + temperature probe, Govee smart sensor",
+    "maintenance": {
+      "monthly": "Verify readings vs reference",
+      "quarterly": "Clean probe housing",
+      "yearly": "Replace if reading error exceeds ±3°F or ±5% RH"
+    },
+    "notes": "Placed at island level above water surface. Feeds data to both ISL temp controller and ISL humidity controller.",
+    "suppliers": "Amazon, Inkbird official, Electronics supply"
+  },
+  "category": "Island System"
+}

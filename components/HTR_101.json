@@ -1,0 +1,24 @@
+{
+  "id": "HTR_101",
+  "name": "Main Heater (HTR-101)",
+  "desc": "200W",
+  "status": "operational",
+  "details": {
+    "specs": "Submersible, adjustable thermostat, 200W for 125 gal",
+    "priceRange": "$25-50",
+    "operatingCost": {
+      "monthly": "$12.44 (200W × 50% duty cycle × 24hrs × 30days × $0.14/kWh)",
+      "yearly": "$147.17 (varies by season - winter higher, summer lower)"
+    },
+    "preferredBrands": "Eheim Jager, Fluval E-Series, Aqueon Pro",
+    "alternatives": "Hydor Theo, Marineland Precision, Generic heaters",
+    "maintenance": {
+      "monthly": "Check temperature accuracy",
+      "quarterly": "Clean algae from heater",
+      "yearly": "Replace if temperature drift occurs"
+    },
+    "notes": "Rule: 5W per gallon. Use controller for safety. Never adjust while hot.",
+    "suppliers": "Petco, Amazon, BRS"
+  },
+  "category": "Heating & Climate"
+}

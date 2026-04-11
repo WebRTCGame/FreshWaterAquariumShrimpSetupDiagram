@@ -1,0 +1,21 @@
+{
+  "id": "PH_101",
+  "name": "pH Sensor (pH-101)",
+  "desc": "pH Monitoring",
+  "status": "operational",
+  "details": {
+    "specs": "Digital pH probe, 0.01 accuracy, temperature compensation",
+    "priceRange": "$50-120",
+    "preferredBrands": "Milwaukee, Hanna Instruments, Neptune",
+    "alternatives": "API pH test kit, Seachem pH Alert",
+    "maintenance": {
+      "weekly": "Check readings vs test kit",
+      "monthly": "Calibrate with buffer solutions",
+      "quarterly": "Replace probe storage solution",
+      "yearly": "Replace pH probe"
+    },
+    "notes": "Critical for shrimp health (6.5-7.5 range). Store in KCl solution.",
+    "suppliers": "BRS, Amazon, Hanna Direct"
+  },
+  "category": "Sensors & Instruments"
+}

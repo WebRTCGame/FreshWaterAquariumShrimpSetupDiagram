@@ -1,0 +1,20 @@
+{
+  "id": "DOS_TMR",
+  "name": "Dosing Timer Controller",
+  "desc": "Automated Dosing Control",
+  "status": "operational",
+  "details": {
+    "specs": "Multi-channel timer, 24hr programming, backup memory",
+    "priceRange": "$25-60",
+    "preferredBrands": "Digital timers, Apex modules, Hydros",
+    "alternatives": "Manual dosing schedule, Basic outlet timers",
+    "maintenance": {
+      "monthly": "Verify timing accuracy",
+      "quarterly": "Test backup battery",
+      "as-needed": "Update dosing schedules"
+    },
+    "notes": "Consistency is key for plant and shrimp health.",
+    "suppliers": "Amazon, BRS, Electronic stores"
+  },
+  "category": "Dosing System"
+}

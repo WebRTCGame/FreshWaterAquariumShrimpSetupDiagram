@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AquariumComponent",
+  "type": "object",
+  "required": ["id", "name", "desc", "status", "category", "details"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "desc": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["operational", "maintenance", "offline"]
+    },
+    "category": { "type": "string" },
+    "details": {
+      "type": "object",
+      "required": ["specs"],
+      "additionalProperties": false,
+      "properties": {
+        "specs": { "type": "string" },
+        "priceRange": { "type": "string" },
+        "preferredBrands": { "type": "string" },
+        "alternatives": { "type": "string" },
+        "notes": { "type": "string" },
+        "suppliers": { "type": "string" },
+        "maintenance": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "operatingCost": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}

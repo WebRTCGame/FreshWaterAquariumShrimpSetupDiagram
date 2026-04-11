@@ -1,0 +1,20 @@
+{
+  "id": "CO2_SOL",
+  "name": "Solenoid Valve (CO₂-203)",
+  "desc": "12V DC Control",
+  "status": "operational",
+  "details": {
+    "specs": "12V DC solenoid, normally closed, timer controlled",
+    "priceRange": "$30-60",
+    "preferredBrands": "ASCO, Parker, Aquatek integrated",
+    "alternatives": "Manual needle valve, 24V AC solenoids",
+    "maintenance": {
+      "monthly": "Test on/off operation",
+      "quarterly": "Check for gas leaks",
+      "as-needed": "Clean valve seat if sticking"
+    },
+    "notes": "Turns off CO₂ at night. Prevents pH swings and waste.",
+    "suppliers": "BRS, Amazon, Industrial suppliers"
+  },
+  "category": "CO₂ System"
+}

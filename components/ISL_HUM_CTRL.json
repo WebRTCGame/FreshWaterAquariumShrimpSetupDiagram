@@ -1,0 +1,20 @@
+{
+  "id": "ISL_HUM_CTRL",
+  "name": "Island Humidity Controller (ISL-HC-601)",
+  "desc": "Inkbird IHC-200, Dual Relay",
+  "status": "operational",
+  "details": {
+    "specs": "Dual relay: humidify + dehumidify outputs, 1% RH resolution, 110V switched outlets",
+    "priceRange": "$55-65",
+    "preferredBrands": "Inkbird IHC-200, Govee Smart Humidity Controller",
+    "alternatives": "Single-relay humidistat, Smart plug + humidity sensor",
+    "maintenance": {
+      "monthly": "Calibrate against reference hygrometer",
+      "quarterly": "Test both relay outputs",
+      "yearly": "Replace sensor probe if reading drift"
+    },
+    "notes": "Controls misting system (humidify relay) and island fan (dehumidify relay). Target island RH: 70-80%.",
+    "suppliers": "Amazon, eBay, Greenhouse supply"
+  },
+  "category": "Island System"
+}

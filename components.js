@@ -889,7 +889,7 @@ export const components = {
         specs: 'Focused spot bulb, 40-60W, directed at island surface, adjustable arm mount',
         priceRange: '$15-40',
         operatingCost: {
-          monthly: '$2.42 (50W × 8hr/day × 30days × $0.14/kWh)',
+          monthly: '$2.42 (50W mid-range × 8hr/day × 30days × $0.14/kWh)',
           yearly: '$29.02 (8hr daily operation)'
         },
         preferredBrands: 'Zoo Med Repti Basking Spot, Exo Terra Sun Glo',

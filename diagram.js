@@ -89,9 +89,6 @@ direction LR
         OUTLET_CO2["OUTLET-CO2"]
         OUTLET_ATO["OUTLET-ATO"]
         OUTLET_TMR["OUTLET-TMR"]
-        OUTLET_ISL_BASK["OUTLET-ISL-BASK"]
-        OUTLET_ISL_FAN["OUTLET-ISL-FAN"]
-        OUTLET_ISL_MIST["OUTLET-ISL-MIST"]
         OUTLET_ISL_WF["OUTLET-ISL-WF"]
         OUTLET_ISL_CTRL["OUTLET-ISL-CTRL"]
   end
@@ -457,17 +454,14 @@ direction LR
     DOS_101 --> DOS_PMP_1
     PRE_OUT --> SUPPLY_MANIFOLD
     FV_201 --> PRE_IN
-    PWR_101 -. Electrical Connection .-> OUTLET_ISL_BASK & OUTLET_ISL_FAN & OUTLET_ISL_MIST & OUTLET_ISL_WF & OUTLET_ISL_CTRL
-    OUTLET_ISL_BASK -. Electrical Connection .-> ISL_TEMP_CTRL
-    OUTLET_ISL_FAN -. Electrical Connection .-> ISL_HUM_CTRL
-    OUTLET_ISL_MIST -. Electrical Connection .-> ISL_HUM_CTRL
+    PWR_101 -. Electrical Connection .-> OUTLET_ISL_WF & OUTLET_ISL_CTRL
     OUTLET_ISL_WF -. Electrical Connection .-> ISL_WF_PMP
     OUTLET_ISL_CTRL -. Electrical Connection .-> ISL_TEMP_CTRL & ISL_HUM_CTRL
     ISL_TEMP_CTRL --- ISL_TH_SNS
     ISL_HUM_CTRL --- ISL_TH_SNS
-    ISL_TEMP_CTRL -. Heat Control .-> ISL_BASK
-    ISL_HUM_CTRL -. Humidify .-> ISL_MIST
-    ISL_HUM_CTRL -. Dehumidify .-> ISL_FAN
+    ISL_TEMP_CTRL -. Switched Power .-> ISL_BASK
+    ISL_HUM_CTRL -. Switched Power .-> ISL_MIST
+    ISL_HUM_CTRL -. Switched Power .-> ISL_FAN
     TK_101 == 1/4IN Silicone, 2ft, 60 GPH ==> ISL_WF_PMP
     ISL_WF_PMP == 1/4IN Silicone, 3ft, 60 GPH ==> ISL_WF_TUB
     ISL_WF_TUB == Waterfall Cascade ==> ISL_ROCK
@@ -532,9 +526,6 @@ direction LR
      OUTLET_CO2["OUTLET-CO2"]:::power
      OUTLET_ATO["OUTLET-ATO"]:::power
      OUTLET_TMR["OUTLET-TMR"]:::power
-     OUTLET_ISL_BASK["OUTLET-ISL-BASK"]:::power
-     OUTLET_ISL_FAN["OUTLET-ISL-FAN"]:::power
-     OUTLET_ISL_MIST["OUTLET-ISL-MIST"]:::power
      OUTLET_ISL_WF["OUTLET-ISL-WF"]:::power
      OUTLET_ISL_CTRL["OUTLET-ISL-CTRL"]:::power
      ISL_ROCK[["ISL-101<br>Lava Rock Island<br>Porous Structure<br>Above Waterline"]]:::island

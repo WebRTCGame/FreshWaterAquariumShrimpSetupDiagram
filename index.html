@@ -1,6 +1,7 @@
 
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
       body {
         margin: 0;
@@ -282,6 +283,131 @@
         background: #c62828;
         color: #ffcdd2;
       }
+
+      /* ── Mobile / Touch Responsive Styles ── */
+
+      /* Touch-positioned tooltip: bottom sheet on small screens */
+      .component-tooltip.touch-positioned {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        top: auto !important;
+        width: auto !important;
+        max-width: none !important;
+        transform: none !important;
+        pointer-events: auto;
+        max-height: 50vh;
+      }
+
+      /* Overlay that dims the graph when the sidebar is open on mobile */
+      #sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 450;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #sidebar-overlay.visible {
+        display: block;
+      }
+
+      @media (max-width: 768px) {
+        /* Sidebar becomes a full-height slide-in drawer */
+        #sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          height: 100%;
+          z-index: 500;
+          width: min(85vw, 300px);
+          transform: translateX(0);
+          margin-left: 0 !important;
+          transition: transform 0.3s ease;
+          box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+        }
+
+        #sidebar.collapsed {
+          transform: translateX(-100%);
+          margin-left: 0 !important;
+        }
+
+        /* Toggle button always floats above everything */
+        #toggle-sidebar {
+          position: fixed;
+          top: 10px;
+          left: 10px;
+          z-index: 600;
+          min-height: 44px;
+          min-width: 44px;
+          padding: 10px 14px;
+          font-size: 15px;
+          touch-action: manipulation;
+        }
+
+        /* Main container fills the whole viewport */
+        #main-container {
+          width: 100vw;
+        }
+
+        /* Sidebar header bigger padding */
+        #sidebar-header {
+          padding: 16px;
+          font-size: 15px;
+        }
+
+        /* Category titles: bigger touch targets */
+        .category-title {
+          padding: 12px;
+          font-size: 14px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
+
+        /* Component items: bigger touch targets */
+        .component-item {
+          padding: 10px 12px;
+          font-size: 14px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+        }
+
+        .component-item-header {
+          width: 100%;
+        }
+
+        /* Expand arrow bigger tap area */
+        .expand-arrow {
+          font-size: 13px;
+          padding: 8px;
+          margin: -8px;
+        }
+
+        /* Tooltip on mobile: slightly larger text */
+        .component-tooltip {
+          font-size: 13px;
+        }
+
+        .tooltip-title {
+          font-size: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        /* Phone-sized: even larger font for readability */
+        .category-title,
+        .component-item {
+          font-size: 15px;
+        }
+
+        #sidebar-header {
+          font-size: 16px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -289,8 +415,9 @@
       <div id="sidebar-header">
         Component Navigator
         <div style="font-size: 11px; font-weight: normal; margin-top: 6px; padding-top: 6px; border-top: 1px solid #495057; color: #e9ecef;">
-          <div style="margin-bottom: 6px;">💡 <strong>Hover</strong> over diagram components for quick info</div>
-          <div style="margin-bottom: 8px;">🖱️ <strong>Click</strong> diagram items to focus & zoom</div>
+          <div style="margin-bottom: 6px;">💡 <strong>Hover / Tap</strong> diagram components for quick info</div>
+          <div style="margin-bottom: 8px;">🖱️ <strong>Click / Tap</strong> sidebar items to focus & zoom</div>
+          <div style="margin-bottom: 8px;">🤏 <strong>Pinch</strong> to zoom the diagram</div>
           <button onclick="testTooltips()" style="background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; margin-top: 4px;">🔧 Debug Tooltips</button>
         </div>
         <div style="font-size: 12px; font-weight: normal; margin-top: 8px; padding-top: 8px; border-top: 1px solid #495057;">
@@ -304,7 +431,10 @@
         <!-- Components will be populated by JavaScript -->
       </div>
     </div>
-    
+
+    <!-- Overlay that closes the mobile sidebar when tapped -->
+    <div id="sidebar-overlay"></div>
+
     <div id="main-container">
       <button id="toggle-sidebar">☰ Toggle Sidebar</button>
       <div id="graphDiv"></div>
@@ -1022,7 +1152,11 @@ direction LR
           zoomEnabled: true,
           controlIconsEnabled: true,
           fit: true,
-          center: true
+          center: true,
+          dblClickZoomEnabled: true,
+          mouseWheelZoomEnabled: true,
+          preventMouseEventsDefault: true,
+          eventsListenerElement: document.getElementById('graphDiv')
         });
         
         // Store panZoom instance globally for tooltip functionality
@@ -2032,6 +2166,16 @@ direction LR
       }
       
       function focusOnComponent(panZoom, componentId) {
+        // Close sidebar on mobile so the graph is fully visible
+        if (window.innerWidth <= 768) {
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('sidebar-overlay');
+          const toggleBtn = document.getElementById('toggle-sidebar');
+          sidebar.classList.add('collapsed');
+          if (overlay) overlay.classList.remove('visible');
+          if (toggleBtn) toggleBtn.textContent = '☰ Show Sidebar';
+        }
+
         const element = document.querySelector(`[id="${componentId}"]`) || document.querySelector(`[id*="${componentId}"]`);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -2509,8 +2653,40 @@ direction LR
         element.addEventListener('mousemove', mouseMove);
         element.addEventListener('click', click);
         
+        // Touch support: tap to show / tap again or tap elsewhere to dismiss
+        const TOUCH_MOVE_THRESHOLD = 10; // pixels; below this is treated as a tap, not a drag
+        let _touchStartX = 0, _touchStartY = 0;
+
+        const touchStart = (e) => {
+          if (e.touches.length === 1) {
+            _touchStartX = e.touches[0].clientX;
+            _touchStartY = e.touches[0].clientY;
+          }
+        };
+
+        const touchEnd = (e) => {
+          if (e.changedTouches.length !== 1) return;
+          const t = e.changedTouches[0];
+          // Only treat as tap if finger barely moved
+          if (Math.abs(t.clientX - _touchStartX) > TOUCH_MOVE_THRESHOLD || Math.abs(t.clientY - _touchStartY) > TOUCH_MOVE_THRESHOLD) return;
+          e.preventDefault(); // prevent ghost click
+          e.stopPropagation(); // prevent global body dismiss from firing simultaneously
+          if (tooltip.classList.contains('visible')) {
+            hideTooltip(tooltip);
+          } else {
+            const content = createContent();
+            tooltip.innerHTML = content;
+            positionTooltipForTouch(t, tooltip);
+            tooltip.style.opacity = '1';
+            tooltip.classList.add('visible');
+          }
+        };
+
+        element.addEventListener('touchstart', touchStart, { passive: true });
+        element.addEventListener('touchend', touchEnd);
+
         // Store references for cleanup
-        element._tooltipHandlers = { mouseEnter, mouseLeave, mouseMove, click };
+        element._tooltipHandlers = { mouseEnter, mouseLeave, mouseMove, click, touchStart, touchEnd };
       }
       
       function createIntelligentTooltipContent(componentInfo) {
@@ -2679,6 +2855,7 @@ direction LR
         console.log('🔄 Hiding tooltip');
         tooltip.style.opacity = '0';
         tooltip.classList.remove('visible');
+        tooltip.classList.remove('touch-positioned');
       }
       
       function updateTooltipPosition(event, tooltip) {
@@ -2715,6 +2892,17 @@ direction LR
         
         tooltip.style.left = x + 'px';
         tooltip.style.top = y + 'px';
+      }
+
+      function positionTooltipForTouch(touch, tooltip) {
+        if (window.innerWidth <= 768) {
+          // On mobile: show as a bottom sheet so the finger never covers the content
+          tooltip.classList.add('touch-positioned');
+        } else {
+          // On larger touch screens (e.g. Surface): position near touch point like a mouse
+          tooltip.classList.remove('touch-positioned');
+          updateTooltipPosition({ clientX: touch.clientX, clientY: touch.clientY }, tooltip);
+        }
       }
       
       function createTooltipContent(componentData) {
@@ -2846,13 +3034,51 @@ direction LR
       document.addEventListener('DOMContentLoaded', () => {
         const toggleButton = document.getElementById('toggle-sidebar');
         const sidebar = document.getElementById('sidebar');
-        
+        const overlay = document.getElementById('sidebar-overlay');
+
+        // Auto-collapse sidebar on mobile screens at startup
+        if (window.innerWidth <= 768) {
+          sidebar.classList.add('collapsed');
+          toggleButton.textContent = '☰ Show Sidebar';
+        }
+
+        const closeSidebar = () => {
+          sidebar.classList.add('collapsed');
+          if (overlay) overlay.classList.remove('visible');
+          toggleButton.textContent = '☰ Show Sidebar';
+        };
+
+        const openSidebar = () => {
+          sidebar.classList.remove('collapsed');
+          if (overlay && window.innerWidth <= 768) overlay.classList.add('visible');
+          toggleButton.textContent = '☰ Hide Sidebar';
+        };
+
         toggleButton.addEventListener('click', () => {
-          sidebar.classList.toggle('collapsed');
-          toggleButton.textContent = sidebar.classList.contains('collapsed') 
-            ? '☰ Show Sidebar' 
-            : '☰ Hide Sidebar';
+          if (sidebar.classList.contains('collapsed')) {
+            openSidebar();
+          } else {
+            closeSidebar();
+          }
         });
+
+        // Tap the dim overlay to close the sidebar
+        if (overlay) {
+          overlay.addEventListener('click', closeSidebar);
+          overlay.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            closeSidebar();
+          });
+        }
+
+        // Global touch-to-dismiss tooltip: tapping empty SVG area hides tooltip
+        document.body.addEventListener('touchend', (e) => {
+          const tooltipEl = document.getElementById('component-tooltip');
+          if (!tooltipEl || !tooltipEl.classList.contains('visible')) return;
+          // Don't dismiss if the touch was on the tooltip itself or a tooltip-enabled element
+          if (tooltipEl.contains(e.target) || e.target.closest('[data-tooltip-enabled]')) return;
+          hideTooltip(tooltipEl);
+        }, { passive: true });
       });
       
       try {

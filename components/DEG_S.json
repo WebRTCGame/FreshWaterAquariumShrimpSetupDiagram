@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_S",
+    "name":  "DEG-S-501",
+    "desc":  "Dissolved Gas Sensor",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Dissolved Gas Sensor"
+                }
+}

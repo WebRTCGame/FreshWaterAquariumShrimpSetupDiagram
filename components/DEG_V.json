@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_V",
+    "name":  "DEG-V-501",
+    "desc":  "Isolation Valve",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Isolation Valve"
+                }
+}

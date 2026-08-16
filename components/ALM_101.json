@@ -1,0 +1,10 @@
+{
+    "id":  "ALM_101",
+    "name":  "ALM-101",
+    "desc":  "Low Water Alarm",
+    "status":  "operational",
+    "category":  "Safety \u0026 Alarms",
+    "details":  {
+                    "specs":  "Low Water Alarm"
+                }
+}

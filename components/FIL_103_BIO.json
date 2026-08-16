@@ -1,0 +1,10 @@
+{
+    "id":  "FIL_103_BIO",
+    "name":  "FIL-103-BIO",
+    "desc":  "Biofilm Layer",
+    "status":  "operational",
+    "category":  "Substrate \u0026 Plants",
+    "details":  {
+                    "specs":  "Biofilm Layer"
+                }
+}

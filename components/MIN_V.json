@@ -1,0 +1,10 @@
+{
+    "id":  "MIN_V",
+    "name":  "MIN-V-301",
+    "desc":  "Isolation Valve",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Isolation Valve"
+                }
+}

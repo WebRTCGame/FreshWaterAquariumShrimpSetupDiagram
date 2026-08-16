@@ -1,0 +1,10 @@
+{
+    "id":  "PLM_02",
+    "name":  "PL-102: Lava Rock",
+    "desc":  "Bacterial Surface Area",
+    "status":  "operational",
+    "category":  "Substrate \u0026 Plants",
+    "details":  {
+                    "specs":  "Bacterial Surface Area"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "BIO_ACC",
+    "name":  "BIO-V-201",
+    "desc":  "Media Access Port",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Media Access Port"
+                }
+}

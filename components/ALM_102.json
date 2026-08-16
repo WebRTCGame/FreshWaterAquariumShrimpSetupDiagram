@@ -1,0 +1,10 @@
+{
+    "id":  "ALM_102",
+    "name":  "ALM-102",
+    "desc":  "High Temp Alarm",
+    "status":  "operational",
+    "category":  "Safety \u0026 Alarms",
+    "details":  {
+                    "specs":  "High Temp Alarm"
+                }
+}

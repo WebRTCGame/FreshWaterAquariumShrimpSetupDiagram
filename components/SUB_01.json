@@ -1,0 +1,10 @@
+{
+    "id":  "SUB_01",
+    "name":  "SB-101: Cap Layer",
+    "desc":  "Fine Sand",
+    "status":  "operational",
+    "category":  "Substrate \u0026 Plants",
+    "details":  {
+                    "specs":  "Fine Sand"
+                }
+}

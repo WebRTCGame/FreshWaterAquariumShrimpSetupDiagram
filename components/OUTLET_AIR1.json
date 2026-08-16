@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_AIR1",
+    "name":  "OUTLET-AIR1",
+    "desc":  "OUTLET-AIR1",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-AIR1"
+                }
+}

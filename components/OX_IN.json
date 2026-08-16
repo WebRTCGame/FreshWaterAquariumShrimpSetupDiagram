@@ -1,0 +1,10 @@
+{
+    "id":  "OX_IN",
+    "name":  "OX-IN-401",
+    "desc":  "Redox Inlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Redox Inlet"
+                }
+}

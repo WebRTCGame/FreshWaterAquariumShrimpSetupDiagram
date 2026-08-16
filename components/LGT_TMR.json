@@ -1,0 +1,10 @@
+{
+    "id":  "LGT_TMR",
+    "name":  "LGT-TMR",
+    "desc":  "Photoperiod Timer",
+    "status":  "operational",
+    "category":  "Lighting",
+    "details":  {
+                    "specs":  "Photoperiod Timer"
+                }
+}

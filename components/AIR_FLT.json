@@ -1,0 +1,10 @@
+{
+    "id":  "AIR_FLT",
+    "name":  "AF-101",
+    "desc":  "Air Filter; HEPA Grade",
+    "status":  "operational",
+    "category":  "Air System",
+    "details":  {
+                    "specs":  "Air Filter; HEPA Grade"
+                }
+}

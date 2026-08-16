@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_TMR",
+    "name":  "OUTLET-TMR",
+    "desc":  "OUTLET-TMR",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-TMR"
+                }
+}

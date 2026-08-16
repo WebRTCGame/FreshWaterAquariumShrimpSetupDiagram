@@ -1,0 +1,10 @@
+{
+    "id":  "AIR_DRY",
+    "name":  "AD-101",
+    "desc":  "Air Dryer; Moisture Trap",
+    "status":  "operational",
+    "category":  "Air System",
+    "details":  {
+                    "specs":  "Air Dryer; Moisture Trap"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "DATA_101",
+    "name":  "DATA-101",
+    "desc":  "WiFi/Cloud Module",
+    "status":  "operational",
+    "category":  "Equipment",
+    "details":  {
+                    "specs":  "WiFi/Cloud Module"
+                }
+}

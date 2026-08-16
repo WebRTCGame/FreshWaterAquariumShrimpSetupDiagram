@@ -1,0 +1,10 @@
+{
+    "id":  "WC_DRAIN",
+    "name":  "WC-203",
+    "desc":  "Drain Valve",
+    "status":  "operational",
+    "category":  "Water Management",
+    "details":  {
+                    "specs":  "Drain Valve"
+                }
+}

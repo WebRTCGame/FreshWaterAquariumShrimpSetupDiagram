@@ -1,387 +1,1129 @@
 [
-  {
-    "id": "TK_101",
-    "name": "Main Tank (TK-101)",
-    "desc": "125 GAL Freshwater Planted",
-    "status": "operational",
-    "category": "Main Systems"
-  },
-  {
-    "id": "P_201",
-    "name": "Main Circulation Pump (P-201)",
-    "desc": "400 GPH, 30W, Shrimp-Safe",
-    "status": "operational",
-    "category": "Main Systems"
-  },
-  {
-    "id": "CONT_101",
-    "name": "Parameter Controller (CONT-101)",
-    "desc": "Main System Controller",
-    "status": "operational",
-    "category": "Main Systems"
-  },
-  {
-    "id": "PRE_FIL",
-    "name": "Prefilter (FIL-201)",
-    "desc": "Dual-Density Foam, 100μm",
-    "status": "maintenance",
-    "category": "Filtration"
-  },
-  {
-    "id": "BIO_RX",
-    "name": "Bioreactor (BIO-201)",
-    "desc": "Matrix + Bio Rings",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "MIN_RX",
-    "name": "pH Buffer Tower (MIN-301)",
-    "desc": "Crushed Coral + Aragonite",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "OX_RX",
-    "name": "Redox Reactor (OX-401)",
-    "desc": "Zeolite + Purigen",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "DEG_COL",
-    "name": "Degasser (DEG-501)",
-    "desc": "Trickling Tower, Bio Balls",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "FIL_101",
-    "name": "Left Corner Sponge (FIL-101)",
-    "desc": "Mechanical Filtration",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "FIL_102",
-    "name": "Right Corner Sponge (FIL-102)",
-    "desc": "Biological Filtration",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "FIL_103",
-    "name": "Matten Filter (FIL-103)",
-    "desc": "Combined Filtration",
-    "status": "operational",
-    "category": "Filtration"
-  },
-  {
-    "id": "PH_101",
-    "name": "pH Sensor (pH-101)",
-    "desc": "pH Monitoring",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "TDS_102",
-    "name": "TDS Meter (TDS-102)",
-    "desc": "Total Dissolved Solids",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "TE_103",
-    "name": "Temperature Probe (TE-103)",
-    "desc": "Temperature Monitoring",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "DO_106",
-    "name": "Dissolved Oxygen (DO-106)",
-    "desc": "Oxygen Level Monitoring",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "ORP_105",
-    "name": "Redox Potential (ORP-105)",
-    "desc": "Oxidation-Reduction Potential",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "LVL_107",
-    "name": "Water Level Sensor (LVL-107)",
-    "desc": "Tank Level Monitoring",
-    "status": "operational",
-    "category": "Sensors & Instruments"
-  },
-  {
-    "id": "HTR_101",
-    "name": "Main Heater (HTR-101)",
-    "desc": "200W",
-    "status": "operational",
-    "category": "Heating & Climate"
-  },
-  {
-    "id": "HTR_102",
-    "name": "Backup Heater (HTR-102)",
-    "desc": "100W",
-    "status": "operational",
-    "category": "Heating & Climate"
-  },
-  {
-    "id": "HTR_CONT",
-    "name": "Temperature Controller",
-    "desc": "Heating System Control",
-    "status": "operational",
-    "category": "Heating & Climate"
-  },
-  {
-    "id": "CO2_CYL",
-    "name": "CO₂ Cylinder (CO₂-201)",
-    "desc": "CO₂ Supply",
-    "status": "operational",
-    "category": "CO₂ System"
-  },
-  {
-    "id": "CO2_REG",
-    "name": "CO₂ Regulator (CO₂-202)",
-    "desc": "Dual Stage, Solenoid",
-    "status": "operational",
-    "category": "CO₂ System"
-  },
-  {
-    "id": "CO2_SOL",
-    "name": "Solenoid Valve (CO₂-203)",
-    "desc": "12V DC Control",
-    "status": "operational",
-    "category": "CO₂ System"
-  },
-  {
-    "id": "CO2_DIFF",
-    "name": "CO₂ Diffuser (CO₂-205)",
-    "desc": "CO₂ Injection Point",
-    "status": "operational",
-    "category": "CO₂ System"
-  },
-  {
-    "id": "DOS_PMP_1",
-    "name": "Mineral Dosing Pump (DOS-P-101)",
-    "desc": "GH/KH+ Dosing",
-    "status": "operational",
-    "category": "Dosing System"
-  },
-  {
-    "id": "DOS_PMP_2",
-    "name": "Fertilizer Dosing Pump (DOS-P-102)",
-    "desc": "Plant Fertilizer",
-    "status": "operational",
-    "category": "Dosing System"
-  },
-  {
-    "id": "DOS_TMR",
-    "name": "Dosing Timer Controller",
-    "desc": "Automated Dosing Control",
-    "status": "operational",
-    "category": "Dosing System"
-  },
-  {
-    "id": "AIR_101",
-    "name": "Main Air Compressor (AC-101)",
-    "desc": "Primary Air Supply",
-    "status": "operational",
-    "category": "Air System"
-  },
-  {
-    "id": "AIR_102",
-    "name": "Backup Air Pump (AC-102)",
-    "desc": "USB Backup Air",
-    "status": "operational",
-    "category": "Air System"
-  },
-  {
-    "id": "AIR_SPL",
-    "name": "Air Manifold (ASP-101)",
-    "desc": "6-Way Distribution",
-    "status": "operational",
-    "category": "Air System"
-  },
-  {
-    "id": "ATO_PMP",
-    "name": "Auto Top-Off Pump (ATO-202)",
-    "desc": "50 GPH Submersible",
-    "status": "operational",
-    "category": "Water Management"
-  },
-  {
-    "id": "WC_PMP",
-    "name": "Water Change Pump (WC-202)",
-    "desc": "200 GPH Submersible",
-    "status": "operational",
-    "category": "Water Management"
-  },
-  {
-    "id": "WC_MIX",
-    "name": "Mixing Tank (WC-201)",
-    "desc": "20 GAL Storage",
-    "status": "operational",
-    "category": "Water Management"
-  },
-  {
-    "id": "LGT_101",
-    "name": "LED Lighting (LGT-101)",
-    "desc": "Full Spectrum Plant Growth",
-    "status": "operational",
-    "category": "Lighting"
-  },
-  {
-    "id": "LGT_CON",
-    "name": "Light Controller",
-    "desc": "Lighting Control System",
-    "status": "operational",
-    "category": "Lighting"
-  },
-  {
-    "id": "PAR_101",
-    "name": "PAR Sensor (PAR-101)",
-    "desc": "Light Intensity Monitoring",
-    "status": "operational",
-    "category": "Lighting"
-  },
-  {
-    "id": "SH_MOSS",
-    "name": "Moss Fields (SH-101)",
-    "desc": "Grazing Area",
-    "status": "operational",
-    "category": "Shrimp Habitat"
-  },
-  {
-    "id": "SH_CAVES",
-    "name": "Rock Caves (SH-102)",
-    "desc": "Hiding & Molting Area",
-    "status": "operational",
-    "category": "Shrimp Habitat"
-  },
-  {
-    "id": "SH_BREED",
-    "name": "Breeding Colony (SH-103)",
-    "desc": "Quiet Corner",
-    "status": "operational",
-    "category": "Shrimp Habitat"
-  },
-  {
-    "id": "SH_FEED",
-    "name": "Feeding Station (SH-104)",
-    "desc": "Supplemental Area",
-    "status": "operational",
-    "category": "Shrimp Habitat"
-  },
-  {
-    "id": "QT_TANK",
-    "name": "Quarantine Tank (QT-101)",
-    "desc": "10 GAL Glass",
-    "status": "operational",
-    "category": "Quarantine"
-  },
-  {
-    "id": "QT_PMP",
-    "name": "Quarantine Pump (QT-104)",
-    "desc": "100 GPH Sponge Safe",
-    "status": "operational",
-    "category": "Quarantine"
-  },
-  {
-    "id": "ISL_ROCK",
-    "name": "Lava Rock Island (ISL-101)",
-    "desc": "Lava Rock Structure",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_BASK",
-    "name": "Basking Spot (ISL-102)",
-    "desc": "Heat Lamp / Basking Light",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_WF_PMP",
-    "name": "Waterfall Pump (ISL-P-201)",
-    "desc": "50-80 GPH Submersible",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_WF_TUB",
-    "name": "Waterfall Tubing (ISL-T-201)",
-    "desc": "1/4\" Silicone Tubing",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_FAN",
-    "name": "Island Fan (ISL-FAN-301)",
-    "desc": "Micro USB Fan, Humidity Control",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_MIST",
-    "name": "Island Misting System (ISL-MIST-401)",
-    "desc": "Pump + Nozzle + Tubing",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_TEMP_CTRL",
-    "name": "Island Temp Controller (ISL-TC-501)",
-    "desc": "Inkbird Digital, ±0.5°F",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_HUM_CTRL",
-    "name": "Island Humidity Controller (ISL-HC-601)",
-    "desc": "Inkbird IHC-200, Dual Relay",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_TH_SNS",
-    "name": "Island Temp/Humidity Sensor (ISL-SNS-701)",
-    "desc": "Digital Probe, ±1°F / ±2% RH",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "ISL_WLVL",
-    "name": "Waterfall Reservoir Level Sensor (ISL-LVL-801)",
-    "desc": "Float Switch, Pump Protection",
-    "status": "operational",
-    "category": "Island System"
-  },
-  {
-    "id": "PWR_101",
-    "name": "Main Power (PWR-101)",
-    "desc": "GFCI Protected",
-    "status": "operational",
-    "category": "Power & Control"
-  },
-  {
-    "id": "PWR_102",
-    "name": "Battery Backup (PWR-102)",
-    "desc": "Emergency Power",
-    "status": "operational",
-    "category": "Power & Control"
-  },
-  {
-    "id": "PWR_TMR",
-    "name": "Timer Hub (PWR-TMR)",
-    "desc": "Scheduling Control",
-    "status": "operational",
-    "category": "Power & Control"
-  }
+    {
+        "id":  "TK_101",
+        "name":  "Main Tank (TK-101)",
+        "desc":  "125 GAL Freshwater Planted",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "P_201",
+        "name":  "Main Circulation Pump (P-201)",
+        "desc":  "400 GPH, 30W, Shrimp-Safe",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "CONT_101",
+        "name":  "Parameter Controller (CONT-101)",
+        "desc":  "Main System Controller",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "PRE_FIL",
+        "name":  "Prefilter (FIL-201)",
+        "desc":  "Dual-Density Foam, 100μm",
+        "status":  "maintenance",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "BIO_RX",
+        "name":  "Bioreactor (BIO-201)",
+        "desc":  "Matrix + Bio Rings",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "MIN_RX",
+        "name":  "pH Buffer Tower (MIN-301)",
+        "desc":  "Crushed Coral + Aragonite",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "OX_RX",
+        "name":  "Redox Reactor (OX-401)",
+        "desc":  "Zeolite + Purigen",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "DEG_COL",
+        "name":  "Degasser (DEG-501)",
+        "desc":  "Trickling Tower, Bio Balls",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_101",
+        "name":  "Left Corner Sponge (FIL-101)",
+        "desc":  "Mechanical Filtration",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_102",
+        "name":  "Right Corner Sponge (FIL-102)",
+        "desc":  "Biological Filtration",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_103",
+        "name":  "Matten Filter (FIL-103)",
+        "desc":  "Combined Filtration",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "PH_101",
+        "name":  "pH Sensor (pH-101)",
+        "desc":  "pH Monitoring",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "TDS_102",
+        "name":  "TDS Meter (TDS-102)",
+        "desc":  "Total Dissolved Solids",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "TE_103",
+        "name":  "Temperature Probe (TE-103)",
+        "desc":  "Temperature Monitoring",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "DO_106",
+        "name":  "Dissolved Oxygen (DO-106)",
+        "desc":  "Oxygen Level Monitoring",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "ORP_105",
+        "name":  "Redox Potential (ORP-105)",
+        "desc":  "Oxidation-Reduction Potential",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "LVL_107",
+        "name":  "Water Level Sensor (LVL-107)",
+        "desc":  "Tank Level Monitoring",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "HTR_101",
+        "name":  "Main Heater (HTR-101)",
+        "desc":  "200W",
+        "status":  "operational",
+        "category":  "Heating \u0026 Climate"
+    },
+    {
+        "id":  "HTR_102",
+        "name":  "Backup Heater (HTR-102)",
+        "desc":  "100W",
+        "status":  "operational",
+        "category":  "Heating \u0026 Climate"
+    },
+    {
+        "id":  "HTR_CONT",
+        "name":  "Temperature Controller",
+        "desc":  "Heating System Control",
+        "status":  "operational",
+        "category":  "Heating \u0026 Climate"
+    },
+    {
+        "id":  "CO2_CYL",
+        "name":  "CO₂ Cylinder (CO₂-201)",
+        "desc":  "CO₂ Supply",
+        "status":  "operational",
+        "category":  "CO₂ System"
+    },
+    {
+        "id":  "CO2_REG",
+        "name":  "CO₂ Regulator (CO₂-202)",
+        "desc":  "Dual Stage, Solenoid",
+        "status":  "operational",
+        "category":  "CO₂ System"
+    },
+    {
+        "id":  "CO2_SOL",
+        "name":  "Solenoid Valve (CO₂-203)",
+        "desc":  "12V DC Control",
+        "status":  "operational",
+        "category":  "CO₂ System"
+    },
+    {
+        "id":  "CO2_DIFF",
+        "name":  "CO₂ Diffuser (CO₂-205)",
+        "desc":  "CO₂ Injection Point",
+        "status":  "operational",
+        "category":  "CO₂ System"
+    },
+    {
+        "id":  "DOS_PMP_1",
+        "name":  "Mineral Dosing Pump (DOS-P-101)",
+        "desc":  "GH/KH+ Dosing",
+        "status":  "operational",
+        "category":  "Dosing System"
+    },
+    {
+        "id":  "DOS_PMP_2",
+        "name":  "Fertilizer Dosing Pump (DOS-P-102)",
+        "desc":  "Plant Fertilizer",
+        "status":  "operational",
+        "category":  "Dosing System"
+    },
+    {
+        "id":  "DOS_TMR",
+        "name":  "Dosing Timer Controller",
+        "desc":  "Automated Dosing Control",
+        "status":  "operational",
+        "category":  "Dosing System"
+    },
+    {
+        "id":  "AIR_101",
+        "name":  "Main Air Compressor (AC-101)",
+        "desc":  "Primary Air Supply",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "AIR_102",
+        "name":  "Backup Air Pump (AC-102)",
+        "desc":  "USB Backup Air",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "AIR_SPL",
+        "name":  "Air Manifold (ASP-101)",
+        "desc":  "6-Way Distribution",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "ATO_PMP",
+        "name":  "Auto Top-Off Pump (ATO-202)",
+        "desc":  "50 GPH Submersible",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "WC_PMP",
+        "name":  "Water Change Pump (WC-202)",
+        "desc":  "200 GPH Submersible",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "WC_MIX",
+        "name":  "Mixing Tank (WC-201)",
+        "desc":  "20 GAL Storage",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "LGT_101",
+        "name":  "LED Lighting (LGT-101)",
+        "desc":  "Full Spectrum Plant Growth",
+        "status":  "operational",
+        "category":  "Lighting"
+    },
+    {
+        "id":  "LGT_CON",
+        "name":  "Light Controller",
+        "desc":  "Lighting Control System",
+        "status":  "operational",
+        "category":  "Lighting"
+    },
+    {
+        "id":  "PAR_101",
+        "name":  "PAR Sensor (PAR-101)",
+        "desc":  "Light Intensity Monitoring",
+        "status":  "operational",
+        "category":  "Lighting"
+    },
+    {
+        "id":  "SH_MOSS",
+        "name":  "Moss Fields (SH-101)",
+        "desc":  "Grazing Area",
+        "status":  "operational",
+        "category":  "Shrimp Habitat"
+    },
+    {
+        "id":  "SH_CAVES",
+        "name":  "Rock Caves (SH-102)",
+        "desc":  "Hiding \u0026 Molting Area",
+        "status":  "operational",
+        "category":  "Shrimp Habitat"
+    },
+    {
+        "id":  "SH_BREED",
+        "name":  "Breeding Colony (SH-103)",
+        "desc":  "Quiet Corner",
+        "status":  "operational",
+        "category":  "Shrimp Habitat"
+    },
+    {
+        "id":  "SH_FEED",
+        "name":  "Feeding Station (SH-104)",
+        "desc":  "Supplemental Area",
+        "status":  "operational",
+        "category":  "Shrimp Habitat"
+    },
+    {
+        "id":  "QT_TANK",
+        "name":  "Quarantine Tank (QT-101)",
+        "desc":  "10 GAL Glass",
+        "status":  "operational",
+        "category":  "Quarantine"
+    },
+    {
+        "id":  "QT_PMP",
+        "name":  "Quarantine Pump (QT-104)",
+        "desc":  "100 GPH Sponge Safe",
+        "status":  "operational",
+        "category":  "Quarantine"
+    },
+    {
+        "id":  "ISL_ROCK",
+        "name":  "Lava Rock Island (ISL-101)",
+        "desc":  "Lava Rock Structure",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_BASK",
+        "name":  "Basking Spot (ISL-102)",
+        "desc":  "Heat Lamp / Basking Light",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_WF_PMP",
+        "name":  "Waterfall Pump (ISL-P-201)",
+        "desc":  "50-80 GPH Submersible",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_WF_TUB",
+        "name":  "Waterfall Tubing (ISL-T-201)",
+        "desc":  "1/4\" Silicone Tubing",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_FAN",
+        "name":  "Island Fan (ISL-FAN-301)",
+        "desc":  "Micro USB Fan, Humidity Control",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_MIST",
+        "name":  "Island Misting System (ISL-MIST-401)",
+        "desc":  "Pump + Nozzle + Tubing",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_TEMP_CTRL",
+        "name":  "Island Temp Controller (ISL-TC-501)",
+        "desc":  "Inkbird Digital, ±0.5°F",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_HUM_CTRL",
+        "name":  "Island Humidity Controller (ISL-HC-601)",
+        "desc":  "Inkbird IHC-200, Dual Relay",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_TH_SNS",
+        "name":  "Island Temp/Humidity Sensor (ISL-SNS-701)",
+        "desc":  "Digital Probe, ±1°F / ±2% RH",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "ISL_WLVL",
+        "name":  "Waterfall Reservoir Level Sensor (ISL-LVL-801)",
+        "desc":  "Float Switch, Pump Protection",
+        "status":  "operational",
+        "category":  "Island System"
+    },
+    {
+        "id":  "PWR_101",
+        "name":  "Main Power (PWR-101)",
+        "desc":  "GFCI Protected",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "PWR_102",
+        "name":  "Battery Backup (PWR-102)",
+        "desc":  "Emergency Power",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "PWR_TMR",
+        "name":  "Timer Hub (PWR-TMR)",
+        "desc":  "Scheduling Control",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "DEG_S",
+        "name":  "DEG-S-501",
+        "desc":  "Dissolved Gas Sensor",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "DEG_AIR",
+        "name":  "DEG-AIR-501",
+        "desc":  "Air Vent",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FV_202",
+        "name":  "FV-202",
+        "desc":  "Return Valve",
+        "status":  "operational",
+        "category":  "Flow Control"
+    },
+    {
+        "id":  "DEG_ACC",
+        "name":  "DEG-V-501",
+        "desc":  "Media Access Port",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "DEG_V",
+        "name":  "DEG-V-501",
+        "desc":  "Isolation Valve",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "DEG_OUT",
+        "name":  "DEG-OUT-501",
+        "desc":  "Degasser Outlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "P_PRE",
+        "name":  "P-PRE-201",
+        "desc":  "Pump Prefilter; 0.5mm Mesh",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "P_ISO_2",
+        "name":  "P-ISO-202",
+        "desc":  "Outlet Isolation",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "P_GRID",
+        "name":  "P-GRID-201",
+        "desc":  "Strainer 0.5mm; Shrimp-Safe",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "AIR_CHK",
+        "name":  "AV-101",
+        "desc":  "Check Valve",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "P_BYP",
+        "name":  "P-BYP-201",
+        "desc":  "Bypass Valve",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "FV_201",
+        "name":  "FV-201",
+        "desc":  "Flow Control",
+        "status":  "operational",
+        "category":  "Flow Control"
+    },
+    {
+        "id":  "P_ISO_1",
+        "name":  "P-ISO-201",
+        "desc":  "Inlet Isolation",
+        "status":  "operational",
+        "category":  "Main Systems"
+    },
+    {
+        "id":  "MIN_ACC",
+        "name":  "MIN-V-301",
+        "desc":  "Media Access Port",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "MIN_V",
+        "name":  "MIN-V-301",
+        "desc":  "Isolation Valve",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "MIN_OUT",
+        "name":  "MIN-OUT-301",
+        "desc":  "Buffer Outlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "BIO_OUT",
+        "name":  "BIO-OUT-201",
+        "desc":  "Reactor Outlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "BIO_S",
+        "name":  "BIO-S-201",
+        "desc":  "Flow Indicator",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "MIN_IN",
+        "name":  "MIN-IN-301",
+        "desc":  "Buffer Inlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "MIN_S",
+        "name":  "MIN-S-301",
+        "desc":  "pH Sensor",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "OX_OUT",
+        "name":  "OX-OUT-401",
+        "desc":  "Redox Outlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "OX_S",
+        "name":  "OX-S-401",
+        "desc":  "Redox Sensor",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "DEG_IN",
+        "name":  "DEG-IN-501",
+        "desc":  "Degasser Inlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "OX_IN",
+        "name":  "OX-IN-401",
+        "desc":  "Redox Inlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "OX_ACC",
+        "name":  "OX-V-401",
+        "desc":  "Media Access Port",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "OX_V",
+        "name":  "OX-V-401",
+        "desc":  "Isolation Valve",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "AIR_FLT",
+        "name":  "AF-101",
+        "desc":  "Air Filter; HEPA Grade",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "WC_FILL",
+        "name":  "WC-204",
+        "desc":  "Fill Valve",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "DATA_101",
+        "name":  "DATA-101",
+        "desc":  "WiFi/Cloud Module",
+        "status":  "operational",
+        "category":  "Equipment"
+    },
+    {
+        "id":  "DATA_102",
+        "name":  "DATA-102",
+        "desc":  "Data Logger",
+        "status":  "operational",
+        "category":  "Equipment"
+    },
+    {
+        "id":  "TEE_WC1",
+        "name":  "TEE-WC1",
+        "desc":  "1/2IN TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "TEE_WC2",
+        "name":  "TEE-WC2",
+        "desc":  "1/2IN TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "WC_DRAIN",
+        "name":  "WC-203",
+        "desc":  "Drain Valve",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "QT_FIL",
+        "name":  "QT-102",
+        "desc":  "Filter",
+        "status":  "operational",
+        "category":  "Quarantine"
+    },
+    {
+        "id":  "PRE_IN",
+        "name":  "PRE-IN-201",
+        "desc":  "Filter Inlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "PRE_V",
+        "name":  "PRE-V-201",
+        "desc":  "Isolation Valve",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "PRE_OUT",
+        "name":  "PRE-OUT-201",
+        "desc":  "Filter Outlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "QT_HTR",
+        "name":  "QT-103",
+        "desc":  "Heater",
+        "status":  "operational",
+        "category":  "Quarantine"
+    },
+    {
+        "id":  "PRE_ACC",
+        "name":  "FIL-V-201",
+        "desc":  "Prefilter Clean Access",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "PRE_S",
+        "name":  "PRE-S-201",
+        "desc":  "Pressure Sensor",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "ALM_102",
+        "name":  "ALM-102",
+        "desc":  "High Temp Alarm",
+        "status":  "operational",
+        "category":  "Safety \u0026 Alarms"
+    },
+    {
+        "id":  "DOS_101",
+        "name":  "DOS-101",
+        "desc":  "Mineral Doser; GH/KH+",
+        "status":  "operational",
+        "category":  "Dosing System"
+    },
+    {
+        "id":  "DOS_102",
+        "name":  "DOS-102",
+        "desc":  "Plant Fertilizer; Micro/Macro",
+        "status":  "operational",
+        "category":  "Dosing System"
+    },
+    {
+        "id":  "AIR_DRY",
+        "name":  "AD-101",
+        "desc":  "Air Dryer; Moisture Trap",
+        "status":  "operational",
+        "category":  "Air System"
+    },
+    {
+        "id":  "FI_104",
+        "name":  "FI-104",
+        "desc":  "Flow Indicator",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "ALM_101",
+        "name":  "ALM-101",
+        "desc":  "Low Water Alarm",
+        "status":  "operational",
+        "category":  "Safety \u0026 Alarms"
+    },
+    {
+        "id":  "TEE_DOS2",
+        "name":  "TEE-DOS2",
+        "desc":  "1/8IN TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "ATO_RES",
+        "name":  "ATO-201",
+        "desc":  "Reservoir",
+        "status":  "operational",
+        "category":  "Water Management"
+    },
+    {
+        "id":  "TEE_ATO1",
+        "name":  "TEE-ATO1",
+        "desc":  "1/4IN TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "ATO_SNS",
+        "name":  "ATO-203",
+        "desc":  "Float Sensor",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "HTR_THRM",
+        "name":  "HTR-THRM",
+        "desc":  "Thermal Cutoff",
+        "status":  "operational",
+        "category":  "Heating \u0026 Climate"
+    },
+    {
+        "id":  "CO2_BUB",
+        "name":  "CO₂-204",
+        "desc":  "Bubble Counter",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "CO2_PH_CTRL",
+        "name":  "CO₂-206",
+        "desc":  "pH Controller",
+        "status":  "operational",
+        "category":  "Sensors \u0026 Instruments"
+    },
+    {
+        "id":  "OUTLET_ATO",
+        "name":  "OUTLET-ATO",
+        "desc":  "OUTLET-ATO",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_TMR",
+        "name":  "OUTLET-TMR",
+        "desc":  "OUTLET-TMR",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_ISL_WF",
+        "name":  "OUTLET-ISL-WF",
+        "desc":  "OUTLET-ISL-WF",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_DOS1",
+        "name":  "OUTLET-DOS1",
+        "desc":  "OUTLET-DOS1",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_DOS2",
+        "name":  "OUTLET-DOS2",
+        "desc":  "OUTLET-DOS2",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_CO2",
+        "name":  "OUTLET-CO2",
+        "desc":  "OUTLET-CO2",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_ISL_CTRL",
+        "name":  "OUTLET-ISL-CTRL",
+        "desc":  "OUTLET-ISL-CTRL",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "SUB_03",
+        "name":  "SB-103: Buffer Layer",
+        "desc":  "Safe-T-Sorb/Fluorite",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "SUB_04",
+        "name":  "SB-104: Mesh Screen",
+        "desc":  "Fine Nylon Mesh",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "PLM_01",
+        "name":  "PL-101: Plenum Chamber",
+        "desc":  "0.5-1 in Gap; Denitrifying Zone",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "LGT_TMR",
+        "name":  "LGT-TMR",
+        "desc":  "Photoperiod Timer",
+        "status":  "operational",
+        "category":  "Lighting"
+    },
+    {
+        "id":  "SUB_01",
+        "name":  "SB-101: Cap Layer",
+        "desc":  "Fine Sand",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "SUB_02",
+        "name":  "SB-102: Middle Layer",
+        "desc":  "Mineralized Soil",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "TK_ACC",
+        "name":  "TK-ACC-1",
+        "desc":  "Access Cover",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "TK_OVF",
+        "name":  "TK-OVF-1",
+        "desc":  "Overflow Protection; Standpipe",
+        "status":  "operational",
+        "category":  "Equipment"
+    },
+    {
+        "id":  "FEEDER_101",
+        "name":  "FD-101",
+        "desc":  "Auto Feeder",
+        "status":  "operational",
+        "category":  "Feeding"
+    },
+    {
+        "id":  "TEE_OV1",
+        "name":  "TEE-OV1",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "TEE_OV2",
+        "name":  "TEE-OV2",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "TEE_OV3",
+        "name":  "TEE-OV3",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "OUTLET_PUMP",
+        "name":  "OUTLET-PUMP",
+        "desc":  "OUTLET-PUMP",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_HTR2",
+        "name":  "OUTLET-HTR2",
+        "desc":  "OUTLET-HTR2",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_CHILLER",
+        "name":  "OUTLET-CHILLER",
+        "desc":  "OUTLET-CHILLER",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_FEEDER",
+        "name":  "OUTLET-FEEDER",
+        "desc":  "OUTLET-FEEDER",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_AIR1",
+        "name":  "OUTLET-AIR1",
+        "desc":  "OUTLET-AIR1",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_AIR2",
+        "name":  "OUTLET-AIR2",
+        "desc":  "OUTLET-AIR2",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "OUTLET_HTR1",
+        "name":  "OUTLET-HTR1",
+        "desc":  "OUTLET-HTR1",
+        "status":  "operational",
+        "category":  "Power \u0026 Control"
+    },
+    {
+        "id":  "PLM_02",
+        "name":  "PL-102: Lava Rock",
+        "desc":  "Bacterial Surface Area",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "SUP_TEE2",
+        "name":  "SUP-TEE-2",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "SUP_TEE3",
+        "name":  "SUP-TEE-3",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "SUP_TEE4",
+        "name":  "SUP-TEE-4",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "FIL_103_OUT",
+        "name":  "FIL-103-OUT",
+        "desc":  "Filtered Output",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_103_BIO",
+        "name":  "FIL-103-BIO",
+        "desc":  "Biofilm Layer",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "SUP_TEE1",
+        "name":  "SUP-TEE-1",
+        "desc":  "SUP-TEE-1",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "RET_TEE1",
+        "name":  "RET-TEE-1",
+        "desc":  "RET-TEE-1",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "BIO_IN",
+        "name":  "BIO-IN-201",
+        "desc":  "Reactor Inlet",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "BIO_ACC",
+        "name":  "BIO-V-201",
+        "desc":  "Media Access Port",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "BIO_V",
+        "name":  "BIO-V-201",
+        "desc":  "Isolation Valve",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "RET_TEE2",
+        "name":  "RET-TEE-2",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "RET_TEE3",
+        "name":  "RET-TEE-3",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "RET_TEE4",
+        "name":  "RET-TEE-4",
+        "desc":  "1IN PVC TEE",
+        "status":  "operational",
+        "category":  "Plumbing \u0026 Valves"
+    },
+    {
+        "id":  "PLT_03",
+        "name":  "PLT-103: Carpet Zone",
+        "desc":  "Moss, Monte Carlo",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "PLT_04",
+        "name":  "PLT-104: Floating Plants",
+        "desc":  "Frogbit, Surface Cover",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "FIL_101_IN",
+        "name":  "FIL-101-IN",
+        "desc":  "Water Intake",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "PLM_ACC",
+        "name":  "PL-ACC-1",
+        "desc":  "Plenum Access Port",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "PLT_01",
+        "name":  "PLT-101: Root Zone",
+        "desc":  "Crypts, Swords; Root Oxygenation",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "PLT_02",
+        "name":  "PLT-102: Midground",
+        "desc":  "Stems, Java Fern",
+        "status":  "operational",
+        "category":  "Substrate \u0026 Plants"
+    },
+    {
+        "id":  "FIL_101_1",
+        "name":  "FIL-V-101",
+        "desc":  "Sponge Clean Access",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "FIL_102_OUT",
+        "name":  "FIL-102-OUT",
+        "desc":  "Filtered Output",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_103_IN",
+        "name":  "FIL-103-IN",
+        "desc":  "Water Intake",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_103_1",
+        "name":  "FIL-V-103",
+        "desc":  "Matten Clean Access",
+        "status":  "operational",
+        "category":  "Accessories"
+    },
+    {
+        "id":  "FIL_101_OUT",
+        "name":  "FIL-101-OUT",
+        "desc":  "Filtered Output",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_102_IN",
+        "name":  "FIL-102-IN",
+        "desc":  "Water Intake",
+        "status":  "operational",
+        "category":  "Filtration"
+    },
+    {
+        "id":  "FIL_102_1",
+        "name":  "FIL-V-102",
+        "desc":  "Media Access",
+        "status":  "operational",
+        "category":  "Accessories"
+    }
 ]

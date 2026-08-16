@@ -1,0 +1,10 @@
+{
+    "id":  "OX_OUT",
+    "name":  "OX-OUT-401",
+    "desc":  "Redox Outlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Redox Outlet"
+                }
+}

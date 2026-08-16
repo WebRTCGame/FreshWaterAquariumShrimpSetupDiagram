@@ -1,0 +1,10 @@
+{
+    "id":  "P_PRE",
+    "name":  "P-PRE-201",
+    "desc":  "Pump Prefilter; 0.5mm Mesh",
+    "status":  "operational",
+    "category":  "Main Systems",
+    "details":  {
+                    "specs":  "Pump Prefilter; 0.5mm Mesh"
+                }
+}

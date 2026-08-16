@@ -1,0 +1,10 @@
+{
+    "id":  "BIO_OUT",
+    "name":  "BIO-OUT-201",
+    "desc":  "Reactor Outlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Reactor Outlet"
+                }
+}

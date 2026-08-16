@@ -1,0 +1,10 @@
+{
+    "id":  "FIL_102_IN",
+    "name":  "FIL-102-IN",
+    "desc":  "Water Intake",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Water Intake"
+                }
+}

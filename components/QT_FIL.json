@@ -1,0 +1,10 @@
+{
+    "id":  "QT_FIL",
+    "name":  "QT-102",
+    "desc":  "Filter",
+    "status":  "operational",
+    "category":  "Quarantine",
+    "details":  {
+                    "specs":  "Filter"
+                }
+}

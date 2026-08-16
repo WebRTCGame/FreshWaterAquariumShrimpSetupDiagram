@@ -1,0 +1,10 @@
+{
+    "id":  "CO2_BUB",
+    "name":  "CO₂-204",
+    "desc":  "Bubble Counter",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Bubble Counter"
+                }
+}

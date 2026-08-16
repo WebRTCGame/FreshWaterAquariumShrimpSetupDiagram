@@ -1,0 +1,10 @@
+{
+    "id":  "TEE_ATO1",
+    "name":  "TEE-ATO1",
+    "desc":  "1/4IN TEE",
+    "status":  "operational",
+    "category":  "Plumbing \u0026 Valves",
+    "details":  {
+                    "specs":  "1/4IN TEE"
+                }
+}

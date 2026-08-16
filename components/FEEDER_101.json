@@ -1,0 +1,10 @@
+{
+    "id":  "FEEDER_101",
+    "name":  "FD-101",
+    "desc":  "Auto Feeder",
+    "status":  "operational",
+    "category":  "Feeding",
+    "details":  {
+                    "specs":  "Auto Feeder"
+                }
+}

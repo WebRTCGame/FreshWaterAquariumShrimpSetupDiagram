@@ -1,0 +1,10 @@
+{
+    "id":  "MIN_S",
+    "name":  "MIN-S-301",
+    "desc":  "pH Sensor",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "pH Sensor"
+                }
+}

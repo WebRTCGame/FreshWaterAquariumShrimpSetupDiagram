@@ -1,7 +1,9 @@
-
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freshwater Aquarium Shrimp Setup Diagram</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -12,12 +14,11 @@
           <div style="margin-bottom: 6px;">💡 <strong>Hover / Tap</strong> diagram components for quick info</div>
           <div style="margin-bottom: 8px;">🖱️ <strong>Click / Tap</strong> sidebar items to focus &amp; zoom</div>
           <div style="margin-bottom: 8px;">🤏 <strong>Pinch</strong> to zoom the diagram</div>
-          <button onclick="testTooltips()" style="background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; margin-top: 4px;">🔧 Debug Tooltips</button>
         </div>
         <div style="font-size: 12px; font-weight: normal; margin-top: 8px; padding-top: 8px; border-top: 1px solid #495057;">
           <div style="color: #28a745;">💡 Total System Operating Cost:</div>
-          <div style="color: #ffc107; font-weight: bold;">Monthly: ~$21.84</div>
-          <div style="color: #ffc107; font-weight: bold;">Yearly: ~$273.27</div>
+          <div id="total-cost-monthly" style="color: #ffc107; font-weight: bold;">Monthly: computing...</div>
+          <div id="total-cost-yearly" style="color: #ffc107; font-weight: bold;">Yearly: computing...</div>
           <div style="font-size: 10px; color: #adb5bd; margin-top: 4px;">Based on $0.14/kWh electricity rate</div>
         </div>
       </div>
@@ -35,7 +36,12 @@
       <!-- Tooltip element -->
       <div id="component-tooltip" class="component-tooltip"></div>
     </div>
-    <script src="https://bumbu.me/svg-pan-zoom/dist/svg-pan-zoom.js"></script>
-    <script type="module" src="app.js"></script>
+    <script src="lib/mermaid.min.js"></script>
+    <script src="lib/svg-pan-zoom.min.js"></script>
+    <script src="components/data.js"></script>
+    <script src="diagram.js"></script>
+    <script src="sidebar.js"></script>
+    <script src="tooltips.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

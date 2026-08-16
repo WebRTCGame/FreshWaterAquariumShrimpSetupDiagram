@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_FEEDER",
+    "name":  "OUTLET-FEEDER",
+    "desc":  "OUTLET-FEEDER",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-FEEDER"
+                }
+}

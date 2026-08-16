@@ -1,0 +1,10 @@
+{
+    "id":  "HTR_THRM",
+    "name":  "HTR-THRM",
+    "desc":  "Thermal Cutoff",
+    "status":  "operational",
+    "category":  "Heating \u0026 Climate",
+    "details":  {
+                    "specs":  "Thermal Cutoff"
+                }
+}

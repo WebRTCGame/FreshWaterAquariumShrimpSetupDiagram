@@ -1,4 +1,4 @@
-export const graphDefinition = `
+const graphDefinition = `
 flowchart
 direction LR
  subgraph LEGEND["LEGEND / KEY"]

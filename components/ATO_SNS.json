@@ -1,0 +1,10 @@
+{
+    "id":  "ATO_SNS",
+    "name":  "ATO-203",
+    "desc":  "Float Sensor",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Float Sensor"
+                }
+}

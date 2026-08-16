@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_ISL_WF",
+    "name":  "OUTLET-ISL-WF",
+    "desc":  "OUTLET-ISL-WF",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-ISL-WF"
+                }
+}

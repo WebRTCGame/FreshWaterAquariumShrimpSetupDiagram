@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_IN",
+    "name":  "DEG-IN-501",
+    "desc":  "Degasser Inlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Degasser Inlet"
+                }
+}

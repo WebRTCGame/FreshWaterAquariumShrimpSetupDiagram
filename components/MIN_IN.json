@@ -1,0 +1,10 @@
+{
+    "id":  "MIN_IN",
+    "name":  "MIN-IN-301",
+    "desc":  "Buffer Inlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Buffer Inlet"
+                }
+}

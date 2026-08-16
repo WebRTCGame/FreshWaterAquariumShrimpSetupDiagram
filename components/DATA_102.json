@@ -1,0 +1,10 @@
+{
+    "id":  "DATA_102",
+    "name":  "DATA-102",
+    "desc":  "Data Logger",
+    "status":  "operational",
+    "category":  "Equipment",
+    "details":  {
+                    "specs":  "Data Logger"
+                }
+}

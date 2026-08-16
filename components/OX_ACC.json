@@ -1,0 +1,10 @@
+{
+    "id":  "OX_ACC",
+    "name":  "OX-V-401",
+    "desc":  "Media Access Port",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Media Access Port"
+                }
+}

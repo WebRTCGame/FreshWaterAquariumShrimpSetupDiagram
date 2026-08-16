@@ -1,0 +1,10 @@
+{
+    "id":  "TK_OVF",
+    "name":  "TK-OVF-1",
+    "desc":  "Overflow Protection; Standpipe",
+    "status":  "operational",
+    "category":  "Equipment",
+    "details":  {
+                    "specs":  "Overflow Protection; Standpipe"
+                }
+}

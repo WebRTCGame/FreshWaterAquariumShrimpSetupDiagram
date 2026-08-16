@@ -159,12 +159,12 @@ A **float-switch reservoir level sensor** protects the waterfall pump from runni
 
 ## 💰 Operating Costs
 
-Costs are calculated at **$0.14 / kWh** and displayed live in the sidebar header.
+Costs are calculated at **$0.14 / kWh** and displayed live in the sidebar header. Totals are computed at runtime by summing the `operatingCost` fields in `components/*.json` — edit the data, not the header.
 
 | Budget | Cost |
 |---|---|
-| **Monthly** | **~$21.84** |
-| **Yearly** | **~$273.27** |
+| **Monthly** | **~$26.23** |
+| **Yearly** | **~$310.55** |
 
 Major contributors:
 
@@ -184,10 +184,16 @@ Major contributors:
 ```
 FreshWaterAquariumShrimpSetupDiagram/
 ├── index.html          # Single-page application shell
-├── app.js              # Main entry point — renders diagram, sidebar, tooltips
+├── app.js              # Main entry point — diagram render, totals, sidebar toggle
+├── sidebar.js          # Sidebar rendering, component details, focus/zoom
+├── tooltips.js         # Diagram tooltips (hover / tap)
 ├── diagram.js          # Mermaid flowchart definition (graphDefinition export)
-├── components.js       # Component data (specs, costs, brands, maintenance)
+├── components/         # Component data: manifest.json + one JSON per component
+│   ├── manifest.json   # Slim index (id, name, desc, status, category)
+│   ├── schema.json     # JSON Schema for component files
+│   └── *.json          # Full specs, costs, brands, maintenance per component
 ├── styles.css          # Layout, sidebar, tooltip, and responsive styles
+├── validate.js         # Node script: schema-validates every component file
 ├── island.md           # Island humidity system BOM + misting product comparison
 ├── Humidity Control Relay Setup.pdf  # Island relay wiring reference
 └── LICENSE

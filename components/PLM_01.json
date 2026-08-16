@@ -1,0 +1,10 @@
+{
+    "id":  "PLM_01",
+    "name":  "PL-101: Plenum Chamber",
+    "desc":  "0.5-1 in Gap; Denitrifying Zone",
+    "status":  "operational",
+    "category":  "Substrate \u0026 Plants",
+    "details":  {
+                    "specs":  "0.5-1 in Gap; Denitrifying Zone"
+                }
+}

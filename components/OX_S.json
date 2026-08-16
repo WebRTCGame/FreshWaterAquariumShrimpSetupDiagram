@@ -1,0 +1,10 @@
+{
+    "id":  "OX_S",
+    "name":  "OX-S-401",
+    "desc":  "Redox Sensor",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Redox Sensor"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "MIN_OUT",
+    "name":  "MIN-OUT-301",
+    "desc":  "Buffer Outlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Buffer Outlet"
+                }
+}

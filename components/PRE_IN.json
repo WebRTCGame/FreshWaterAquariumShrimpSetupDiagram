@@ -1,0 +1,10 @@
+{
+    "id":  "PRE_IN",
+    "name":  "PRE-IN-201",
+    "desc":  "Filter Inlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Filter Inlet"
+                }
+}

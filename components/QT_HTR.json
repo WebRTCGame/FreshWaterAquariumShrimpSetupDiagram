@@ -1,0 +1,10 @@
+{
+    "id":  "QT_HTR",
+    "name":  "QT-103",
+    "desc":  "Heater",
+    "status":  "operational",
+    "category":  "Quarantine",
+    "details":  {
+                    "specs":  "Heater"
+                }
+}

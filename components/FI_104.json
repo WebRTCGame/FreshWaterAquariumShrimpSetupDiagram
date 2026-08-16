@@ -1,0 +1,10 @@
+{
+    "id":  "FI_104",
+    "name":  "FI-104",
+    "desc":  "Flow Indicator",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Flow Indicator"
+                }
+}

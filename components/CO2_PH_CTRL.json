@@ -1,0 +1,10 @@
+{
+    "id":  "CO2_PH_CTRL",
+    "name":  "CO₂-206",
+    "desc":  "pH Controller",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "pH Controller"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "FIL_103_OUT",
+    "name":  "FIL-103-OUT",
+    "desc":  "Filtered Output",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Filtered Output"
+                }
+}

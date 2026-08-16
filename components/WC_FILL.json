@@ -1,0 +1,10 @@
+{
+    "id":  "WC_FILL",
+    "name":  "WC-204",
+    "desc":  "Fill Valve",
+    "status":  "operational",
+    "category":  "Water Management",
+    "details":  {
+                    "specs":  "Fill Valve"
+                }
+}

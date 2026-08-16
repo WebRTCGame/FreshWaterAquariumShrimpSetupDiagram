@@ -1,0 +1,10 @@
+{
+    "id":  "DOS_101",
+    "name":  "DOS-101",
+    "desc":  "Mineral Doser; GH/KH+",
+    "status":  "operational",
+    "category":  "Dosing System",
+    "details":  {
+                    "specs":  "Mineral Doser; GH/KH+"
+                }
+}

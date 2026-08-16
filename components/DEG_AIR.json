@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_AIR",
+    "name":  "DEG-AIR-501",
+    "desc":  "Air Vent",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Air Vent"
+                }
+}

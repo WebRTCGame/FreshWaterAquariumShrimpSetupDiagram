@@ -1,0 +1,10 @@
+{
+    "id":  "P_BYP",
+    "name":  "P-BYP-201",
+    "desc":  "Bypass Valve",
+    "status":  "operational",
+    "category":  "Main Systems",
+    "details":  {
+                    "specs":  "Bypass Valve"
+                }
+}

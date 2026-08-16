@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_OUT",
+    "name":  "DEG-OUT-501",
+    "desc":  "Degasser Outlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Degasser Outlet"
+                }
+}

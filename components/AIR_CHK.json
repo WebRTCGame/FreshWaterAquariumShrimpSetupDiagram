@@ -1,0 +1,10 @@
+{
+    "id":  "AIR_CHK",
+    "name":  "AV-101",
+    "desc":  "Check Valve",
+    "status":  "operational",
+    "category":  "Air System",
+    "details":  {
+                    "specs":  "Check Valve"
+                }
+}

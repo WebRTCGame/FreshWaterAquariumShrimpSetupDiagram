@@ -1,0 +1,10 @@
+{
+    "id":  "DEG_ACC",
+    "name":  "DEG-V-501",
+    "desc":  "Media Access Port",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Media Access Port"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "ATO_RES",
+    "name":  "ATO-201",
+    "desc":  "Reservoir",
+    "status":  "operational",
+    "category":  "Water Management",
+    "details":  {
+                    "specs":  "Reservoir"
+                }
+}

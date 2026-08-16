@@ -1,0 +1,10 @@
+{
+    "id":  "P_ISO_1",
+    "name":  "P-ISO-201",
+    "desc":  "Inlet Isolation",
+    "status":  "operational",
+    "category":  "Main Systems",
+    "details":  {
+                    "specs":  "Inlet Isolation"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "P_ISO_2",
+    "name":  "P-ISO-202",
+    "desc":  "Outlet Isolation",
+    "status":  "operational",
+    "category":  "Main Systems",
+    "details":  {
+                    "specs":  "Outlet Isolation"
+                }
+}

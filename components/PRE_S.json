@@ -1,0 +1,10 @@
+{
+    "id":  "PRE_S",
+    "name":  "PRE-S-201",
+    "desc":  "Pressure Sensor",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Pressure Sensor"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "BIO_S",
+    "name":  "BIO-S-201",
+    "desc":  "Flow Indicator",
+    "status":  "operational",
+    "category":  "Sensors \u0026 Instruments",
+    "details":  {
+                    "specs":  "Flow Indicator"
+                }
+}

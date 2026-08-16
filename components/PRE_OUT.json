@@ -1,0 +1,10 @@
+{
+    "id":  "PRE_OUT",
+    "name":  "PRE-OUT-201",
+    "desc":  "Filter Outlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Filter Outlet"
+                }
+}

@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_HTR1",
+    "name":  "OUTLET-HTR1",
+    "desc":  "OUTLET-HTR1",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-HTR1"
+                }
+}

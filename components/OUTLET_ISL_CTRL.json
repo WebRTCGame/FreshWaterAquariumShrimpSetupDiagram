@@ -1,0 +1,10 @@
+{
+    "id":  "OUTLET_ISL_CTRL",
+    "name":  "OUTLET-ISL-CTRL",
+    "desc":  "OUTLET-ISL-CTRL",
+    "status":  "operational",
+    "category":  "Power \u0026 Control",
+    "details":  {
+                    "specs":  "OUTLET-ISL-CTRL"
+                }
+}

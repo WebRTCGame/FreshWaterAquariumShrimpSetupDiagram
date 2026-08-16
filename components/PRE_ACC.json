@@ -1,0 +1,10 @@
+{
+    "id":  "PRE_ACC",
+    "name":  "FIL-V-201",
+    "desc":  "Prefilter Clean Access",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Prefilter Clean Access"
+                }
+}

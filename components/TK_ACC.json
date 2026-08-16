@@ -1,0 +1,10 @@
+{
+    "id":  "TK_ACC",
+    "name":  "TK-ACC-1",
+    "desc":  "Access Cover",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Access Cover"
+                }
+}

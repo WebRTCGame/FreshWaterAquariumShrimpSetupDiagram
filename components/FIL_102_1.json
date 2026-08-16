@@ -1,0 +1,10 @@
+{
+    "id":  "FIL_102_1",
+    "name":  "FIL-V-102",
+    "desc":  "Media Access",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Media Access"
+                }
+}

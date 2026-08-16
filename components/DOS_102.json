@@ -1,0 +1,10 @@
+{
+    "id":  "DOS_102",
+    "name":  "DOS-102",
+    "desc":  "Plant Fertilizer; Micro/Macro",
+    "status":  "operational",
+    "category":  "Dosing System",
+    "details":  {
+                    "specs":  "Plant Fertilizer; Micro/Macro"
+                }
+}

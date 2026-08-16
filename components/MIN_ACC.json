@@ -1,0 +1,10 @@
+{
+    "id":  "MIN_ACC",
+    "name":  "MIN-V-301",
+    "desc":  "Media Access Port",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Media Access Port"
+                }
+}

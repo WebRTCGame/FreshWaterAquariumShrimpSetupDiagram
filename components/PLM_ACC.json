@@ -1,0 +1,10 @@
+{
+    "id":  "PLM_ACC",
+    "name":  "PL-ACC-1",
+    "desc":  "Plenum Access Port",
+    "status":  "operational",
+    "category":  "Accessories",
+    "details":  {
+                    "specs":  "Plenum Access Port"
+                }
+}

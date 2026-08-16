@@ -1,0 +1,10 @@
+{
+    "id":  "BIO_IN",
+    "name":  "BIO-IN-201",
+    "desc":  "Reactor Inlet",
+    "status":  "operational",
+    "category":  "Filtration",
+    "details":  {
+                    "specs":  "Reactor Inlet"
+                }
+}

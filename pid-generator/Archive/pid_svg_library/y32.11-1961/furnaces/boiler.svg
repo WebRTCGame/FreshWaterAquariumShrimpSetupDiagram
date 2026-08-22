@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
+  <metadata>
+    <symbol>
+      <id>boiler</id>
+      <category>furnace</category>
+      <description>Steam boiler</description>
+      <standard>original-standards-inspired</standard>
+      <version>1.0.0</version>
+      <connections>
+        <connection id="feedwater" x="10" y="60" type="pipe"/>
+        <connection id="steam" x="90" y="40" type="pipe"/>
+        <connection id="fuel" x="50" y="90" type="pipe"/>
+      </connections>
+    </symbol>
+  </metadata>
+  <defs>
+    <style type="text/css">
+    .sym-stroke { stroke: #1a1a1a; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sym-fill { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <g id="boiler">
+    <rect x="25" y="25" width="50" height="50" rx="4" class="sym-fill"/>
+    <path d="M 35,45 Q 40,35 45,45 T 55,45 T 65,45" class="sym-stroke" fill="none"/>
+    <line x1="10" y1="60" x2="25" y2="60" class="sym-stroke sym-thick"/>
+    <line x1="75" y1="40" x2="90" y2="40" class="sym-stroke sym-thick"/>
+    <line x1="50" y1="75" x2="50" y2="90" class="sym-stroke sym-thick"/>
+  </g>
+</svg>

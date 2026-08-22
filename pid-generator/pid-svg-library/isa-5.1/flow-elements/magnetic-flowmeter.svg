@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 90" >
+<line x1="10" y1="40" x2="45" y2="40" stroke="currentColor" stroke-width="2" fill="none"/><line x1="115" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="2" fill="none"/><rect x="45" y="20" width="70" height="40" stroke="currentColor" stroke-width="2" fill="none"/><ellipse cx="80" cy="40" rx="12" ry="20" stroke="currentColor" stroke-width="1" fill="none"/><line x1="50" y1="20" x2="50" y2="60" stroke="currentColor" stroke-width="1" fill="none"/><line x1="110" y1="20" x2="110" y2="60" stroke="currentColor" stroke-width="1" fill="none"/><text x="80" y="75" font-size="11" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">MAG</text>
+</svg>

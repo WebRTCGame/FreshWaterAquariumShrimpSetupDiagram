@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
+  <metadata>
+    <symbol>
+      <id>double_pipe_exchanger</id>
+      <category>heat-exchanger</category>
+      <description>Double pipe / hairpin exchanger</description>
+      <standard>original-standards-inspired</standard>
+      <version>1.0.0</version>
+      <connections>
+        <connection id="inner_in" x="10" y="40" type="pipe"/>
+        <connection id="inner_out" x="90" y="40" type="pipe"/>
+        <connection id="annulus_in" x="10" y="60" type="pipe"/>
+        <connection id="annulus_out" x="90" y="60" type="pipe"/>
+      </connections>
+    </symbol>
+  </metadata>
+  <defs>
+    <style type="text/css">
+    .sym-stroke { stroke: #1a1a1a; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sym-fill { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <g id="double-pipe">
+    <path d="M 20,35 Q 50,20 80,35" class="sym-stroke sym-thick" fill="none"/>
+    <path d="M 20,65 Q 50,80 80,65" class="sym-stroke sym-thick" fill="none"/>
+    <line x1="20" y1="35" x2="20" y2="65" class="sym-stroke sym-thick"/>
+    <line x1="80" y1="35" x2="80" y2="65" class="sym-stroke sym-thick"/>
+    <line x1="10" y1="40" x2="20" y2="40" class="sym-stroke sym-thick"/>
+    <line x1="80" y1="40" x2="90" y2="40" class="sym-stroke sym-thick"/>
+    <line x1="10" y1="60" x2="20" y2="60" class="sym-stroke sym-thick"/>
+    <line x1="80" y1="60" x2="90" y2="60" class="sym-stroke sym-thick"/>
+  </g>
+</svg>

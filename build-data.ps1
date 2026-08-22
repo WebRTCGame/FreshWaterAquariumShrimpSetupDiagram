@@ -99,3 +99,61 @@ foreach ($item in $manifest) {
 [void]$sb.AppendLine('};')
 [System.IO.File]::WriteAllText((Join-Path $dir 'data.js'), $sb.ToString())
 Write-Host "Wrote components/data.js ($($manifest.Count) components)"
+
+# ── Step 3: bundle pid-svg-library into symbols.js (file:// cannot fetch() SVGs) ──
+$libDir = Join-Path $PSScriptRoot 'pid-generator\pid-svg-library'
+$bundleDir = Join-Path $libDir 'bundle'
+New-Item -ItemType Directory -Force -Path $bundleDir | Out-Null
+
+# connection metadata injected into each symbol (renderer reads it for port routing)
+$conns = @{}
+$connPath = Join-Path $libDir 'connections.json'
+if (Test-Path $connPath) { $conns = Get-Content -Raw -Encoding UTF8 $connPath | ConvertFrom-Json }
+
+# natural symbol sizes in mm (renderer embeds at 1:1; viewBox becomes the real size)
+$sizes = @{}
+$sizesPath = Join-Path $libDir 'sizes.json'
+if (Test-Path $sizesPath) { $sizes = Get-Content -Raw -Encoding UTF8 $sizesPath | ConvertFrom-Json }
+
+# normalize any non-100x100 viewBox by wrapping content in a scale transform
+function Normalize-ViewBox($content) {
+  if ($content -match 'viewBox="(-?[\d.]+) (-?[\d.]+) ([\d.]+) ([\d.]+)"') {
+    $mx = [double]$Matches[1]; $my = [double]$Matches[2]
+    $w = [double]$Matches[3]; $h = [double]$Matches[4]
+    if ($w -eq 100 -and $h -eq 100 -and $mx -eq 0 -and $my -eq 0) { return $content }
+    $sx = [Math]::Round(100 / $w, 6); $sy = [Math]::Round(100 / $h, 6)
+    $content = $content -replace 'viewBox="(-?[\d.]+) (-?[\d.]+) ([\d.]+) ([\d.]+)"', 'viewBox="0 0 100 100"'
+    $content = $content -replace '(<svg[^>]*>)', "`$1<g transform=`"translate($([Math]::Round(-$mx * $sx, 6)) $([Math]::Round(-$my * $sy, 6))) scale($sx $sy)`">"
+    $content = $content -replace '</svg>', '</g></svg>'
+  }
+  return $content
+}
+
+$sb = [System.Text.StringBuilder]::new()
+[void]$sb.AppendLine('window.PID_SYMBOLS = {')
+Get-ChildItem -Recurse $libDir -Filter *.svg | ForEach-Object {
+  $key = $_.FullName.Replace("$libDir\", '').Replace('\', '/').Replace('.svg', '')
+  $inner = Get-Content $_.FullName -Raw -Encoding UTF8
+  $inner = Normalize-ViewBox (($inner -replace '\r?\n', ' ').Trim())
+  # rescale to the symbol's natural mm size (self-describing glyphs)
+  if ($sizes.PSObject.Properties.Name -contains $key) {
+    $sz = [double]$sizes.$key
+    if ($sz -ne 100) {
+      $inner = $inner -replace 'viewBox="0 0 100 100"', "viewBox=`"0 0 $sz $sz`""
+      $inner = $inner -replace '(<svg[^>]*>)', "`$1<g transform=`"scale($([Math]::Round($sz / 100, 6)))`">"
+      $inner = $inner -replace '</svg>', '</g></svg>'
+    }
+  }
+  # inject metadata when the symbol has no metadata of its own and connections are defined
+  if ($inner -notmatch '<metadata' -and $conns.PSObject.Properties.Name -contains $key) {
+    $connXml = ($conns.$key | ForEach-Object { "<connection id=`"$($_.id)`" x=`"$($_.x)`" y=`"$($_.y)`" type=`"$($_.type)`"/>" }) -join ''
+    $sizeXml = ''
+    if ($sz) { $sizeXml = "<size>$sz</size>" }
+    $meta = "<metadata><symbol><id>$key</id>$sizeXml<connections>$connXml</connections></symbol></metadata>"
+    $inner = $inner -replace '(<svg[^>]*>)', "`$1$meta"
+  }
+  [void]$sb.AppendLine("  `"$key`": `"$($inner -replace '"','\"')`",")
+}
+[void]$sb.AppendLine('};')
+[System.IO.File]::WriteAllText((Join-Path $bundleDir 'symbols.js'), $sb.ToString())
+Write-Host "Wrote pid-svg-library/bundle/symbols.js ($((Get-ChildItem -Recurse $libDir -Filter *.svg).Count) symbols)"

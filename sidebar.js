@@ -73,9 +73,10 @@ function populateComponentList(panZoom, manifest) {
   });
 }
 
-// Mermaid renders node groups as flowchart-<ID>-<N>; look up by that exact prefix
+// Mermaid renders node groups as <diagramId>-flowchart-<ID>-<N>; look up by substring
+// (component ids use underscores, so "-ID-" only matches the node's own group)
 function findNodeElement(componentId) {
-  return document.querySelector(`g[id^="flowchart-${componentId}-"]`);
+  return document.querySelector(`[id*="flowchart-${componentId}-"]`);
 }
 
 // Screen-space center of an SVG element (getBoundingClientRect is stale on SVG internals)
@@ -106,15 +107,24 @@ function focusOnComponent(panZoom, componentId) {
 
   const svg = document.getElementById('mySvgId');
 
-  // Pan first (no pending transform updates, so CTM is accurate), then zoom around
-  // the viewport center — a centered node stays centered.
-  const center = getElementScreenCenter(element);
-  const svgRect = svg.getBoundingClientRect();
-  panZoom.panBy({
-    x: (svgRect.left + svgRect.width / 2) - center.clientX,
-    y: (svgRect.top + svgRect.height / 2) - center.clientY
-  });
   panZoom.zoom(6);
+
+  // svg-pan-zoom applies CTM changes on the next animation frame (and mermaid 11.16+
+  // defers the initial fit flush). So measure, pan, wait for the flush, re-measure:
+  // iterate until the residual offset is gone.
+  const settle = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  (async () => {
+    for (let i = 0; i < 4; i++) {
+      await settle();
+      const center = getElementScreenCenter(element);
+      const svgRect = svg.getBoundingClientRect();
+      const dx = (svgRect.left + svgRect.width / 2) - center.clientX;
+      const dy = (svgRect.top + svgRect.height / 2) - center.clientY;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) break;
+      panZoom.panBy({ x: dx, y: dy });
+    }
+  })();
 
   // Highlight the component briefly
   element.style.filter = 'drop-shadow(0 0 10px #ff6b35)';

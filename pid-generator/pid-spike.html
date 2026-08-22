@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>pid spike</title>
+    <style>
+      body { font-family: sans-serif; margin: 8px; }
+      #status { font-weight: bold; }
+      #warnings { color: #b45309; font-size: 12px; margin: 6px 0; white-space: pre-wrap; }
+      #pid-source { width: 100%; height: 130px; font-family: monospace; font-size: 11px; }
+      .hint { font-size: 11px; color: #666; margin: 4px 0; }
+      #graphDiv svg [data-pid-id] { cursor: grab; }
+    </style>
+  </head>
+  <body>
+    <div id="status">rendering...</div>
+    <div id="warnings"></div>
+    <div class="hint">Drag any component to reposition it - the DSL source below updates automatically.</div>
+    <div id="graphDiv"></div>
+    <hr>
+    <textarea id="pid-source" spellcheck="false"></textarea>
+    <script src="pid-svg-library/bundle/symbols.js"></script>
+    <script src="P&IDGenerator.js"></script>
+    <script>
+      const pidSource = `pid
+layout auto
+fit page
+stub 8
+title "Reactor & Distillation Unit"
+project "PID Generator Demo"
+sheet 1 of 1
+rev "A" "2026-08-16" "Initial issue"
+
+line N2-001 size 4 service PG number 101 spec 1E1 ins H thick 50 trace T
+line N2-002 size 3 service PW number 102 spec 1E1 ins H thick 50 trace T
+line N2-003 size 2 service PW number 103 spec 1E1 ins H thick 50 trace T
+line N2-004 size 2 service CW number 104 spec 1E1 ins H thick 50 trace T
+line N2-005 size 2 service CW number 105 spec 1E1 ins H thick 50 trace T
+line N2-006 size 3 service PW number 106 spec 1E1 ins H thick 50 trace T
+
+version 1
+
+equipment T-101 tank
+valve V-101 gate
+equipment P-101 pump
+instrument FT-101 field
+instrument FIC-101 dcs
+valve FV-101 control
+valve PSV-101 relief above R-101 offset 40,0
+equipment R-101 reactor
+instrument TT-101 field
+instrument TIC-101 dcs
+valve V-102 control
+equipment C-101 tower
+instrument LT-101 field
+instrument LIC-101 dcs
+equipment E-101 kettle-reboiler
+valve V-103 control
+equipment P-103 pump
+instrument FT-103 field
+instrument FIC-103 dcs
+stub UTIL-1
+stub UTIL-2
+stub FLARE-1
+junction J-3
+junction J-4
+equipment E-102 heat-exchanger
+instrument PT-101 field
+instrument PIC-101 dcs
+equipment D-101 drum
+valve V-105 control rotated 90
+equipment P-102 pump
+instrument LT-102 field
+instrument LIC-102 dcs
+equipment E-103 heat-exchanger
+equipment T-102 tank
+
+T-101.outlet -> V-101 line N2-001
+V-101 -> P-101 line N2-001
+P-101 -> FV-101 line N2-001
+FV-101 -> R-101.left line N2-001
+R-101.right -> V-102.left line N2-002
+V-102.right -> C-101.feed line N2-002
+C-101.overhead -> E-102.tube_in line N2-003
+E-102.tube_out -> D-101.inlet line N2-003
+D-101.outlet -> P-102.suction line N2-003
+P-102.discharge -> J-4
+J-4 -> V-105.left line N2-004
+V-105.right -> C-101.reflux line N2-004
+J-4 -> E-103.tube_in line N2-005
+E-103.tube_out -> J-3 line N2-005
+C-101.bottoms -> E-101.inlet line N2-006
+E-101.outlet -> V-103 line N2-006
+V-103 -> P-103 line N2-006
+P-103 -> J-3 line N2-006
+J-3 -> T-102 line N2-006
+R-101.top -> PSV-101
+PSV-101 -> FLARE-1
+UTIL-1 -> E-102.shell_in line N2-004
+E-102.shell_out -> UTIL-2
+
+signal FT-101 -> FIC-101 electrical
+tap FT-101 -> P-101
+signal FIC-101 -> FV-101 electrical
+signal TT-101 -> TIC-101 electrical
+tap TT-101 -> R-101
+signal LT-101 -> LIC-101 electrical
+tap LT-101 -> C-101
+signal LIC-101 -> V-103 electrical
+signal PT-101 -> PIC-101 electrical
+tap PT-101 -> D-101
+signal LT-102 -> LIC-102 electrical
+tap LT-102 -> D-101
+signal FT-103 -> FIC-103 electrical
+tap FT-103 -> P-103
+signal LIC-102 -> P-102 electrical
+signal PIC-101 -> V-105 electrical
+signal TIC-101 -> V-102 electrical
+`;
+
+      let pidResult = null;
+
+      function enableDrag() {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) return;
+        let dragging = null;
+        svg.addEventListener('pointerdown', (e) => {
+          const chipEl = e.target.closest('[data-pid-id]');
+          if (!chipEl) return;
+          const wrap = svg.querySelector('g[transform*="scale"]');
+          const ctm = wrap ? wrap.getCTM() : svg.getCTM();
+          dragging = {
+            id: chipEl.getAttribute('data-pid-id'),
+            grp: chipEl.closest('g[data-pid-id]') || chipEl,
+            startX: e.clientX, startY: e.clientY,
+            scale: ctm ? ctm.a : 1
+          };
+          dragging.grp.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+        svg.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+          const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
+          const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
+          dragging.grp.setAttribute('transform', `translate(${dx} ${dy})`);
+        });
+        svg.addEventListener('pointerup', (e) => {
+          if (!dragging) return;
+          try {
+            const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+            const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
+            const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
+            const entity = [...pidResult.data.equipment, ...pidResult.data.valves,
+              ...pidResult.data.instruments, ...pidResult.data.junctions]
+              .find(x => (x.id || x.tag) === dragging.id);
+            if (entity) { entity.x += dx; entity.y += dy; }
+            dragging.grp.removeAttribute('transform');
+            dragging = null;
+            const src = PIDGenerator.toSource(pidResult.data);
+            document.getElementById('pid-source').value = src;
+            pidResult = PIDGenerator.renderPid(src, 'graphDiv');
+            document.getElementById('status').textContent = 'UPDATED - component moved, source regenerated';
+            enableDrag();
+          } catch (err) {
+            console.error('drag update failed:', err);
+            document.getElementById('status').textContent = 'FAIL on update: ' + err.message;
+          }
+        });
+      }
+
+      (() => {
+        try {
+          pidResult = PIDGenerator.renderPid(pidSource, 'graphDiv');
+          document.getElementById('pid-source').value = pidSource;
+          let roundTrip = '';
+          try {
+            const rt = PIDGenerator.parse(PIDGenerator.toSource(pidResult.data));
+            roundTrip = (rt.data.equipment.length === pidResult.data.equipment.length &&
+              rt.data.valves.length === pidResult.data.valves.length &&
+              rt.data.instruments.length === pidResult.data.instruments.length &&
+              rt.data.pipes.length === pidResult.data.pipes.length) ? 'round-trip OK' : 'round-trip MISMATCH';
+          } catch (rtErr) { roundTrip = 'round-trip FAIL: ' + rtErr.message; }
+          document.getElementById('status').textContent = 'RENDER OK - ' + pidResult.data.equipment.length + ' equipment, ' +
+            pidResult.data.valves.length + ' valves, ' + pidResult.data.instruments.length + ' instruments, ' +
+            pidResult.data.pipes.length + ' connections (' + roundTrip + ')';
+          if (pidResult.score) {
+            const rt = pidResult.score.routing, an = pidResult.score.annotations, im = pidResult.score.instruments;
+            document.getElementById('status').textContent += ' | score ' + pidResult.score.total +
+              ' (xings ' + rt.crossings + ' [' + rt.pp + 'p/' + rt.ps + 's/' + rt.ss + 's], bends ' + rt.bends + ', len ' + rt.length + 'mm, labels ' + an.labelCollisions + ', taps ' + im.tapReachTotal + 'mm, sig ' + im.maxSignalLen + 'mm)';
+          }
+          const errTxt = pidResult.errors.length ? 'ERRORS:\n' + pidResult.errors.map(e => e.message).join('\n') + '\n\n' : '';
+          document.getElementById('warnings').textContent = errTxt +
+            (pidResult.warnings.length ? 'WARNINGS:\n' + pidResult.warnings.join('\n') : '');
+          enableDrag();
+        } catch (e) {
+          document.getElementById('status').textContent = 'FAIL: ' + e.message;
+          console.error(e);
+        }
+      })();
+    </script>
+  </body>
+</html>

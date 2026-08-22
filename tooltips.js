@@ -4,9 +4,9 @@ const OVERVIEW_ALIASES = {
   OV_BUF: 'MIN_RX', OV_REDOX: 'OX_RX', OV_DEG: 'DEG_COL'
 };
 
-// Mermaid node groups get id="flowchart-<NODE_ID>-<N>" — exact match, no fuzzy text guessing
+// Mermaid node groups get id="<diagramId>-flowchart-<NODE_ID>-<N>" (prefix varies by version) — exact match, no fuzzy text guessing
 function componentForSvgId(id) {
-  const m = String(id).match(/^flowchart-(.+?)-\d+$/);
+  const m = String(id).match(/flowchart-(.+?)-\d+$/);
   if (!m) return null;
   const cid = m[1];
   if (window.sidebarComponents[cid]) return window.sidebarComponents[cid];

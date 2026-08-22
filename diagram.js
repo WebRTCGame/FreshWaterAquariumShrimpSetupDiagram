@@ -61,16 +61,7 @@ direction LR
   end
  subgraph OUTSIDE_MAIN_TANK["OUTSIDE MAIN TANK"]
     direction LR
-        EXT_FIL["EXT_FIL"]
-        PUMP["PUMP"]
-        AIR_SYS["AIR_SYS"]
-        DOS["DOS"]
-        HEAT["HEAT"]
-        CO2["CO2"]
-        ATO["ATO"]
-        WC["WC"]
         FEEDER_101["FD-101<br>Auto Feeder"]
-        QUAR["QUAR"]
   end
  subgraph ELECTRICAL_DIST["ELECTRICAL DISTRIBUTION"]
     direction LR

@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
+  <metadata>
+    <symbol>
+      <id>atmospheric_tank</id>
+      <category>tank</category>
+      <description>Atmospheric storage tank</description>
+      <standard>original-standards-inspired</standard>
+      <version>1.0.0</version>
+      <connections>
+        <connection id="inlet" x="20" y="20" type="nozzle"/>
+        <connection id="outlet" x="80" y="80" type="nozzle"/>
+      </connections>
+    </symbol>
+  </metadata>
+  <defs>
+    <style type="text/css">
+    .sym-stroke { stroke: #1a1a1a; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sym-fill { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <g id="atmospheric-tank">
+    <rect x="20" y="25" width="60" height="55" class="sym-fill"/>
+    <line x1="20" y1="25" x2="80" y2="25" class="sym-stroke"/>
+    <line x1="15" y1="20" x2="25" y2="20" class="sym-stroke"/>
+    <line x1="75" y1="80" x2="85" y2="80" class="sym-stroke"/>
+  </g>
+</svg>

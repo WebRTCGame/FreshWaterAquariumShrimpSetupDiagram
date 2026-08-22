@@ -1,0 +1,301 @@
+{
+  "pip/equipment/pump-centrifugal": [
+    { "id": "suction", "x": 7.7, "y": 50, "type": "pipe" },
+    { "id": "discharge", "x": 84.6, "y": 50, "type": "pipe" }
+  ],
+  "pip/equipment/vessel-vertical": [
+    { "id": "top", "x": 46.2, "y": 16.7, "type": "nozzle" },
+    { "id": "bottom", "x": 46.2, "y": 91.7, "type": "nozzle" },
+    { "id": "left", "x": 23.1, "y": 54.2, "type": "nozzle" },
+    { "id": "right", "x": 69.2, "y": 54.2, "type": "nozzle" }
+  ],
+  "pip/equipment/vessel-horizontal": [
+    { "id": "left", "x": 11.5, "y": 50, "type": "nozzle" },
+    { "id": "right", "x": 88.5, "y": 50, "type": "nozzle" },
+    { "id": "top", "x": 50, "y": 29.2, "type": "nozzle" },
+    { "id": "bottom", "x": 50, "y": 70.8, "type": "nozzle" }
+  ],
+  "pip/equipment/tank-cone-roof": [
+    { "id": "inlet", "x": 15.4, "y": 62.5, "type": "nozzle" },
+    { "id": "outlet", "x": 92.3, "y": 62.5, "type": "nozzle" },
+    { "id": "top", "x": 53.8, "y": 33.3, "type": "nozzle" }
+  ],
+  "pip/equipment/heat-exchanger-shell-tube": [
+    { "id": "tube_in", "x": 11.5, "y": 37.5, "type": "pipe" },
+    { "id": "tube_out", "x": 88.5, "y": 37.5, "type": "pipe" },
+    { "id": "shell_in", "x": 11.5, "y": 62.5, "type": "pipe" },
+    { "id": "shell_out", "x": 88.5, "y": 62.5, "type": "pipe" }
+  ],
+  "pip/equipment/compressor": [
+    { "id": "suction", "x": 0, "y": 37.5, "type": "pipe" },
+    { "id": "discharge", "x": 92.3, "y": 20.8, "type": "pipe" }
+  ],
+  "pip/equipment/filter": [
+    { "id": "inlet", "x": 23.1, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 69.2, "y": 50, "type": "pipe" },
+    { "id": "top", "x": 46.2, "y": 16.7, "type": "nozzle" },
+    { "id": "bottom", "x": 46.2, "y": 83.3, "type": "nozzle" }
+  ],
+  "pip/equipment/agitator": [
+    { "id": "inlet", "x": 23.1, "y": 58.3, "type": "pipe" },
+    { "id": "outlet", "x": 69.2, "y": 58.3, "type": "pipe" },
+    { "id": "top", "x": 46.2, "y": 33.3, "type": "nozzle" },
+    { "id": "bottom", "x": 46.2, "y": 83.3, "type": "nozzle" }
+  ],
+  "pip/equipment/column-tower": [
+    { "id": "top", "x": 46.2, "y": 8.3, "type": "nozzle" },
+    { "id": "bottom", "x": 46.2, "y": 100, "type": "nozzle" },
+    { "id": "left", "x": 26.9, "y": 50, "type": "nozzle" },
+    { "id": "right", "x": 65.4, "y": 50, "type": "nozzle" },
+    { "id": "overhead", "x": 46.2, "y": 8.3, "type": "nozzle" },
+    { "id": "bottoms", "x": 46.2, "y": 100, "type": "nozzle" },
+    { "id": "feed", "x": 26.9, "y": 50, "type": "nozzle" },
+    { "id": "reflux", "x": 65.4, "y": 50, "type": "nozzle" }
+  ],
+  "y32.11-1961/miscellaneous/silencer": [
+    { "id": "inlet", "x": 7.7, "y": 37.5, "type": "pipe" },
+    { "id": "outlet", "x": 88.5, "y": 37.5, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/sight-glass": [
+    { "id": "inlet", "x": 7.7, "y": 45.8, "type": "pipe" },
+    { "id": "outlet", "x": 84.6, "y": 45.8, "type": "pipe" }
+  ],
+  "isa-5.1/valves/gate": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" }
+  ],
+  "isa-5.1/valves/globe": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" },
+    { "id": "top", "x": 50, "y": 25, "type": "pipe" },
+    { "id": "bottom", "x": 50, "y": 95, "type": "pipe" }
+  ],
+  "isa-5.1/valves/ball": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" },
+    { "id": "top", "x": 50, "y": 25, "type": "pipe" },
+    { "id": "bottom", "x": 50, "y": 95, "type": "pipe" }
+  ],
+  "isa-5.1/valves/check-valve": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" }
+  ],
+  "isa-5.1/valves/butterfly": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" }
+  ],
+  "isa-5.1/valves/needle-valve": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" }
+  ],
+  "isa-5.1/valves/three-way": [
+    { "id": "left", "x": 8.3, "y": 60, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 60, "type": "pipe" },
+    { "id": "top", "x": 50, "y": 10, "type": "nozzle" }
+  ],
+  "isa-5.1/valves/control-valve": [
+    { "id": "left", "x": 16.7, "y": 80, "type": "pipe" },
+    { "id": "right", "x": 83.3, "y": 80, "type": "pipe" },
+    { "id": "actuator", "x": 50, "y": 10, "type": "nozzle" }
+  ],
+  "isa-5.1/valves/relief-safety": [
+    { "id": "inlet", "x": 50, "y": 95, "type": "pipe" },
+    { "id": "discharge", "x": 50, "y": 10, "type": "nozzle" }
+  ],
+  "isa-5.1/instruments/field-instrument": [
+    { "id": "tap", "x": 50, "y": 87.5, "type": "pipe" }
+  ]
+,
+  "isa-5.1/valves/angle-valve": [
+    { "id": "inlet", "x": 8.3, "y": 75, "type": "pipe" },
+    { "id": "outlet", "x": 50, "y": 33.3, "type": "pipe" }
+  ],
+  "isa-5.1/valves/four-way-valve": [
+    { "id": "left", "x": 8.3, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 50, "type": "pipe" },
+    { "id": "top", "x": 50, "y": 8.3, "type": "pipe" },
+    { "id": "bottom", "x": 50, "y": 91.7, "type": "pipe" }
+  ],
+  "isa-5.1/valves/rupture-disc": [
+    { "id": "left", "x": 37.5, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 62.5, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/valves/vacuum-relief-valve": [
+    { "id": "inlet", "x": 50, "y": 76.7, "type": "pipe" },
+    { "id": "vent", "x": 50, "y": 23.3, "type": "nozzle" }
+  ],
+  "isa-5.1/valves/motor-operated-gate": [
+    { "id": "left", "x": 8.3, "y": 80, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 80, "type": "pipe" }
+  ],
+  "isa-5.1/valves/check-valve-swing": [
+    { "id": "left", "x": 8.3, "y": 66.7, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 66.7, "type": "pipe" }
+  ],
+  "isa-5.1/valves/check-valve-lift": [
+    { "id": "left", "x": 8.3, "y": 66.7, "type": "pipe" },
+    { "id": "right", "x": 91.7, "y": 66.7, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/orifice-plate": [
+    { "id": "left", "x": 6.25, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 93.75, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/venturi-tube": [
+    { "id": "left", "x": 9.4, "y": 25, "type": "pipe" },
+    { "id": "right", "x": 90.6, "y": 25, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/flow-nozzle": [
+    { "id": "left", "x": 9.4, "y": 25, "type": "pipe" },
+    { "id": "right", "x": 90.6, "y": 25, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/pitot-tube": [
+    { "id": "left", "x": 6.25, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 93.75, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/averaging-pitot": [
+    { "id": "left", "x": 6.25, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 93.75, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/magnetic-flowmeter": [
+    { "id": "left", "x": 28.1, "y": 44.4, "type": "pipe" },
+    { "id": "right", "x": 71.9, "y": 44.4, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/vortex-flowmeter": [
+    { "id": "left", "x": 6.25, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 93.75, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/turbine-flowmeter": [
+    { "id": "left", "x": 28.1, "y": 44.4, "type": "pipe" },
+    { "id": "right", "x": 71.9, "y": 44.4, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/rotameter": [
+    { "id": "top", "x": 50, "y": 9.1, "type": "pipe" },
+    { "id": "bottom", "x": 50, "y": 90.9, "type": "pipe" }
+  ],
+  "isa-5.1/flow-elements/thermal-flowmeter": [
+    { "id": "left", "x": 6.25, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 93.75, "y": 50, "type": "pipe" }
+  ]
+,
+  "y32.11-1961/pumps/vacuum-pump": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/pumps/pump-screw": [
+    { "id": "suction", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "discharge", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/pumps/pump-vertical-turbine": [
+    { "id": "inlet", "x": 10, "y": 58, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 58, "type": "pipe" }
+  ],
+  "y32.11-1961/compressors/compressor-liquid-ring": [
+    { "id": "suction", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "discharge", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/furnaces/fired-heater": [
+    { "id": "feed", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "product", "x": 90, "y": 50, "type": "pipe" },
+    { "id": "burner", "x": 50, "y": 90, "type": "nozzle" }
+  ],
+  "y32.11-1961/furnaces/electric-heater": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/furnaces/boiler": [
+    { "id": "feedwater", "x": 10, "y": 60, "type": "pipe" },
+    { "id": "steam", "x": 90, "y": 40, "type": "pipe" },
+    { "id": "fuel", "x": 50, "y": 90, "type": "pipe" }
+  ],
+  "y32.11-1961/heat-exchangers/kettle-reboiler": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" },
+    { "id": "top", "x": 50, "y": 15, "type": "nozzle" }
+  ],
+  "y32.11-1961/miscellaneous/fan": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/blower": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/turbine": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/ejector": [
+    { "id": "motive", "x": 50, "y": 25, "type": "pipe" },
+    { "id": "suction", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "discharge", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/conveyor": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/crusher": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/ball-mill": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/dryer": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/steam-trap": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "y32.11-1961/miscellaneous/gas-cylinder": [
+    { "id": "top", "x": 50, "y": 10, "type": "nozzle" }
+  ],
+  "y32.11-1961/separators/gravity-separator": [
+    { "id": "inlet", "x": 10, "y": 40, "type": "pipe" },
+    { "id": "gas_out", "x": 50, "y": 10, "type": "pipe" },
+    { "id": "liquid_out", "x": 50, "y": 90, "type": "pipe" }
+  ],
+  "y32.11-1961/tanks/tank-dome-roof": [
+    { "id": "inlet", "x": 22, "y": 56, "type": "nozzle" },
+    { "id": "outlet", "x": 78, "y": 56, "type": "nozzle" }
+  ],
+  "y32.11-1961/tanks/tank-internal-floating-roof": [
+    { "id": "inlet", "x": 22, "y": 55, "type": "nozzle" },
+    { "id": "outlet", "x": 78, "y": 55, "type": "nozzle" }
+  ],
+  "y32.11-1961/vessels/drum": [
+    { "id": "inlet", "x": 10, "y": 50, "type": "nozzle" },
+    { "id": "outlet", "x": 90, "y": 50, "type": "nozzle" },
+    { "id": "vent", "x": 50, "y": 15, "type": "nozzle" }
+  ],
+  "y32.11-1961/vessels/knockout-drum": [
+    { "id": "inlet", "x": 10, "y": 40, "type": "nozzle" },
+    { "id": "gas_out", "x": 90, "y": 30, "type": "nozzle" },
+    { "id": "liquid_out", "x": 50, "y": 90, "type": "nozzle" }
+  ],
+  "y32.11-1961/vessels/reactor-stirred": [
+    { "id": "top", "x": 50, "y": 15, "type": "nozzle" },
+    { "id": "bottom", "x": 50, "y": 85, "type": "nozzle" },
+    { "id": "left", "x": 30, "y": 50, "type": "nozzle" },
+    { "id": "right", "x": 70, "y": 50, "type": "nozzle" }
+  ],
+  "y32.11-1961/vessels/reactor-jacketed": [
+    { "id": "top", "x": 50, "y": 15, "type": "nozzle" },
+    { "id": "bottom", "x": 50, "y": 85, "type": "nozzle" },
+    { "id": "left", "x": 30, "y": 50, "type": "nozzle" },
+    { "id": "right", "x": 70, "y": 50, "type": "nozzle" }
+  ],
+  "isa-5.1/measurement/level-gauge": [
+    { "id": "left", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/measurement/level-switch": [
+    { "id": "left", "x": 10, "y": 50, "type": "pipe" },
+    { "id": "right", "x": 90, "y": 50, "type": "pipe" }
+  ],
+  "isa-5.1/measurement/diaphragm-seal": [
+    { "id": "left", "x": 10, "y": 50, "type": "pipe" }
+  ]
+}

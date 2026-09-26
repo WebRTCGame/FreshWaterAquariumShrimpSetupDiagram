@@ -2340,7 +2340,96 @@ true finding. Re-blessed. Geometry unchanged.
 New registry params: `annotation.sizeMin` 2.6, `annotation.sizeMax` 3.5,
 `annotation.sizeScopeMin` 0 (suppress a size with fewer runs than this).
 
-### 9.51 Still outstanding after this pass
+### 9.52 "Too squished" — two hypotheses killed, and the real defect is at junctions
+
+Reported: the demo sheet is "definitely too squished", with a suggestion to use
+"every other lane" for routing. The suggestion was directionally right and
+mechanically wrong, and two rounds of measurement were needed to find out which.
+
+#### It is not crowding, and it is not the pipe work
+
+Clearance between parallel runs of different lines, whole corpus:
+
+| sheet | co-linear pairs | median gap | p90 | ≤6 mm |
+|---|---|---|---|---|
+| `demo` | 50 | 19 mm | 34 mm | 8 (16%) |
+| `spike` | 152 | 24.5 mm | 35 mm | 12 (8%) |
+| `dense` | 55 | 25 mm | 35 mm | 2 (4%) |
+| `min` | 8 | 35 mm | 38 mm | 0 |
+| `split` | 0 | — | — | — |
+
+Median clearance is 19–35 mm. The corpus is not tight. The gaps cluster at
+10/15/25/30/35 mm — grid-locked to the 5 mm A* cell, which is what the "lanes" idea
+is really seeing, but 25 mm apart does not read as squished.
+
+#### The demo is under-ALLOCATED, not over-packed
+
+| sheet | entities | content bbox | of drawable | entity centre spread |
+|---|---|---|---|---|
+| **`demo`** | 14 | 533×180 mm | **64% W × 39% H** | **170 of 463 mm** |
+| `spike` | 28 | 735×383 mm | 89% W × 83% H | 318 mm |
+| `dense` | 11 | 440×178 mm | 53% W × 38% H | 110 mm |
+| `min` | 5 | 345×73 mm | 42% W × 16% H | 35 mm |
+
+**`spike` is well-allocated.** The demo uses 39% of usable height. Content aspect is
+**2.96:1** against a drawable **1.79:1** — it is far too wide to be tall, so it *cannot*
+fill the height without first being made narrower. Widening the crowded part (the
+"every other lane" plan) pushes the content further from the sheet's shape, not closer.
+
+The honest reading is that a 14-entity chain topology simply does not fill a 24×36 in
+sheet, and the response is a **richer demo** (already item 8), not a layout change.
+
+#### `layout.minSep` does nothing — measured, not assumed
+
+Swept 45 → 55 → 65 → 80 → 95 mm in memory:
+
+| minSep | `demo` score | `demo` %W×H | `demo` tightest |
+|---|---|---|---|
+| 45 / 55 / 65 / 80 / 95 | **235 at every value** | **64% × 39%** | **0.0 mm** |
+
+The demo is *byte-identical* across the whole range. `minSep` is the vertical
+separation for entities **sharing a depth**, and the demo's entities mostly do not
+share one — the rank structure already separates them diagonally. The knob that looks
+like it controls vertical spread does not, for this topology.
+
+`spike` moved only at 55 mm, and **worse** (83%×75% against 89%×83%).
+
+#### The real defect: lines that MEET at a junction run coincident
+
+Tightest clearance on `demo` is **0.0 mm** — two runs at the same coordinate, and
+invariant to every parameter swept above:
+
+```
+gap 0.0mm over 8mm at x=470   V-102 -> J-1   and   J-1 -> PSV-101
+gap 0.0mm over 6mm at x=445   J-1  -> PSV-101 and  PSV-101 -> OP-CD
+```
+
+Two lines meeting at a junction should diverge at once. These run on top of each other
+for 6–8 mm, which is exactly what reads as a thick line and gives the "squished"
+impression. Everything else on the sheet has 19–35 mm of air.
+
+**Not a lane-penalty problem.** `markLine` already penalises the corridor at 300 and
+the adjacent cells at `routing.fieldNear` (35). Swept 35 → 80 → 150 → 250 → 290: the
+demo's zero-gap count stays at **2 at every value**. Raising the penalty does nothing.
+
+**Why.** `minPortRun` (14 mm) requires every line to run straight before its first
+bend, so a line leaving a junction must continue in a straight line — and "straight
+from J-1" is along the corridor the arriving line used. The 8 mm of overlap is the
+lead-in. The overlap is a *consequence* of the lead-in rule, not a pressure problem, so
+no penalty weight can remove it.
+
+The spike column in that sweep is a **trap worth recording**: 250 scored 885 while 150
+scored 972 and 290 scored 919. Non-monotonic across a smooth parameter is search
+noise, not a signal — with six candidates per render, a single good value is a
+lottery win. Not shipped.
+
+#### What the fix actually is
+
+Not more space — **junction fan-out**: when several lines meet at one node, their
+departure directions must differ. That is a new constraint, not a tuning knob, and it
+belongs with the T2 constraints registry rather than as a weight tweak. Filed as T3.4.
+
+### 9.53 Still outstanding after this pass
 
 - **Annotation type is 1.0-1.9 mm over the stated print band on every sheet**, and
   `typeFloor` flattens three roles onto 3.5 mm. Both are decisions rather than defects,

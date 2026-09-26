@@ -440,6 +440,21 @@ consumption across the five live engine files: of the symbol metadata, only
   floor additionally binds for every base ≤2.50mm, flattening three roles onto
   exactly 3.5mm so they are no longer individually distinguishable. This is a drafter's
   decision — screen legibility vs print fidelity — not a bug to fix unilaterally.
+- [ ] **T3.4** **Junction fan-out** — lines that MEET at a node run coincident for
+  6-8mm before separating, which is the real "squished" defect. On the demo,
+  `V-102->J-1` and `J-1->PSV-101` share 8mm at x=470 at **0.0mm** clearance, and
+  `J-1->PSV-101` / `PSV-101->OP-CD` share 6mm. A **new constraint, not a weight**:
+  departure directions at a shared node must differ. Two hypotheses were killed by
+  measurement first — `layout.minSep` is byte-identical on the demo across
+  45/55/65/80/95mm, and `routing.fieldNear` leaves the zero-gap count at 2 across
+  35/80/150/250/290 — because the overlap is forced by `minPortRun` (14mm), which
+  requires a line leaving a junction to run straight, and straight-from-J-1 is along
+  the arriving line's corridor. Belongs with the T2 constraints registry. §9.52.
+- [ ] **T3.5** The demo is **under-allocated, not crowded**: 64% W x 39% H, entity
+  centres spanning 170 of 463mm. Content aspect 2.96:1 against a drawable 1.79:1, so
+  it cannot fill the height without first being narrowed — "spread it out" pushes it
+  further from the sheet shape. A 14-entity chain does not fill ARCH D. The fix is a
+  richer demo (item 8), not a layout change. §9.52.
 - [ ] **T7.10** Ports sit at the symbol **bounding-box edge**, not at the metal —
   60 of 259 are >1 mm clear of the drawn content (worst 9.75 mm). Needs a per-family
   lead-in-stub decision, not an auto-fix. Distinct from T7.9, which moved ports along

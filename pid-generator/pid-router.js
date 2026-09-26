@@ -850,8 +850,8 @@ function autoLayout(data) {
       }))
       .sort((a, b) => String(a.tag).localeCompare(String(b.tag), undefined, { numeric: true }));
     if (!rows.length) return null;
-    return { rows, height: ruleParam('annotation.equipListRowH', 8)
-             + ruleParam('annotation.equipListPad', 4) };
+    const rowH = ruleParam('annotation.equipListRowH', 12);
+    return { rows, rowH, height: rowH + ruleParam('annotation.equipListPad', 4) };
   })();
   data.equipList = eqList;
 
@@ -1922,4 +1922,89 @@ function resolveNozzlePositions(data) {
       }
     }
   }
-}
+
+
+// ---- valve size, derived from the process line (T7.12) ----------------------
+// Runs here because it needs p._from/_to.nozzle, which the block above populates.
+//
+// Every nozzle that carries a size has an EMPTY portId, so the only reliable link
+// from a pipe end to a sized nozzle is the resolved nozzle id on the pipe state.
+// Matching on ownerId|portId silently finds nothing, which reads as "this model has
+// no size data" - it does have, and the probe that concluded otherwise was wrong.
+//
+// The size for one end of a valve is the size at the NEAREST equipment along that
+// run, walked through junctions. Two rules, both learned the hard way:
+//   * NEAREST, not everything reachable. The junction network is looped, so an
+//     unbounded walk wanders round the whole drawing and returns things like
+//     4"x3" for a SINGLE end, which is not a pipe size.
+//   * ONLY IF UNAMBIGUOUS. If the nearest equipment is reached carrying two different
+//     sizes the end is genuinely ambiguous, and we print nothing. A guessed valve
+//     size is worse than no valve size.
+// This is the isoconfig idiom: the property belongs to the PAIR of ends, so differing
+// ends are reported as a pair (4"x3, i.e. a reducer) rather than picking a side.
+if (ruleParam('annotation.valveSize', 1)) {
+  const nzById = new Map((data.nozzles || []).map((n) => [n.id, n]));
+  const procP = (data.pipes || []).filter((p) => p.kind !== 'signal' && p.kind !== 'tap');
+  const isJunc = (id, p) => !!(p._from && p._from.junction) || !!(p._to && p._to.junction)
+    || (data.junctions || []).some((j) => (j.id || j.tag) === id);
+  const MAX_HOP = ruleParam('annotation.valveSizeMaxHop', 4);
+
+  // nearest sized equipment from one end of one pipe; null if none within MAX_HOP
+  const nearestSize = (pipe, at) => {
+    const seen = new Set([pipe.id]);
+    let frontier = [{ pipe, at }];
+    for (let hop = 0; hop <= MAX_HOP && frontier.length; hop++) {
+      const hits = [], next = [];
+      for (const cur of frontier) {
+        const p = cur.pipe;
+        // the state key of the FAR end is the opposite of the end we stand on
+        const farId = cur.at === 'from' ? p.to : p.from;
+        const farK = cur.at === 'from' ? '_to' : '_from';
+        const nz = nzById.get((p[farK] || {}).nozzle);
+        if (nz && nz.size) { hits.push({ size: nz.size, at: farId, nozzle: nz.id, hop }); continue; }
+        if (!isJunc(farId, p)) continue;         // real equipment with no size: stop
+        for (const q of procP) {
+          if (seen.has(q.id)) continue;
+          for (const eK of ['from', 'to']) {
+            if (q[eK] !== farId) continue;
+            seen.add(q.id); next.push({ pipe: q, at: eK });
+          }
+        }
+      }
+      if (hits.length) {
+        const uniq = [...new Set(hits.map((h) => h.size))];
+        return uniq.length === 1
+          ? { size: uniq[0], hop, via: hits.map((h) => h.at) }
+          : { ambiguous: uniq, hop, via: hits.map((h) => h.at) };
+      }
+      frontier = next;
+    }
+    return null;
+  };
+
+  for (const v of data.valves) {
+    const ends = {};
+    for (const end of ['from', 'to']) {
+      let best = null;
+      for (const p of procP) {
+        if (p[end] !== v.id) continue;
+        const r = nearestSize(p, end);
+        if (r && (!best || r.hop < best.hop)) best = r;
+      }
+      if (best) ends[end] = best;
+    }
+    const a = ends.from, b = ends.to;
+    let label = null;
+    if (a && b && a.size && b.size) {
+      // both ends known: equal is one size; differing is a reducer, shown as the pair
+      // rather than silently picking one side
+      label = a.size === b.size ? a.size : a.size + 'x' + b.size;
+    } else if ((a && a.size) || (b && b.size)) {
+      label = (a && a.size) || b.size;          // one end only: that IS the line size
+    }
+    // keep the evidence on the record so a wrong size can be traced to its nozzle
+    v.sizeEvidence = ends;
+    if (!label) continue;                      // ambiguous or unknown: say nothing
+    v.sizeLabel = label;
+  }
+}}

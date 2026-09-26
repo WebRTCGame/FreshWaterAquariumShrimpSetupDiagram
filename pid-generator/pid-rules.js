@@ -197,8 +197,14 @@ const PID_RULES = {
       // drawn into whatever space happens to be left, so it can never land on the
       // drawing. Max rows is capped because the band is reserved from the top margin:
       // an unbounded list would push the drawing off the sheet.
+            // Valve size, derived from the process line when the DSL does not state it
+      // (T7.12). The resolver walks each end of the valve to the NEAREST equipment
+      // carrying a sized nozzle, through junctions, and prints nothing when that is
+      // ambiguous or unknown - a guessed size is worse than none.
+      valveSize:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'show the derived line size above each valve' },
+      valveSizeMaxHop: { value: 4, min: 1, max: 12, unit: 'count', desc: 'how far to walk through junctions looking for sized equipment. The junction network is looped, so a larger value reaches unrelated equipment across the drawing' },
       equipList:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'clone each equipment annotation into one row along the top edge of the sheet' },
-            equipListRowH: { value: 8, min: 5, max: null, unit: 'mm', desc: 'height of the one tag-list row: a bold tag line with a grey type line under it' },
+            equipListRowH: { value: 12, min: 8, max: null, unit: 'mm', desc: 'height of one tag-list item: a bold tag line plus a grey type line under it, which sits 5.5mm below the tag (the same offset the equipment annotation uses)' },
 equipListPad:  { value: 4, min: 0, max: null, unit: 'mm', desc: 'clear space between the tag list and the drawing below it' },
       labelOffset:  { value: 14, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff' },
       labelOffsetWide: { value: 28, min: 8, max: null, unit: 'mm', desc: 'line-label fallback standoff' },

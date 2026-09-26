@@ -1727,6 +1727,13 @@ const shiftFor = (lineIdx, x) => {
         const rows = [[tag, fs(3.0), 0]];
         if (!v.noTypeLabel) rows.push([typeLabel, fs(2.8), 5.5]);
         if (state) rows.push([state, fs(2.3), 10.5]); // emission-fixed offsets
+        // Derived line size (T7.12). Added as a ROW of the existing stack rather than
+        // drawn independently, so it inherits the above/below flip and the collision
+        // test at 1734. A separately positioned size would have to re-implement both.
+        // Blue like the line designations, because that is what it is: a property of
+        // the pipe, not of the valve.
+        const sizeLabel = v.sizeLabel || '';
+        if (sizeLabel) rows.push([sizeLabel, fs(2.3), 15.5]);
         const stackBoxes = (fx, fy, mid, dir) => rows.map(([str, fnt, off]) => mid
           ? textBox(fx, fy + dir * off, str, fnt)
           : { x0: fx - (dir < 0 ? String(str).length * fnt * 0.55 : 0), x1: fx + (dir < 0 ? 0 : String(str).length * fnt * 0.55), y0: fy - fnt * 1.15, y1: fy });
@@ -1747,15 +1754,18 @@ const shiftFor = (lineIdx, x) => {
           g += `<text x="${tx}" y="${ty2}" text-anchor="middle" font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
           if (!v.noTypeLabel) g += `<text x="${tx}" y="${ty2 - 5.5}" text-anchor="middle" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
           if (state) g += `<text x="${tx}" y="${ty2 - 10.5}" text-anchor="middle" font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
+          if (sizeLabel) g += `<text x="${tx}" y="${ty2 - 15.5}" text-anchor="middle" font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
         } else if (vertical && flip) {
           const tx2 = v.x - s / 2 - 3;
           g += `<text x="${tx2}" y="${ty}" text-anchor="end" font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
           if (!v.noTypeLabel) g += `<text x="${tx2}" y="${ty + 5.5}" text-anchor="end" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
           if (state) g += `<text x="${tx2}" y="${ty + 10.5}" text-anchor="end" font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
+          if (sizeLabel) g += `<text x="${tx2}" y="${ty + 15.5}" text-anchor="end" font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
         } else {
           g += `<text x="${tx}" y="${ty}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
           if (!v.noTypeLabel) g += `<text x="${tx}" y="${ty + 5.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
           if (state) g += `<text x="${tx}" y="${ty + 10.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
+          if (sizeLabel) g += `<text x="${tx}" y="${ty + 15.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
         }
       }
       body += `<g data-pid-id="${v.id}" class="ly-valve">${g}</g>`;
@@ -2053,6 +2063,12 @@ function annotationsSvg(data, W, H) {
     // The north arrow starts at y = pad + 28, BELOW this row, so the row may use
     // the full width rather than stopping short of the arrow.
     const right = W - pad - 12;
+    // Same 5.5mm the equipment annotation uses between its tag and type lines.
+
+    // Anything tighter overlaps: textBox height is 1.15em, so 3.6mm collides by 0.9mm.
+
+    const TYPE_OFF = 5.5;
+
     const GUT = 7;                           // gutter between items
     // Uppercase serif advance averages ~0.62em. Over-estimate slightly: a list that
     // overflows the frame is a defect, one 2mm narrower than it could be is not.
@@ -2063,7 +2079,7 @@ function annotationsSvg(data, W, H) {
       // Never start an item that cannot finish inside the frame.
       if (x > lx && x + w > right) break;
       s += `<text x="${x}" y="${ty}" font-size="${tm.eqTag}" font-weight="bold" fill="#111" text-decoration="underline">${esc(row.tag)}</text>`;
-      if (row.type) s += `<text x="${x}" y="${ty + 3.6}" font-size="${tm.eqType}" fill="#666">${esc(row.type)}</text>`;
+      if (row.type) s += `<text x="${x}" y="${ty + TYPE_OFF}" font-size="${tm.eqType}" fill="#666">${esc(row.type)}</text>`;
       x += w + GUT;
       fit++;
     }

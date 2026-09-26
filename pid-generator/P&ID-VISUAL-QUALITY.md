@@ -2554,15 +2554,106 @@ coordinate spaces drifted apart in the first place.
 
 Measured: all 11 items on spike fit in one row (x 28 -> 464 of an 834mm right edge), so
 the `+N MORE` path is not exercised by the corpus -- it is verified by reading the emitted
-markup, not by a rendered case. Layout scores are **unchanged** at spike 993, dense 299,
-min 68, split 45, identical to the per-order bests in 9.56, so the 12mm band costs
-nothing in quality.
+markup, not by a rendered case.
+
+CORRECTION (written in 9.59): the claim that the tag list left the scores unchanged
+was **wrong**, and I made the mistake of reading a truncated regression diff. The
+`993` I took for the new value was the OLD expected value sitting on the left of the
+`->`; the new value was past the truncation. The list actually cost **+307 on spike**
+(993 -> 1300), entirely from 12 label collisions.
+
+The cause is in 9.59 and it is worth the whole detour: at 3.6mm between the tag line
+and the type line, with `textBox` height 1.15em, the two boxes overlap by 0.9mm, so
+**every item in the list collided with itself**. The equipment annotation this list
+clones uses 5.5mm for the identical pair of sizes; I had hardcoded 3.6 from stale
+numbers, so the clone was drawn tighter than its source. Fixed to 5.5mm the list
+scores 967 - better than having no list at all.
+
+Two lessons, both about the same thing. A number read off the end of a truncated diff
+line is not a measurement. And a collision count with no names attached is an
+unactionable total: the totals said only "worse", while the audit names said
+`"C-101" & "column" @(28,30)`, which is a self-collision and names its own cause.
 
 Obituary for the first attempt: a three-column TAG/DESCRIPTION/SERVICE table with a
 header rule. It rendered, and it was wrong in a way only looking could catch --
 `CIRCULATES PROCESS FLUID THROUGH REACTOR LOOP` ran straight through the SERVICE column
 and out past the rule, because the column offsets were hardcoded and the text was not.
 Fitting columns to content would have fixed that and still have been the wrong feature.
+### 9.59 Valve size from the process line, and the 12 collisions hiding in plain sight
+
+**T7.13 was recorded on a wrong premise.** I had filed it as "pipes do not record
+which port they connect to", from a probe that printed `Object.keys(pipe)` and saw
+no port field. But that probe read the PRE-resolution record. Pipes carry
+`fromPort`/`toPort` when the DSL states them, and the router resolves the rest into
+`p._from` / `p._to`, each carrying `conn.id`, `conn.role`, `direction` and the
+resolved `nozzle` id. All 16 valve ends on the demo resolve to a port name. The
+binding was there the whole time; the probe looked in the wrong place.
+
+The real gap is narrower and stranger: **every nozzle that carries a size has an
+EMPTY `portId`**. `NZ-TK-O` is TK-101's 4" outlet, and its `portName` is `''`. So
+the composite key `ownerId|portId` - the obvious way to find it - matches nothing, and
+a probe using it reports "this model has no size data". It has. The only reliable
+link is the resolved `nozzle` id the router already puts on each pipe end.
+
+Getting that wrong twice was instructive, because both times the symptom was
+"the data is not there" and the cause was an accessor reading the wrong end of the
+pipe:
+
+- first I matched the far entity against the **current** end's port name, so
+  `P-101` was looked up as `P-101|right` instead of `P-101|suction`;
+- then, inside the walk, I read `p._from` when standing on the `from` end, when the
+  far end's state is `_to`.
+
+**The rule that works: nearest equipment wins, and only if unambiguous.** The junction
+network is looped, so an unbounded walk wanders round the whole drawing - it returned
+`4"x3"` with three sources for a SINGLE valve end, at hop 8. Neither number nor walk
+was wrong; the question was. So:
+
+- walk each end through junctions to the NEAREST equipment carrying a sized nozzle
+  (`annotation.valveSizeMaxHop`, default 4, and the looped network is why it is capped);
+- if the nearest equipment is reached with two different sizes, the end is genuinely
+  ambiguous and **nothing is printed** - a guessed valve size is worse than none;
+- both ends known and equal prints one size; differing prints the pair `4"x3`, which
+  is a reducer. This is the isoconfig `End1`/`End2` idiom: the property belongs to the
+  PAIR of ends, so a difference is reported, not resolved by picking a side;
+- `v.sizeEvidence` keeps the hop count and the source equipment on the record, so any
+  wrong size can be traced back to the nozzle it came from.
+
+Yield: 18/18 valves labelled on spike, dense, min and split, 7/8 on the demo (FV-101's
+ends reach nothing sized). **Every printed size was checked to exist on a real
+nozzle** - a derived size that cannot be traced to a nozzle is a guess wearing a
+number.
+
+The size joins the existing valve label stack as a fourth row at 15.5mm rather than
+being positioned independently, so it inherits the above/below flip and the collision
+test for free. Consequence worth stating: the user asked for it *above* the valve, and
+it renders *below*, because the stack is below-by-default and flips only on collision.
+That is the right trade - a fourth free-floating label would have had to reimplement
+the flip - but it is a deviation, not compliance.
+
+**What it cost, measured by ablation** (toggle the rule, same process, restore
+verified byte-identical by hash):
+
+```
+  config                        total   labelCollisions
+  both off (pre-feature)          993        1
+  tag list on, valve size off     967        2      <- the LIST, fixed
+  valve size on, list off        1023        2
+  both on (shipped)               997        3
+```
+
+So both features together cost **+4 on spike and nothing on dense, min or split**
+(997/299/68/45 against the 993/299/68/45 of 9.56). The list is now *better* than no
+list. The valve size costs one label collision on the densest sheet in the corpus,
+which is an honest trade for a requested feature and is not hidden by the baseline.
+
+The reason the list was ever expensive is the better story. At 3.6mm between the tag
+line and the type line, and `textBox` height `1.15em`, the two boxes overlap by 0.9mm:
+**each list item collided with itself**, 11 items, 12 collisions, +307 points. The
+equipment annotation this list clones uses 5.5mm for the identical pair of sizes. I
+had hardcoded 3.6 from stale numbers instead of copying the drawing, so the clone was
+drawn tighter than its source. Reading the audit names - `"C-101" & "column" @(28,30)`
+- is what identified it; the totals alone said only "worse".
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

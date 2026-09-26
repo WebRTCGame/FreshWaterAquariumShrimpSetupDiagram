@@ -504,44 +504,78 @@ consumption across the five live engine files: of the symbol metadata, only
 
 ### Deferred by request, 2026-09-26
 
-Four items raised in review that are **not** done. Recorded here so they are not lost,
+One item raised in review is still **not** done (T3.4, below). T3.6, T7.12 and T7.13
+have since been closed — see their entries for what they turned out to be. Recorded here so they are not lost,
 each with the open question that has to be answered before implementation — not just a
-title.
+title. T3.6 is now closed and its six open questions are answered in place.
 
-- [ ] **T7.13** **Pipes do not record which port they connect to.** Found while scoping
-  T7.12: a pipe record is `{from: "J-0", to: "V-101"}` with **no port name on either
-  end**. The valve-port binding is *inferred* inside the router and never stored. So
-  "the process line the valve is on" - and with it any per-end property, including line
-  size - is not recoverable from the data model at all; it exists only as a routing
-  decision. **This is the real blocker for T7.12**, not the two-ends ambiguity recorded
-  there. The fix is small and well defined: have the router publish its port binding
-  (per pipe, the `(entity, port)` chosen at each end). Worth doing on its own merits -
-  it would also let the validator check port capacity and lead-in against *declared*
-  bindings instead of inferred ones.
+- [x] **T7.13** **Pipe port binding — ALREADY IMPLEMENTED; the finding was wrong.**
+  Closed 2026-09-26 (log 9.59) with no code change. The premise was false: pipes DO
+  record their port binding. A `fromPort`/`toPort` when the DSL states it, and
+  otherwise the router resolves it into `p._from` / `p._to`, each carrying `conn.id`,
+  `conn.role`, `direction` and the resolved `nozzle` id. All 16 valve ends on the demo
+  resolve to a port name. The probe that filed this read `Object.keys(pipe)` on the
+  **pre-resolution** record and saw no port field.
 
-- [ ] **T3.6** **Equipment list / schedule along the top edge**, as on a real P&ID.
-  Requested: "we need each equipment listed along the top edge of the page as a
-  callout/annotation". **Deferred only because it is a feature, not a patch** — it
-  needs a column layout, a row-pitch budget, and a decision on which fields.
-  *Why it is worth doing first of the four:* it attacks the measured under-allocation
-  directly. The demo uses **39% of usable height** with entity centres spanning only
-  170 of 463 mm, and a real equipment schedule occupies exactly that void (9.52).
-  Open questions: which fields (tag / description / service / size?); is the list
-  per-sheet or whole-drawing; does it consume the top margin so the centring target
-  must move down; does a long list wrap or paginate; does it interact with `legend`
-  (F7), which may be the same feature under another name.
+  The gap that is real, and it is a nastier one: **every nozzle carrying a size has an
+  EMPTY `portId`.** `NZ-TK-O` is TK-101's 4" outlet and its `portName` is `''`. The
+  obvious lookup, `ownerId|portId`, therefore matches nothing and reports "this model
+  has no size data" — it does. Only the router-resolved `nozzle` id finds it.
+  *Consequence for the validator suggestion below:* the proposed benefit of checking
+  "declared rather than inferred bindings" is **not available**, because for sized
+  nozzles there is no declared binding to check against. Port capacity and lead-in can
+  still be validated, but against the inferred binding, as now.
+- [x] **T3.6** **Equipment tag list, one row across the top edge.** DONE 2026-09-26
+  (`ff2d6cf`, log 9.58). All five open questions below were answered by the work
+  itself, and the answers are worth keeping because the first design got three of
+  them wrong:
+  - *Which fields?* **None chosen - it is a clone.** The row reuses the equipment
+    annotation's own two strings (bold underlined tag, grey `TYPE_LABELS[type]`) and
+    the same `noTypeLabel` rule (`pid-renderer.js:1663-1666`). A parallel set of
+    columns was the first attempt and it drifted: hardcoded column offsets let a long
+    description run through the SERVICE column and out past the rule. Cloning cannot
+    drift, because there is nothing to keep in sync.
+  - *Per-sheet or whole-drawing?* **Per-sheet**, so the row never lists equipment
+    that is not on the sheet.
+  - *Does it consume the top margin?* **Yes, reserved not leftover.** `autoLayout`
+    adds `equipList.height` to the centring target's `zy0`. Drawing into leftover
+    space would put the list on the drawing once a sheet fills its sheet - the normal
+    case, not an edge case.
+  - *Wrap or truncate?* **Neither - one row, `+N MORE`.** All 11 spike items fit
+    (x 28 -> 464 of an 834mm edge), so the `+N MORE` path is not exercised by the
+    corpus and is verified by reading the emitted markup, not by a rendered case.
+  - *Interaction with `legend`?* **None observed**, but untested: no corpus sheet sets
+    both, and the legend is bottom-left while the row is top-left, so they do not
+    currently contend for the same space.
 
-- [ ] **T7.12** **Valve size shown above the valve**, derived from the process line
-  when the DSL does not state it. Requested: "show the valve size above the valve, if
-  it's not specified in the dsl then it should be derived from the process line the
-  valve is on."
-  **Blocked on one ambiguity that must be settled first:** what does "the process line
-  the valve is on" mean when the two sides differ? A valve reducing 4" to 2" has two
-  lines and two sizes, and a valve mid-run inherits one. Also unknown: whether the DSL
-  already accepts a valve `size` (nozzles demonstrably do — `nozzle N1 ... size 4"`),
-  and what the fallback should be when *neither* side declares a size. Guessing here
-  would put wrong text on the drawing, which is worse than putting none.
+  The load-bearing constraint: the reserved height is a **constant**, not a per-item
+  pitch, because `fs` is a closure over `textScale` and `annotation.typeScale` inside
+  the renderer. A router-computed row count therefore cannot know the drawn widths and
+  can disagree with the rows actually drawn - producing precisely the overlap the
+  reservation exists to prevent. A fixed one-row height cannot disagree. Type sizes
+  are published off the one `fs()` choke point as `data.typeMm`, never recomputed.
+- [x] **T7.12** **Valve size above the valve, derived from the process line.** DONE
+  2026-09-26 (log 9.59, `annotation.valveSize`). The ambiguity recorded here — what the
+  size is when the two ends differ — was answered by the isoconfig `End1`/`End2` idiom:
+  the property belongs to the **pair** of ends, so differing ends are reported as a
+  pair (`4"x3`, a reducer) rather than resolved by picking a side.
 
+  The rule, both halves earned by measurement:
+  - walk each end through junctions to the **nearest** equipment carrying a sized
+    nozzle. The junction network is looped, so an unbounded walk returned three
+    sources and a nonsense `4"x3"` for a single end at hop 8; `valveSizeMaxHop` (4)
+    bounds it.
+  - print **nothing** when the nearest equipment is reached with two different sizes,
+    or when neither end resolves. A guessed valve size is worse than no valve size.
+
+  `v.sizeEvidence` keeps the hop count and source equipment on each valve so a wrong
+  size is traceable to its nozzle. Yield 18/18 valves on spike/dense/min/split, 7/8 on
+  the demo, and every printed size verified to exist on a real nozzle.
+
+  Cost, by ablation: **+1 label collision on spike, zero on dense/min/split.**
+  *Deviation:* it renders **below** the valve, not above as asked — it is a fourth row
+  of the existing label stack, so it inherits the above/below flip and the collision
+  test instead of reimplementing them. Flagged rather than quietly claimed as done.
 - [ ] **T4.4** **Label-collision metric measures the authored strings, not the drawn
   glyphs.** Introduced as a side effect of the uppercase change (all type is now
   uppercase via CSS, so the data keeps its authored case). Capitals are wider than

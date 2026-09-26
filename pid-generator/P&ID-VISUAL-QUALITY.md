@@ -2258,52 +2258,112 @@ lever is **port offsets** — making `(pct-50)/100*size` land on whole millimetr
 the common symbol sizes — not the placement code. That is a symbol-data change with
 layout consequences, so it needs the visual baseline and is not attempted here.
 
-### 9.49 Still outstanding after this pass
+### 9.50 `PID-TXT-001` — annotation type outside the print-legibility band
 
-- **Pipe routes sit 1–2.5 mm off the drawn grid, at their ports only.** Entity
-  centres are on the 5 mm grid (19/19, 33/34, 14/14, 6/6, 6/6) and interior bends are
-  snapped; the residual is the port endpoints, which are pinned to exact attachment
-  by `(pct-50)/100*size`. The lever is port offsets, not placement code. §9.48.
+Requested: a runtime warning for any component/line text that is under- or
+over-size. Added, and it immediately reports a standing finding on all five sheets.
+
+#### The mechanism it hooks
+
+Every annotation run in the drawing goes through **one** function, so the check is
+exhaustive without touching a single call site (which would rot the moment someone
+adds a label):
+
+```js
+fs(n) = max(round(n * textScale * typeScale, 1dp), typeFloor)
+textScale = max(0.85, symbolScale)     typeScale = 1.4     typeFloor = 3.5
+```
+
+Base sizes in use: 1.8 / 2.2 / 2.3 / 2.6 / 2.8 / 3.0 / 3.2. Title-block, legend and
+north-arrow text does **not** come through `fs` — it is authored with literal sizes in
+its own unit space — so the scope is annotation type and not sheet furniture, with no
+filter needed.
+
+#### What it found
+
+| | emitted sizes | count |
+|---|---|---|
+| annotation type | **3.5, 3.6, 3.9, 4.2, 4.5 mm** | 290 runs over 5 sheets |
+| title block etc. | 5, 6, 8, 11 mm | out of scope, correctly |
+
+The project's stated print-correct sizes are **3.5 mm body, 2.6 mm line tags**. Every
+size the engine actually emits is **at or above the top of that band**. So the check
+does not pass today — it reports, once per sheet:
+
+> `[PID-TXT-001] annotation type OVER: 24 run(s) at 3.6mm, 34 run(s) at 3.9mm, 12 run(s)
+> at 4.2mm, 34 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm.`
+
+**This is a real design tension, not a bug I should quietly fix.** `typeScale 1.4`
+inflates the base sizes — a 2.6 mm line tag becomes 3.6 mm — and the requirement says
+explicitly *do not inflate them*. Either the base sizes are the print-correct ones and
+`typeScale` is screen-legibility that should not ship, or the band is stale. That is a
+decision for the drafter, so the check reports it rather than resolving it. The
+defaults were deliberately **not** widened to match current behaviour: a check that
+blesses the gap it exists to report is not a check.
+
+#### A second finding the message carries
+
+`typeFloor = 3.5` **binds** for every base at or below 3.5/1.4 = **2.50 mm**, so
+`fs(1.8)`, `fs(2.2)` and `fs(2.3)` all render at *exactly* 3.5 mm. Three distinct roles
+are flattened onto one size and are no longer individually distinguishable — the
+nozzle size, the line-spec text and the valve state text are the same size by
+accident, not by design. The warning says so, because a reader seeing "3.5 mm" has no
+way to know three roles collapsed into it.
+
+#### Reported aggregated, on purpose
+
+One warning per offending **size**, not per run. At `typeScale 1.4` roughly 265 of 290
+runs are over the band; 265 identical warnings would be noise that trains the reader
+to ignore the check. The message carries the run counts and the worst case instead.
+
+#### Non-vacuous in both directions
+
+A check that can only report OVER is half a check, and one that fires unconditionally
+is worse than none. Both proven by driving the registry in memory and re-rendering:
+
+| | result |
+|---|---|
+| defaults, band 2.6–3.5 | fires **OVER** |
+| `typeFloor` 1.5 (text can drop below 2.6) | fires **UNDER** as well |
+| band widened to 1.0–9.0 (fits reality) | **silent** — it measures, it does not always warn |
+| `typeScale` 3 (huge type) | fires **OVER** |
+
+Third row is the one that matters: a check that goes quiet when the band is satisfied
+is measuring something real.
+
+#### Cost
+
+One warning per sheet, +5 score each (spike 988→993, dense 294→299, min 63→68,
+split 40→45). That is the check working, not a regression — the score is paying for a
+true finding. Re-blessed. Geometry unchanged.
+
+New registry params: `annotation.sizeMin` 2.6, `annotation.sizeMax` 3.5,
+`annotation.sizeScopeMin` 0 (suppress a size with fewer runs than this).
+
+### 9.51 Still outstanding after this pass
+
+- **Annotation type is 1.0-1.9 mm over the stated print band on every sheet**, and
+  `typeFloor` flattens three roles onto 3.5 mm. Both are decisions rather than defects,
+  and `PID-TXT-001` now reports both on every run. See 9.50.
 - **Ports do not touch their metal.** 60 of 259 ports sit >1 mm clear of the drawn
   content. The valve family is now *correctly placed on its axis* but still short of
-  the body by 0.83–1.67 mm, because ports are authored at the bounding-box edge and
-  the bodies are inset. A per-family lead-in stub decision, not an auto-fix (§9.44).
+  the body by 0.83-1.67 mm, because ports are authored at the bounding-box edge and
+  the bodies are inset. A per-family lead-in stub decision, not an auto-fix. See 9.44.
+- **Pipe routes sit 1-2.5 mm off the drawn grid, at their ports only.** Entity centres
+  are on the 5 mm grid (19/19, 33/34, 14/14, 6/6, 6/6) and interior bends are snapped;
+  the residual is the port endpoints, which are pinned to exact attachment by
+  `(pct-50)/100*size`. The lever is port offsets, not placement code. See 9.48.
 - **`portOffset` still ignores the letterbox** (T7.2). Residual 0.167 mm on the
-  `vb.h=83.33` valves, 0.5 mm on the control-valve group. The §9.22 revert of this
-  was measured against broken port data and should be re-run.
+  `vb.h=83.33` valves, 0.5 mm on the control-valve group. The 9.22 revert of this was
+  measured against broken port data and should be re-run.
 - **The router is now tuned against stale anchors.** Correcting the valve ports moved
-  every pipe terminus and pushed all four corpus scores up (§9.44). The valves are
-  right and the scores are worse; closing that gap is the same re-tuning T3 asks for,
-  now with a measured reason.
-- **`angle-valve` is unchecked**, not fixed — see §9.44.
-- **Instrument tier reads as disconnected.** LT / FT / PI / FIC float well above
-  their hosts on long dashed runs; LT's bubble in particular sits far left with
-  a line that reaches nothing. This is the most visible remaining defect and is
-  the natural next target.
-- **Parallel manifold branches still share a narrow band.** Labels no longer
-  collide, but V-102 / V-103 / V-105 / FV-101 remain within ~45 mm of x. A true
-  fan-out (not a stack) is the structural answer and is untouched.
-- **Demo fill is 44 %** — up from 27 %, but the sheet is still sparse. `[13]`
-  reports it honestly; the structural answer is a richer demo sheet (item 8).
-- `spike`'s 22 crossings and 12 warnings are the Phase-5 residuals the plan
-  already documents as structural. Not chased here.
-- Untouched: legend (F7), text-size consolidation, signal pricing (F4), sheet
-  constants (item 7), richer demo (item 8), symbol conformance (D8).
-
-### 9.4 Still outstanding (unchanged by this work)
-
-The demo sheet remains sparse — centring cannot manufacture content, and stretching
-was rejected on evidence. That is precisely the case for the **`[13] sparse sheet`**
-check from §4: the honest response to an under-filled sheet is to say so, not to
-contort the geometry.
-
-Remaining items 2–8 are untouched and still sequenced as in §6.
-
-### Resolved since Rev 1
-- ~~Is the target print or screen?~~ → **Print, fixed ARCH/ANSI D.** Screen legibility
-  is a viewer's concern (D7), not a geometry concern.
-- ~~Should sheets vary in size?~~ → **No.** Fixed media; Option B withdrawn.
-- ~~Raise the text floor?~~ → **No.** Sizes are print-correct; see D5.
-- ~~Is process-line colour free to change?~~ → **Yes**, and it is now a theme system
-  (D4) rather than a recolour. §8 Q4 above is now a palette-choice question, not a
-  permission question.
+  every pipe terminus and pushed all four corpus scores up (9.44). The valves are right
+  and the scores are worse; closing that gap is the re-tuning T3 asks for, now with a
+  measured reason.
+- **`angle-valve` is now fixed** (inlet 50->75, outlet 50->8.33) and verified by a render.
+- **Instrument tier reads as disconnected.** LT / FT / PI / FIC float well above their
+  hosts on long dashed runs; LT's bubble in particular sits far left with a line that
+  reaches nothing. This is the most visible remaining defect and is the natural next
+  target.
+- Untouched: legend (F7), text-size consolidation (see 9.50), signal pricing (F4),
+  sheet constants (item 7), richer demo (item 8), symbol conformance (D8).

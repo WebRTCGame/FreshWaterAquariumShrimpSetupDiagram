@@ -423,6 +423,23 @@ consumption across the five live engine files: of the symbol metadata, only
   file, idempotent). **All four corpus scores went UP** (spike 995→1185, dense
   248→293, min 58→63, split 36→40) because the router was tuned against the wrong
   anchors. Kept: the geometry is right and the renders confirm it. See §9.44.
+- [x] **T6.13** `PID-TXT-001` — runtime warning for annotation type outside the
+  print-legibility band (`annotation.sizeMin` 2.6 / `sizeMax` 3.5). Hooks the single
+  `fs()` choke point in `pid-renderer.js` so it is exhaustive without touching a
+  call site, and scopes itself to annotation type by construction (title-block and
+  legend text uses literal sizes, so it never enters `fs`). Reported **aggregated**,
+  one warning per offending size, because at `typeScale 1.4` roughly 265 of 290 runs
+  are over the band and per-run reporting would be noise. Proven non-vacuous in both
+  directions: fires OVER at defaults, fires UNDER when `typeFloor` is lowered, and
+  goes **silent** when the band is widened to fit — the row that shows it measures
+  rather than always warning. Reports a standing finding on all five sheets. See
+  §9.50.
+- [ ] **T6.14** Decide the `annotation.typeScale` / `typeFloor` tension the new check
+  exposes. `typeScale 1.4` inflates a 2.6mm line tag to 3.6mm, against a stated
+  print target of 3.5mm body / 2.6mm tags and an explicit "do not inflate" rule. The
+  floor additionally binds for every base ≤2.50mm, flattening three roles onto
+  exactly 3.5mm so they are no longer individually distinguishable. This is a drafter's
+  decision — screen legibility vs print fidelity — not a bug to fix unilaterally.
 - [ ] **T7.10** Ports sit at the symbol **bounding-box edge**, not at the metal —
   60 of 259 are >1 mm clear of the drawn content (worst 9.75 mm). Needs a per-family
   lead-in-stub decision, not an auto-fix. Distinct from T7.9, which moved ports along

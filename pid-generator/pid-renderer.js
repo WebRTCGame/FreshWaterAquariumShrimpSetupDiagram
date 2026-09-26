@@ -220,7 +220,42 @@ function renderInto(svg, data, themeName) {
   const SC = view.symbolScale || 1;
   const textScale = Math.max(0.85, SC);
   // ponytail: type scale + floor from registry (annotation.typeScale/typeFloor)
-  const fs = (n) => Math.max(Math.round(n * textScale * ruleParam('annotation.typeScale', 1.4) * 10) / 10, ruleParam('annotation.typeFloor', 3.5));
+  //
+  // PID-TXT-001. Every annotation run in the drawing goes through this one function,
+  // so recording what it produces here is exhaustive and cannot miss a role — no
+  // per-call-site instrumentation, which would rot the moment someone adds a label.
+  // Title-block, legend and north-arrow text does NOT come through here (it is
+  // authored with literal sizes in its own unit space), which is exactly the scope
+  // we want: this is a check on annotation type, not on sheet furniture.
+  const typeSizes = new Map();          // mm -> how many runs used it
+  const fs = (n) => {
+    const v = Math.max(Math.round(n * textScale * ruleParam('annotation.typeScale', 1.4) * 10) / 10, ruleParam('annotation.typeFloor', 3.5));
+    typeSizes.set(v, (typeSizes.get(v) || 0) + 1);
+    return v;
+  };
+  // Runs the check once the annotations are laid out. Reported AGGREGATED, one
+  // warning per offending size, not one per run: at the current typeScale almost
+  // every run is over the band, and 265 identical warnings would be noise that
+  // trains the reader to ignore the check.
+  const checkTypeBand = () => {
+    const lo = ruleParam('annotation.sizeMin', 2.6), hi = ruleParam('annotation.sizeMax', 3.5);
+    const minRuns = ruleParam('annotation.sizeScopeMin', 0);
+    const under = [], over = [];
+    for (const [mm, n] of [...typeSizes.entries()].sort((a, b) => a[0] - b[0])) {
+      if (n < minRuns) continue;
+      if (mm < lo - 1e-9) under.push([mm, n]);
+      else if (mm > hi + 1e-9) over.push([mm, n]);
+    }
+    const fmt = (rows, word, bound) => rows.map(([mm, n]) => `${n} run(s) at ${mm.toFixed(1)}mm`).join(', ')
+      + ` — ${word} the ${bound.toFixed(1)}mm print limit`;
+    if (under.length) {
+      data.warnings.push(`[PID-TXT-001] annotation type UNDER: ${fmt(under, 'below', lo)}. Raise annotation.typeScale or lower annotation.typeFloor, or accept if this sheet is screen-only.`);
+    }
+    if (over.length) {
+      const worst = over[over.length - 1];
+      data.warnings.push(`[PID-TXT-001] annotation type OVER: ${fmt(over, 'above', hi)}; largest ${worst[0].toFixed(1)}mm. annotation.typeScale is ${ruleParam('annotation.typeScale', 1.4)} and annotation.typeFloor is ${ruleParam('annotation.typeFloor', 3.5)}mm — note the floor BINDS for every base size at or below ${(ruleParam('annotation.typeFloor', 3.5) / ruleParam('annotation.typeScale', 1.4) / textScale).toFixed(2)}mm, so those roles are all flattened to exactly ${ruleParam('annotation.typeFloor', 3.5)}mm and their individual sizes are no longer distinguishable.`);
+    }
+  };
   const sizeOf = (e) => {
     let s = isInstrument(e) ? symbolSize(glyphKeyOf(e)) : glyphSizeOf(e);
     if (e.scale) s *= e.scale;
@@ -1833,6 +1868,9 @@ const shiftFor = (lineIdx, x) => {
 
   svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
   globalThis.__LAST_SVG = (wrap ? wrap : '') + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
+  // must run after every fs() call above, and before finalizeValidation, which is
+  // where the score is priced from the warning list
+  checkTypeBand();
   const lineIssues = validateGeometry(data, geometries, pipes, tapGeos);
   finalizeValidation(data);
 

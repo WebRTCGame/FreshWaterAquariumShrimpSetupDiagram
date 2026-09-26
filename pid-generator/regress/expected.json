@@ -5,6 +5,7 @@
    "warnings": [
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
+    "[PID-TXT-001] annotation type OVER: 24 run(s) at 3.6mm, 34 run(s) at 3.9mm, 12 run(s) at 4.2mm, 34 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (535mm) — instrument pair far apart; consider moving the receiver",
     "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (605mm) — instrument pair far apart; consider moving the receiver",
     "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
@@ -15,9 +16,9 @@
     "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-005] tap \"TT-101\": shares 88mm of process corridor (reads as one line) — move the bubble or add a via"
    ],
-   "warningsTotal": 11,
+   "warningsTotal": 12,
    "score": {
-    "total": 988,
+    "total": 993,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -61,7 +62,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 11
+     "warnings": 12
     }
    }
   },
@@ -122,17 +123,18 @@
     "13": []
    }
   },
-  "budget": 889
+  "budget": 894
  },
  "min": {
   "harness": {
    "errors": [],
    "warnings": [
+    "[PID-TXT-001] annotation type OVER: 4 run(s) at 3.6mm, 6 run(s) at 3.9mm, 2 run(s) at 4.2mm, 6 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 5.5mm (< 14mm) — bend too close to the FIC-1 port"
    ],
-   "warningsTotal": 1,
+   "warningsTotal": 2,
    "score": {
-    "total": 63,
+    "total": 68,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -176,7 +178,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 1
+     "warnings": 2
     }
    }
   },
@@ -216,17 +218,18 @@
     ]
    }
   },
-  "budget": 57
+  "budget": 61
  },
  "dense": {
   "harness": {
    "errors": [],
    "warnings": [
-    "[PID-VAL-004] control valve \"V-2\" has no defined fail action"
+    "[PID-VAL-004] control valve \"V-2\" has no defined fail action",
+    "[PID-TXT-001] annotation type OVER: 8 run(s) at 3.6mm, 16 run(s) at 3.9mm, 6 run(s) at 4.2mm, 14 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
    ],
-   "warningsTotal": 1,
+   "warningsTotal": 2,
    "score": {
-    "total": 294,
+    "total": 299,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -270,7 +273,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 1
+     "warnings": 2
     }
    }
   },
@@ -310,15 +313,17 @@
     "13": []
    }
   },
-  "budget": 265
+  "budget": 269
  },
  "split": {
   "harness": {
    "errors": [],
-   "warnings": [],
-   "warningsTotal": 0,
+   "warnings": [
+    "[PID-TXT-001] annotation type OVER: 4 run(s) at 3.6mm, 8 run(s) at 3.9mm, 2 run(s) at 4.2mm, 6 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
+   ],
+   "warningsTotal": 1,
    "score": {
-    "total": 40,
+    "total": 45,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -362,7 +367,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 0
+     "warnings": 1
     }
    }
   },
@@ -397,6 +402,6 @@
     "13": []
    }
   },
-  "budget": 36
+  "budget": 41
  }
 }

@@ -183,6 +183,15 @@ const PID_RULES = {
     annotation: {
       typeScale:    { value: 1.4, min: 1, max: 3, unit: 'factor', desc: 'type size multiplier over base sizes' },
       typeFloor:    { value: 3.5, min: 2, max: null, unit: 'mm', desc: 'minimum rendered text size' },
+      // Print-legibility band for component and line text, checked by PID-TXT-001.
+      // Defaults are the project's stated print-correct sizes: 3.5mm body, 2.6mm
+      // line tags. Deliberately NOT widened to match what the engine currently
+      // emits — the whole point of the check is to report the gap, not to bless it.
+      // Title-block, legend and north-arrow text are excluded: they are authored in a
+      // different unit space and are not annotation type.
+      sizeMin:      { value: 2.6, min: 0.5, max: null, unit: 'mm', desc: 'smallest print-legible annotation size; below this PID-TXT-001 warns UNDER' },
+      sizeMax:      { value: 3.5, min: 1, max: null, unit: 'mm', desc: 'largest print-legible annotation size; above this PID-TXT-001 warns OVER' },
+      sizeScopeMin: { value: 0, min: 0, max: null, unit: 'count', desc: 'do not warn on annotation type if fewer than this many runs are affected (0 = warn always)' },
       labelOffset:  { value: 14, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff' },
       labelOffsetWide: { value: 28, min: 8, max: null, unit: 'mm', desc: 'line-label fallback standoff' },
     },

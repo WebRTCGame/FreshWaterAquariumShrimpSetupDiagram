@@ -828,16 +828,18 @@ function autoLayout(data) {
   // Built here, before the centring target below, because that target zy0 has to know
   // how much room the list takes. The renderer reads the SAME object, so the two cannot
   // disagree about how tall it is.
-  // ---- equipment tag list, top edge (T3.6) --------------------------------
-  // A clone of each item's OWN annotation: the bold underlined tag plus the grey
-  // type label, stacked and left-aligned. Same two strings and the same
-  // `noTypeLabel` rule the equipment annotation itself uses, so the list cannot
-  // drift from the drawing.
+  // ---- equipment tag list, one row across the top (T3.6) ------------------
+  // A clone of each item's OWN annotation -- the bold underlined tag plus the grey
+  // type label -- laid out left to right in a single row along the top edge. Same
+  // two strings and the same `noTypeLabel` rule the equipment annotation uses, so
+  // the list cannot drift from the drawing.
   //
-  // Only the HEIGHT matters here, and it is RESERVED: added to the centring target's
-  // zy0 below. Drawn into leftover space instead would put the list on top of the
-  // drawing as soon as a sheet filled its sheet, which is the normal case, not an edge
-  // case. The renderer reads this same object, so the two cannot disagree on height.
+  // The reserved height is a CONSTANT for one row, deliberately not a per-item
+  // pitch. The renderer is the only side that knows the drawn type widths (`fs` is a
+  // closure over textScale and typeScale, not reachable from here), so a row count
+  // computed here could disagree with the rows actually drawn and put the list on
+  // top of the drawing. A fixed height cannot disagree: the renderer packs as many
+  // items as fit in ONE row and prints "+N MORE" for the rest.
   const eqList = (() => {
     if (!ruleParam('annotation.equipList', 1)) return null;
     const rows = equipment
@@ -848,14 +850,10 @@ function autoLayout(data) {
       }))
       .sort((a, b) => String(a.tag).localeCompare(String(b.tag), undefined, { numeric: true }));
     if (!rows.length) return null;
-    // Cap the rows. The band comes out of the top margin, so an unbounded list
-    // would push the drawing off the bottom of the sheet.
-    const max = ruleParam('annotation.equipListMax', 14);
-    const pitch = ruleParam('annotation.equipListPitch', 9);
-    const shown = rows.slice(0, max);
-    return { rows: shown, dropped: rows.length - shown.length, pitch,
-             height: pitch * shown.length + ruleParam('annotation.equipListPad', 4) };
-  })();  data.equipList = eqList;
+    return { rows, height: ruleParam('annotation.equipListRowH', 8)
+             + ruleParam('annotation.equipListPad', 4) };
+  })();
+  data.equipList = eqList;
 
   if (ruleParam('layout.centre', 1)) {
     const FRAME = 18;                 // border frame inset

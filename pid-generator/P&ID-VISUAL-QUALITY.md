@@ -2522,6 +2522,47 @@ One incidental find: `min` and `split` score identically under all three orders 
 and 45/45/45). Small sheets do not care about pass order, so the order dimension could be
 skipped for them. That is a micro-optimisation, not a correctness issue.
 
+### 9.58 T3.6 equipment tag list, one row across the top
+
+Clones each equipment's own annotation -- the bold underlined tag plus the grey
+`TYPE_LABELS[type]` line, honouring the same `noTypeLabel` rule -- into a single row
+along the top edge, left to right, sorted naturally by tag. The strings and the rule
+are the *same ones the drawing uses*, not a parallel description, so the row cannot
+drift from the drawing.
+
+Three design points worth recording, each of which replaced something that looked fine
+and was not:
+
+**The band is RESERVED, not drawn into leftover space.** `autoLayout` adds
+`equipList.height` to the centring target's `zy0`. Drawing into whatever space happened
+to be left would put the list on top of the drawing the moment a sheet filled its sheet,
+which is the normal case rather than an edge case. On spike this is visible as the whole
+drawing sitting lower, with the content bbox top at y=65 rather than y=42.
+
+**The reserved height is a CONSTANT, deliberately not a per-item pitch.** An earlier
+version had the router compute a row count from a per-item pitch. That cannot work:
+`fs` is a closure over `textScale` and `annotation.typeScale` inside the renderer, so
+the router cannot know the drawn type widths. A row count computed in the router could
+disagree with the rows actually drawn, and the list would land on the drawing -- exactly
+the failure the reservation exists to prevent. A fixed one-row height cannot disagree:
+the renderer packs as many items as fit and prints `+N MORE` for the rest.
+
+**Type sizes are published, not recomputed.** `data.typeMm = {eqTag: fs(3.2),
+eqType: fs(2.8)}` comes off the single `fs()` choke point, and `annotationsSvg` reads
+it. A third copy of the formula over in the furniture layer is how the overlay
+coordinate spaces drifted apart in the first place.
+
+Measured: all 11 items on spike fit in one row (x 28 -> 464 of an 834mm right edge), so
+the `+N MORE` path is not exercised by the corpus -- it is verified by reading the emitted
+markup, not by a rendered case. Layout scores are **unchanged** at spike 993, dense 299,
+min 68, split 45, identical to the per-order bests in 9.56, so the 12mm band costs
+nothing in quality.
+
+Obituary for the first attempt: a three-column TAG/DESCRIPTION/SERVICE table with a
+header rule. It rendered, and it was wrong in a way only looking could catch --
+`CIRCULATES PROCESS FLUID THROUGH REACTOR LOOP` ran straight through the SERVICE column
+and out past the rule, because the column offsets were hardcoded and the text was not.
+Fitting columns to content would have fixed that and still have been the wrong feature.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

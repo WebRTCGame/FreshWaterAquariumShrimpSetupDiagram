@@ -2041,22 +2041,37 @@ function annotationsSvg(data, W, H) {
     }
   }
 
-  // ---- equipment tag list, top edge (T3.6) --------------------------------
-  // Clones of the equipment annotations, in the band autoLayout reserved. Same text,
-  // same sizes (data.typeMm, published from the one fs() choke point) as the drawing.
+  // ---- equipment tag list, one row across the top (T3.6) ----------------
+  // Clones of the equipment annotations, in the one-row band autoLayout reserved.
+  // Same text and same sizes as the drawing: data.typeMm is published from the one
+  // fs() choke point rather than recomputed, so the clone cannot drift.
   const el = data.equipList;
   if (el && el.rows.length) {
     const tm = data.typeMm || { eqTag: 4.5, eqType: 4.0 };
-    const lx = pad + 10;                              // one common left edge
-    el.rows.forEach((row, i) => {
-      const y = pad + 12 + el.pitch * i;
-      s += `<text x="${lx}" y="${y}" font-size="${tm.eqTag}" font-weight="bold" fill="#111" text-decoration="underline">${esc(row.tag)}</text>`;
-      if (row.type) s += `<text x="${lx}" y="${y + 3.6}" font-size="${tm.eqType}" fill="#666">${esc(row.type)}</text>`;
-    });
-    // Never drop rows silently -- a reader has to be able to tell the list is partial.
-    if (el.dropped > 0) {
-      const y = pad + 12 + el.pitch * (el.rows.length + 1);
-      s += `<text x="${lx}" y="${y}" font-size="${tm.eqType}" fill="#666">+${el.dropped} MORE</text>`;
+    const lx = pad + 10;
+    const ty = pad + 12;                     // tag baseline; type line 3.6 below
+    // The north arrow starts at y = pad + 28, BELOW this row, so the row may use
+    // the full width rather than stopping short of the arrow.
+    const right = W - pad - 12;
+    const GUT = 7;                           // gutter between items
+    // Uppercase serif advance averages ~0.62em. Over-estimate slightly: a list that
+    // overflows the frame is a defect, one 2mm narrower than it could be is not.
+    const adv = (s2, f) => String(s2 || '').length * f * 0.62;
+    let x = lx, fit = 0;
+    for (const row of el.rows) {
+      const w = Math.max(adv(row.tag, tm.eqTag), adv(row.type, tm.eqType));
+      // Never start an item that cannot finish inside the frame.
+      if (x > lx && x + w > right) break;
+      s += `<text x="${x}" y="${ty}" font-size="${tm.eqTag}" font-weight="bold" fill="#111" text-decoration="underline">${esc(row.tag)}</text>`;
+      if (row.type) s += `<text x="${x}" y="${ty + 3.6}" font-size="${tm.eqType}" fill="#666">${esc(row.type)}</text>`;
+      x += w + GUT;
+      fit++;
+    }
+    // Never drop items silently -- a reader has to be able to tell the row is
+    // partial, or the list reads as a complete equipment take-off.
+    if (fit < el.rows.length) {
+      const n = el.rows.length - fit;
+      s += `<text x="${right}" y="${ty}" font-size="${tm.eqTag}" text-anchor="end" fill="#666">+${n} MORE</text>`;
     }
   }
   // legend, bottom-left inside the frame

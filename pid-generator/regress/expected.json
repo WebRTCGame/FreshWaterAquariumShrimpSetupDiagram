@@ -6,19 +6,18 @@
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
     "[PID-TXT-001] annotation type OVER: 24 run(s) at 3.6mm, 34 run(s) at 3.9mm, 12 run(s) at 4.2mm, 34 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (535mm) — instrument pair far apart; consider moving the receiver",
-    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (605mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (535mm) — instrument pair far apart; consider moving the receiver",
     "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
-    "[PID-GEO-002] geometry \"V-102 -> C-101\": port lead-in only 7.0mm (< 14mm) — bend too close to the C-101 port",
+    "[PID-GEO-002] geometry \"LT-101 -> LIC-101\": port lead-in only 9.5mm (< 14mm) — bend too close to the LIC-101 port",
+    "[PID-GEO-002] geometry \"PIC-101 -> V-105\": port lead-in only 5.0mm (< 14mm) — bend too close to the PIC-101 port",
     "[PID-INS-006] tap \"FT-101 -> P-101\": 56.0mm of sideways travel for a 70mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 149mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 207mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-005] tap \"TT-101\": shares 88mm of process corridor (reads as one line) — move the bubble or add a via"
+    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 177mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer"
    ],
-   "warningsTotal": 12,
+   "warningsTotal": 11,
    "score": {
-    "total": 993,
+    "total": 1300,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -37,19 +36,19 @@
      "overlapLen": 12
     },
     "routing": {
-     "crossings": 19,
-     "pp": 10,
-     "ps": 7,
-     "ss": 2,
-     "bends": 94,
-     "length": 8018,
+     "crossings": 15,
+     "pp": 9,
+     "ps": 6,
+     "ss": 0,
+     "bends": 90,
+     "length": 7609,
      "nonOrtho": 0
     },
     "sheet": {
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 1
+     "labelCollisions": 13
     },
     "lines": {
      "overlaps": 0,
@@ -57,73 +56,75 @@
      "astarGiveups": 0
     },
     "instruments": {
-     "tapReachTotal": 186,
-     "maxSignalLen": 235
+     "tapReachTotal": 141,
+     "maxSignalLen": 355
     },
     "issues": {
      "errors": 0,
-     "warnings": 12
+     "warnings": 11
     }
    }
   },
   "audit": {
-   "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 138",
+   "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 160",
    "counts": {
     "0": 0,
-    "3": 15,
-    "4": 2,
+    "3": 10,
+    "4": 1,
     "5": 0,
     "6": 0,
-    "7": 1,
-    "8": 1,
+    "7": 13,
+    "8": 0,
     "9": 0,
-    "10": 2,
-    "11": 89,
+    "10": 1,
+    "11": 92,
     "13": 0
    },
    "lists": {
     "0": [],
     "3": [
-     "PT-101~tap-> X V-102->C-101 @(545,145)",
-     "R-101->V-102 X R-101->PSV-101 @(695,170)",
-     "R-101->V-102 X R-101->PSV-101 @(695,170)",
-     "V-102->C-101 X P-103->J-3 @(490,115)",
-     "V-102->C-101 X P-103->J-3 @(220,115)",
-     "D-101->P-102 X LT-102->LIC-102 @(671,300)",
-     "V-105->C-101 X P-103->J-3 @(210,115)",
-     "J-4->E-103 X C-101->E-101 @(280,305)",
-     "J-4->E-103 X C-101->E-101 @(280,305)",
-     "J-4->E-103 X E-101->V-103 @(445,348)",
-     "J-4->E-103 X E-101->V-103 @(445,348)",
-     "P-103->J-3 X R-101->PSV-101 @(735,145)",
-     "P-103->J-3 X R-101->PSV-101 @(735,145)",
-     "P-103->J-3 X TT-101->TIC-101 @(705,135)",
-     "P-103->J-3 X PT-101->PIC-101 @(565,115)"
+     "PT-101~tap-> X V-102->C-101 @(545,150)",
+     "V-101->P-101 X P-103->J-3 @(180,240)",
+     "R-101->V-102 X R-101->PSV-101 @(695,175)",
+     "R-101->V-102 X R-101->PSV-101 @(695,175)",
+     "V-102->C-101 X P-103->J-3 @(640,170)",
+     "V-102->C-101 X LT-101->LIC-101 @(445,150)",
+     "V-102->C-101 X LT-101->LIC-101 @(445,150)",
+     "J-4->E-103 X V-103->P-103 @(490,335)",
+     "P-103->J-3 X PT-101->PIC-101 @(515,125)",
+     "R-101->PSV-101 X TT-101->TIC-101 @(735,140)"
     ],
     "4": [
-     "TT-101~tap-> & P-103->J-3 overlap 7mm at x=750",
-     "LT-101~tap-> & C-101->E-101 overlap 25mm at y=295"
+     "LT-101~tap-> & C-101->E-101 overlap 26mm at y=270"
     ],
     "5": [],
     "6": [],
     "7": [
-     "\"relief valve\" & \"TT\" @(735,134)"
+     "\"relief valve\" & \"TT\" @(735,139)",
+     "\"control valve\" & \"4\"-PG-101-1E1-H-INS-50-T\" @(168,187)",
+     "\"C-101\" & \"column\" @(28,30)",
+     "\"D-101\" & \"drum\" @(50,30)",
+     "\"E-101\" & \"kettle reboiler\" @(71,30)",
+     "\"E-102\" & \"shell & tube exchanger\" @(115,30)",
+     "\"E-103\" & \"shell & tube exchanger\" @(177,30)",
+     "\"P-101\" & \"centrifugal pump\" @(238,30)",
+     "\"P-102\" & \"centrifugal pump\" @(285,30)",
+     "\"P-103\" & \"centrifugal pump\" @(332,30)",
+     "\"R-101\" & \"stirred reactor\" @(378,30)",
+     "\"T-101\" & \"cone roof tank\" @(422,30)"
     ],
-    "8": [
-     "P-103->J-3 1mm (160,305)->(159,305)"
-    ],
+    "8": [],
     "9": [],
     "10": [
-     "PT-101~tap-> X V-102->C-101 @(545,145)",
-     "V-105->C-101 X P-103->J-3 @(210,115)"
+     "PT-101~tap-> X V-102->C-101 @(545,150)"
     ],
     "11": [
-     "content 750x402mm bbox (60,65)->(810,467) | 98% W x 91% H | drawable 768x439mm | sheet 864x559mm"
+     "content 749x416mm bbox (62,56)->(810,472) | 97% W x 95% H | drawable 768x439mm | sheet 864x559mm"
     ],
     "13": []
    }
   },
-  "budget": 894
+  "budget": 1170
  },
  "min": {
   "harness": {
@@ -134,7 +135,7 @@
    ],
    "warningsTotal": 2,
    "score": {
-    "total": 68,
+    "total": 128,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -165,7 +166,7 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 2
     },
     "lines": {
      "overlaps": 0,
@@ -183,14 +184,14 @@
    }
   },
   "audit": {
-   "paths": "3 process, 2 signal, 1 taps | entities: 6 | texts: 24",
+   "paths": "3 process, 2 signal, 1 taps | entities: 6 | texts: 28",
    "counts": {
     "0": 0,
     "3": 0,
     "4": 0,
     "5": 0,
     "6": 0,
-    "7": 0,
+    "7": 2,
     "8": 2,
     "9": 0,
     "10": 0,
@@ -203,7 +204,10 @@
     "4": [],
     "5": [],
     "6": [],
-    "7": [],
+    "7": [
+     "\"P-1\" & \"centrifugal pump\" @(28,30)",
+     "\"T-1\" & \"cone roof tank\" @(75,30)"
+    ],
     "8": [
      "FV-1->T-1 2mm (415,283)->(415,285)",
      "FV-1->T-1 2.5mm (415,285)->(413,285)"
@@ -218,7 +222,7 @@
     ]
    }
   },
-  "budget": 61
+  "budget": 115
  },
  "dense": {
   "harness": {
@@ -229,7 +233,7 @@
    ],
    "warningsTotal": 2,
    "score": {
-    "total": 299,
+    "total": 449,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -260,7 +264,7 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 5
     },
     "lines": {
      "overlaps": 0,
@@ -278,14 +282,14 @@
    }
   },
   "audit": {
-   "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 55",
+   "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 65",
    "counts": {
     "0": 0,
     "3": 4,
     "4": 0,
     "5": 0,
     "6": 0,
-    "7": 0,
+    "7": 5,
     "8": 0,
     "9": 0,
     "10": 0,
@@ -295,25 +299,31 @@
    "lists": {
     "0": [],
     "3": [
-     "J-1->V-2 X LT-1->LIC-1 @(295,185)",
-     "V-2->C-1 X LT-1->LIC-1 @(308,230)",
-     "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)",
-     "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)"
+     "J-1->V-2 X LT-1->LIC-1 @(295,190)",
+     "V-2->C-1 X LT-1->LIC-1 @(308,235)",
+     "FT-1->FIC-1 X FIC-1->FV-1 @(570,200)",
+     "FT-1->FIC-1 X FIC-1->FV-1 @(570,200)"
     ],
     "4": [],
     "5": [],
     "6": [],
-    "7": [],
+    "7": [
+     "\"C-1\" & \"column\" @(28,30)",
+     "\"D-1\" & \"drum\" @(50,30)",
+     "\"E-1\" & \"kettle reboiler\" @(67,30)",
+     "\"P-1\" & \"centrifugal pump\" @(111,30)",
+     "\"T-1\" & \"cone roof tank\" @(158,30)"
+    ],
     "8": [],
     "9": [],
     "10": [],
     "11": [
-     "content 469x206mm bbox (186,156)->(655,362) | 61% W x 47% H | drawable 768x439mm | sheet 864x559mm"
+     "content 469x206mm bbox (186,161)->(655,367) | 61% W x 47% H | drawable 768x439mm | sheet 864x559mm"
     ],
     "13": []
    }
   },
-  "budget": 269
+  "budget": 404
  },
  "split": {
   "harness": {
@@ -323,7 +333,7 @@
    ],
    "warningsTotal": 1,
    "score": {
-    "total": 45,
+    "total": 135,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -354,7 +364,7 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 3
     },
     "lines": {
      "overlaps": 0,
@@ -372,14 +382,14 @@
    }
   },
   "audit": {
-   "paths": "4 process, 0 signal, 0 taps | entities: 6 | texts: 23",
+   "paths": "4 process, 0 signal, 0 taps | entities: 6 | texts: 29",
    "counts": {
     "0": 0,
     "3": 0,
     "4": 0,
     "5": 0,
     "6": 0,
-    "7": 0,
+    "7": 3,
     "8": 0,
     "9": 0,
     "10": 0,
@@ -392,7 +402,11 @@
     "4": [],
     "5": [],
     "6": [],
-    "7": [],
+    "7": [
+     "\"P-1\" & \"centrifugal pump\" @(28,30)",
+     "\"T-1\" & \"cone roof tank\" @(75,30)",
+     "\"T-2\" & \"cone roof tank\" @(116,30)"
+    ],
     "8": [],
     "9": [],
     "10": [],
@@ -402,6 +416,6 @@
     "13": []
    }
   },
-  "budget": 41
+  "budget": 122
  }
 }

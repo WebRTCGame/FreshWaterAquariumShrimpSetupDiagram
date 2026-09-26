@@ -3325,6 +3325,142 @@ Visible in the same zoom, listed so they are not lost:
 None of these is a layout problem. They are symbol and annotation rendering, which is where
 the remaining ugliness actually lives — 9.66 spent its whole budget on composition levers
 and the sheet still looks cheap because of things no score term measures.
+### 9.68 Spreading the drawing out — the fill term returns, with a lever and a guard
+
+Told the demo "hasn't improved at all" and to stop going down rabbit holes. Fair. Four
+things had been found in 9.66 and none of them had been acted on, and the arithmetic that
+would have settled it in one line had not been done. So: done here.
+
+#### The actual cause, which was in a file I had already read
+
+`pid-router.js:96-97`, quoted in 9.66 and not acted on:
+
+```js
+const colsPerRow = Math.max(2, numCols <= Math.floor(availW / BASE_COL) ? numCols : ...);
+const COL = numCols <= colsPerRow ? availW / numCols : ...;
+```
+
+`COL = availW / numCols` — the columns **always spread to the full sheet width**, so
+`colsPerRow` was always `numCols` and the tier grid was **always one row**. The tiering
+machinery existed and could never engage. Every sheet came out as one flat horizontal
+band with the bottom of the sheet empty, and that is not a tuning problem, it is a
+missing feature that looked present.
+
+That is also why `layout.colSpacing` was a **dead rule** (9.66, byte-identical over a
+140->40mm sweep): `BASE_COL` was only ever a floor for the wrapped case, never the pitch.
+A dead lever and a missing feature, wearing the same coat.
+
+#### Two attempts that were wrong, measured
+
+**1. Wrapping the tier grid** (`layout.colsPerRowMax`, auto aspect fit). It engaged, and
+it was **harmful**: demo 235 -> 377, spike 921 -> 1127. Rendered it and it was worse —
+a void in the middle and V-104 jammed into the title block. Default is now 99 (no wrap);
+the rule is kept because forcing 2 is occasionally useful.
+
+**2. Capping the column pitch** (`layout.colMax`) on the theory that a narrower chain
+would let `k` scale it up. **Refuted**: utilisation fell on every sheet (demo 38% -> 22% at
+110mm). The mechanism did what I predicted — the content became taller and narrower
+(401x317 -> 250x367) — but *smaller overall*, because the same items pack into less
+space. Kept at 0 (off), documented, because the refutation is the useful part.
+
+#### What actually worked: the fill term, with the two things `util` lacked
+
+The reverted `util` term died for two reasons (9.31). Both are now fixable, which makes
+this a resurrection rather than a repeat:
+
+- **It had no lever.** `layout.rowSpacing` **is** the lever, and it is large: measured at
+  demo utilisation **40% -> 61%**. It is now the **third search dimension** alongside the
+  three pass orders and the two coordinate sweeps, plumbed through the parse options on
+  `var PID_ROW_SPACING` exactly as `minSep` already was. Per sheet there is no single
+  best value — demo and dense want 260mm, spike and manifold want 145mm — so the engine
+  tries both and scores them.
+- **It measured pipes, not drawings** (32% useH against the entity-aware 38-61%). The
+  term now measures entities *and* linework.
+- **It punished small drawings** (min.dsl, two valves, 113 points for being small).
+  `annotation.fillEntityMin` (8) is the guard: below 8 placed items the term does not
+  apply at all. `min` scores **68 with gap 0 at every weight tested** — a small process
+  is free, a sparse large drawing is not.
+
+One intermediate attempt worth recording because it was **inert and looked right**: the
+first version priced **aspect mismatch**, and reported `aspectErr: 0` on the very sheet
+that was complained about. The demo bbox is 1.75:1 against a 1.58:1 sheet — only 11% off —
+so the term saw nothing wrong. **A bounding box can be the right shape and still be
+mostly empty.** Area fraction is what a reader sees, and that is what it prices now.
+
+#### Weight 400 is a measured threshold, not a preference
+
+```
+  weight  sheet      util%   cross
+     60  demo        40%      2      <- inert: identical layout through 250
+    150  demo        40%      2
+    250  demo        40%      2
+    400  demo        61%      4      <- threshold
+    400  dense       41%      3      <- was 29% util / 6 crossings: MORE fill, FEWER crossings
+    400  spike       82%     18      untouched
+    400  min         11%      0      untouched, and unpenalised by design
+    400  manifold    83%      1      untouched
+```
+
+So the term is inert below 400 and does real work at 400: two sheets improve, three are
+untouched, and the small-drawing trap is closed. Cost on the demo is +2 crossings and
++24% line length, which is the trade being made deliberately and visibly.
+
+#### Honest verdict
+
+The demo is better spread and I can point at the number: **40% -> 61% sheet utilisation**.
+It is **not** transformed. The drawing is still left-heavy with a sparse lower-left, and
+that is the next thing to attack — the fill term rewards *area used*, and a drawing can
+use area badly, which is a limit of the metric rather than of the layout. 9.67's three
+unmeasured rendering defects (junction blob, oversized flow arrows, crowded valve label
+stacks) are untouched and are what now makes the sheet look cheap rather than empty.
+
+`REGRESS OK (spike, min, dense, split, manifold)`. Final: spike 941, dense 462, min 68,
+split 45, manifold 282.
+### 9.69 The `candidates` check is mis-specified, and this work opened the gap
+
+**One REGRESS line is red and it is not a regression in the layout. Recording it rather
+than suppressing it, because the honest description is that a guard is comparing two
+incomparable things.**
+
+```
+  - dense: candidates winner 473 worse than blessed 445
+```
+
+`regress.mjs:68` `checkCandidates` runs a **different configuration** and asserts it is
+not worse than the blessed default:
+
+```js
+const c = sh('harness2.mjs', [`regress/_cand-${name}.svg`, `--src=...`, '--candidates=8', '--seedbase=1']);
+if (H.score.total > exp.harness.score.total) problems.push(`candidates winner ... worse than blessed ...`);
+```
+
+Those are not the same search. `pid-renderer.js:2546`:
+
+```js
+const layoutSeed = !nLayouts ? null : (L === 0 ? seedBase : seedBase + L * 1000);
+```
+
+The **default** path passes no `layouts`, so `layoutSeed` is `null` — the comment calls it
+"the legacy path (no layout noise)". The **`--candidates=8`** path passes layouts, so every
+candidate is a **noise-perturbed** re-render. The check therefore asserts that a
+*perturbed* multi-start beats a *noise-free* single search, which is not a property any
+layout engine can have: noise can only move you away from an optimum, never closer.
+
+It passed before because the default search was weak enough that the noisy run could
+match it. Adding `rowSpacing` as a search dimension widened the default search (3 orders x
+2 sweeps x 3 pitches) and it found dense at **445** where it used to find 462. The noisy
+run is stuck at 473 because it is not exploring the new dimension systematically, only
+through perturbation. The gap opened because the *default* got better.
+
+Widening the row search from two pitches to three (145/220/300) was tried as a fix on the
+assumption that the search was under-seeded. It genuinely improved dense (462 -> 445) but
+did **not** close the check, which is what confirmed the diagnosis: the problem is the
+noise, not the coverage.
+
+The right fix is to the check, not the layout: compare like with like, or drop the
+assertion and report the multi-start score as a diagnostic alongside the default rather
+than as a pass/fail gate. Filed as **T0.3**. Until then this line is expected to be red
+and is left visible.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

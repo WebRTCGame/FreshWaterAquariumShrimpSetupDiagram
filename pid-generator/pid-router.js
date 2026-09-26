@@ -77,7 +77,8 @@ function autoLayout(data) {
   // the flow snakes: rows of columns, alternating direction, to fit the sheet.
   // y-margin reserves headroom for the instrument tier above row 0 (Phases 5/9).
   // ponytail: layout pitches from the rule registry (tunables, not code)
-  const BASE_COL = ruleParam('layout.colSpacing', 140), ROW = ruleParam('layout.rowSpacing', 145),
+  const BASE_COL = ruleParam('layout.colSpacing', 140),
+    ROW = (typeof PID_ROW_SPACING !== 'undefined' && PID_ROW_SPACING !== null) ? PID_ROW_SPACING : ruleParam('layout.rowSpacing', 145),
     XMARGIN = ruleParam('layout.xMargin', 60), YMARGIN = ruleParam('layout.yMargin', 118);
   const isBottomPort = (p, end) => {
     // the bottom-ish port is on the OTHER endpoint (e.g. C-101.bottoms -> E-101)
@@ -93,9 +94,47 @@ function autoLayout(data) {
   // ~30% of horizontal space on an 864mm sheet, cramming routes into tight corridors.
   const numCols = colKeys.length;
   const availW = (data.view.sheetW || 864) - 2 * XMARGIN;
-  const colsPerRow = Math.max(2, numCols <= Math.floor(availW / BASE_COL) ? numCols : Math.floor(availW / BASE_COL));
-  const COL = numCols <= colsPerRow ? availW / Math.max(numCols, 1) : Math.max(BASE_COL, availW / colsPerRow);
-  // stretch rows to fill vertical space
+  const availH0 = (data.view.sheetH || 559) - YMARGIN - 40;
+  // Cap columns-per-row so the grid WRAPS into tiers.
+  //
+  // This is why every sheet looked the same. COL was `availW / numCols`, so the
+  // columns always spread to the full sheet width and `colsPerRow` was always
+  // `numCols`. The tiering machinery existed but could never engage, and every drawing
+  // came out as one flat horizontal band with the bottom of the sheet empty.
+  //
+  // `layout.colsPerRowMax` (0 = auto) forces the wrap. Auto derives the cap from the
+  // SHEET aspect: a grid of C columns by R rows at pitch COL/ROW is only as good as its
+  // own aspect, so pick the C that brings (C*colW)/(R*ROW) closest to the drawable
+  // shape. For the demo that turns a 606x222mm band (2.7:1) into a 4x2 grid at roughly
+  // 560x290mm (1.9:1) against a 1.58:1 sheet, and the fit scale then renders it near
+  // 100% W x 76% H instead of 79% W x 51% H.
+  const colsCapRule = ruleParam('layout.colsPerRowMax', 0);
+  let colsPerRow = Math.max(2, numCols <= Math.floor(availW / BASE_COL) ? numCols : Math.floor(availW / BASE_COL));
+  if (colsCapRule > 0) {
+    colsPerRow = Math.max(2, Math.min(colsPerRow, colsCapRule, numCols));
+  } else if (numCols > 2) {
+    const sheetAsp = availW / Math.max(availH0, 1);
+    const colW0 = availW / numCols;
+    let best = numCols, bestErr = Infinity;
+    for (let c = 2; c <= numCols; c++) {
+      const rows = Math.ceil(numCols / c);
+      const err = Math.abs(Math.log((c * colW0) / (rows * ROW) / sheetAsp));
+      if (err < bestErr) { bestErr = err; best = c; }
+    }
+    colsPerRow = Math.max(2, Math.min(colsPerRow, best));
+  }
+  // Column pitch. Capped by `layout.colMax` so the chain stays COMPACT and the fit
+  // scale `k` can enlarge it to fill the sheet -- that is how a drafter uses a big
+  // sheet, by drawing bigger, not by stretching.
+  //
+  // Without the cap COL = availW/numCols always spreads to the FULL width, which is
+  // exactly why `layout.colSpacing` was a dead rule (9.66: byte-identical over a
+  // 140->40mm sweep). BASE_COL was only ever a floor for the wrapped case.
+  const colMaxRule = ruleParam('layout.colMax', 0);
+  const colSpread = availW / Math.max(numCols, 1);
+  const COL = colMaxRule > 0
+    ? Math.min(colSpread, colMaxRule)
+    : Math.min(colSpread, Math.max(BASE_COL, availW / colsPerRow));  // stretch rows to fill vertical space
   const numRows = Math.ceil(numCols / colsPerRow);
   const availH = (data.view.sheetH || 559) - YMARGIN - 40;
    // use stretched rows

@@ -2080,14 +2080,66 @@ svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
   // label collision for an invisible one. The count is the diagnostic; the fix
   // for a high count is the obstacle budget, not the meter.
   const astarGiveups = (data.astarGiveups || []).length;
+  // ---- sheet-shape term (9.68) ------------------------------------------------
+  // The reverted `util` term had two failure causes and BOTH are fixed here, which is
+  // why this is a resurrection rather than a repeat:
+  //   * it measured PIPE geometry only, reading the demo at 32% useH where the
+  //     entity-aware audit reads 38-61%. Most of what makes a drawing big is symbols
+  //     and their label stacks, and those are not in `geometries`.
+  //   * it had no lever, so it could only add cost -- and it charged min.dsl (two
+  //     valves) 113 points for the crime of being small. `layout.rowSpacing` IS the
+  //     lever, measured at demo util 38% -> 61%, and it is now a search dimension, so
+  //     a drawing can buy fill instead of merely being taxed for lacking it.
+  //
+  // Prices ASPECT MISMATCH, not absolute area. The render-time fit scale already
+  // handles size; it cannot fix shape, because uniform scale preserves aspect.
+  let fillW = 0, fillH = 0;
+  {
+    const ents = [...equipment, ...valves, ...instruments].filter((e) => e.x != null);
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    const eat = (x, y) => {
+      if (x == null || y == null) return;
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    };
+    for (const e of ents) {
+      const hs = (e.symbolSize || e.size || 30) / 2;
+      eat(e.x - hs, e.y - hs); eat(e.x + hs, e.y + hs);
+    };
+    for (const g of geometries) for (const q of (g.pts || [])) eat(q.x, q.y);
+    const FW = (view.sheetW || 864) - 36, FH = (view.sheetH || 559) - 36;
+    if (x1 > x0 && y1 > y0) {
+      fillW = Math.min(1, (x1 - x0) / FW);
+      fillH = Math.min(1, (y1 - y0) / FH);
+    }
+  }
+  // UTILISATION, not bounding-box aspect. The first attempt used aspect mismatch and
+  // was wrong: the demo bbox is 1.75:1 against a 1.58:1 sheet, only 11% off, so the
+  // term read 0 and the search never moved -- while the thing being complained about is
+  // that the sheet is 40% used with a sparse middle. A bbox can be the right SHAPE and
+  // still be mostly empty; area fraction is what a reader sees.
+  //
+  // The guard is the whole reason this is not the reverted `util` term. That one charged
+  // min.dsl -- two valves -- 113 points for the crime of being small, because it had no
+  // way to tell a small process from a badly spread large one. Here the penalty only
+  // applies once the drawing has enough items to fill a sheet with, so a genuinely small
+  // process is free and a sparse large one is not.
+  const FILL_ENT_MIN = ruleParam('annotation.fillEntityMin', 8);
+  const FILL_TARGET = ruleParam('annotation.fillTarget', 0.62);
+  const utilArea = fillW * fillH;
+  const entCount = equipment.length + valves.length + instruments.length;
+  const fillGap = entCount >= FILL_ENT_MIN
+    ? Math.max(0, FILL_TARGET - utilArea) : 0;
+  const fill = Math.round(fillGap * 100) / 100;
   const score = {
     total: Math.round(
       SW.err * nErr + SW.nonOrtho * nonOrtho + SW.overlap * Math.min(lineIssues.overlaps, 5) +
       SW.ungapped * lineIssues.ungapped +
       SW.pp * pp + SW.ps * ps + SW.ss * ss + SW.label * labelCollisions + SW.sheet * offSheet +
       SW.bend * bends + SW.len * length + SW.tap * tapReachTotal + SW.sig * maxSignalLen +
-      SW.warn * nWarn),
+      SW.warn * nWarn + SW.fill * fill),
     weights: SW,
+    fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), gap: fill, entities: entCount },
     routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), nonOrtho },
     sheet: { offSheet },
     annotations: { labelCollisions },
@@ -2387,6 +2439,25 @@ window.PIDGenerator = {
       // currently values the extent it buys (see the reverted sheet-use term).
       const sepBase = ruleParam('layout.minSep', 45), sepAlt = ruleParam('layout.minSepAlt', 45);
       const seps = doCoord && sepAlt > sepBase ? [sepBase, sepAlt] : [sepBase];
+      // Row pitch as a search dimension (9.68). Measured per sheet there is no single
+      // best value -- demo and dense want 260mm (util 38% -> 61%), spike and manifold
+      // want 145mm -- so let the engine choose per sheet instead of hardcoding one.
+      // Row pitch as a search dimension (9.68). Measured per sheet there is no single
+      // best value -- demo and dense want 260mm (util 40% -> 61%), spike and manifold
+      // want 145mm -- so the engine tries several and scores them.
+      //
+      // Three candidates, not two, and that is not padding. With only two the search
+      // became SEED-SENSITIVE once the fill term existed: the default seed found dense
+      // at 462 and `--seedbase=1` found 473, which regress.mjs reports as "candidates
+      // winner worse than blessed". A fill term rewards one specific arrangement, so a
+      // two-point row search can miss it depending on where the other dimensions
+      // happen to land. Three pitches cover the knee of the curve measured in 9.66
+      // (flat below 180, rising to 220, past its peak by 300) and take the dependence out.
+      const rowsBase = ruleParam('layout.rowSpacing', 145);
+      const rowsAlt = ruleParam('layout.rowSpacingAlt', 220);
+      const rowsAlt2 = ruleParam('layout.rowSpacingAlt2', 300);
+      const rowSeps = [...new Set([rowsBase, rowsAlt, rowsAlt2])].sort((a, b) => a - b);
+
       const orders = ruleParam('layout.orderSearch', 1)
         ? PID_LAYOUT_ORDERS.slice(0, Math.max(1, ruleParam('layout.orderCandidates', 3)))
         : [PID_LAYOUT_ORDERS[0]];
@@ -2394,7 +2465,8 @@ window.PIDGenerator = {
       for (const ord of orders) {
         for (const sw of sweeps) {
           for (const sep of seps) {
-            const data = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep });
+            for (const rs of rowSeps) {
+            const data = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep, rowSpacing: rs });
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('id', containerId + '-svg');
             svg.setAttribute('role', 'img');
@@ -2403,7 +2475,8 @@ window.PIDGenerator = {
             // restored below (see the note at the restore site)
             const geo = window.__pidGeo;
             if (!bestOrder || score.total < bestOrder.score.total) {
-              bestOrder = { ord, sw, sep, svg, data, score, geo };
+              bestOrder = { ord, sw, sep, rs, svg, data, score, geo };
+            }
             }
           }
         }
@@ -2429,7 +2502,7 @@ window.PIDGenerator = {
       return {
         svg: svg.outerHTML, warnings: data.warnings, errors: data.errors,
         info: data.info, score, data, layoutOrder: bestOrder.ord,
-        coordIters: bestOrder.sw, minSep: bestOrder.sep,
+        coordIters: bestOrder.sw, minSep: bestOrder.sep, rowSpacing: bestOrder.rs,
       };
     }
     // ponytail: multi-start — try N random layouts, each with optional M routing

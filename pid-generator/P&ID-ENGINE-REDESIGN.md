@@ -720,6 +720,22 @@ title. T3.6 is now closed and its six open questions are answered in place.
   over 5 runs. The 21 is **not reproducible and unexplained** — worth a look by whoever
   next touches the validator, since if a 002-like change *can* perturb 001 that is a
   coupling nobody intended.
+- [ ] **T0.3** **`checkCandidates` compares two incomparable searches.** Found 2026-09-26
+  (log 9.69). It runs `--candidates=8 --seedbase=1` and asserts the result is not worse
+  than the blessed default. Those are not the same search: the default path passes no
+  `layouts`, so `layoutSeed` is `null` — the "legacy path (no layout noise)" — while the
+  candidates path perturbs every candidate. It asserts that a *perturbed* multi-start
+  beats a *noise-free* search, which no layout engine can satisfy.
+
+  It passed only because the default was weak enough for the noisy run to match. Adding
+  `rowSpacing` as a search dimension made the default stronger (dense 462 -> 445) and the
+  gap opened. Widening the row search to three pitches improved dense further and did
+  **not** close the check, which is what confirmed the diagnosis: the problem is the
+  noise, not the coverage.
+
+  Fix the check, not the layout: compare like with like, or demote it from a pass/fail
+  gate to a reported diagnostic. One REGRESS line is red because of this and is left
+  visible rather than suppressed.
 ## Sequenced recommendation
 
 If only three things get done, do these:

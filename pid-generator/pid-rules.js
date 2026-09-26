@@ -106,6 +106,19 @@ const PID_RULES = {
     pp: 15, ps: 10, ss: 5, label: 30, sheet: 100,
     bend: 2, len: 0.05, tap: 0.2, sig: 0.2, warn: 5,
     overlapLen: 12,
+    fill: 400,
+    // 400 is the measured THRESHOLD, not a guess. Below it the term is inert on every
+    // sheet (demo stays at 40% util through weight 250); at 400 the engine takes the
+    // trade where it is worth taking: demo 40%->61% util, dense 29%->41% util with
+    // crossings 6->3, and spike / min / manifold unchanged. min.dsl (two valves, 11%
+    // util) is untouched at every weight, which is what `fillEntityMin` is for.
+    // Sheet-shape penalty (9.68). The reverted `util` term had two failure causes and
+    // both are fixed here: it measured PIPE geometry only (reading the demo at 32% useH
+    // where the entity-aware audit says 38-61%), and it had no lever, so it only added
+    // cost -- charging min.dsl, which is two valves, 113 points for being small. The lever
+    // is `layout.rowSpacing`, now a search dimension, so a drawing can BUY fill instead
+    // of being taxed for lacking it. Prices aspect mismatch, not absolute area: the
+    // render-time fit scale already handles size and cannot change shape.
     // NOTE: there is deliberately NO a-star-giveup weight. The count IS reported
     // (score.lines.astarGiveups) because it is a real capability metric, but
     // pricing it was measured and reverted — see P&ID-VISUAL-QUALITY.md 9.23.
@@ -149,8 +162,16 @@ const PID_RULES = {
       signalLenWarn: { value: 0.55, min: 0, max: 1, unit: 'fraction', desc: 'signal run warning threshold (× sheet width)' },
     },
     layout: {
+            // Cap the columns-per-row so the tier grid WRAPS instead of always spanning the
+      // full sheet width. 0 = auto, which picks the count whose grid aspect best matches
+      // the drawable area. Before this the cap did not exist and COL was always
+      // availW/numCols, so colsPerRow was always numCols and every drawing came out as
+      // one flat horizontal band with the bottom of the sheet empty.
+      colsPerRowMax: { value: 99, min: 0, max: null, unit: 'count', desc: 'max columns per tier row; 0 = auto-fit to the sheet aspect. 2 gives a vertical column layout that fills the height', noScale: true },
       colSpacing:   { value: 140, min: 40, max: null, unit: 'mm', desc: 'auto-layout column pitch' },
       rowSpacing:   { value: 145, min: 40, max: null, unit: 'mm', desc: 'auto-layout row pitch' },
+      rowSpacingAlt: { value: 220, min: 40, max: null, unit: 'mm', noScale: true, desc: 'second row-pitch candidate for the layout search. There is no single best value across sheets: demo and dense want 260mm (util 38% -> 61%), spike and manifold want 145mm, so the engine tries both and scores them (9.68)' },
+      rowSpacingAlt2: { value: 300, min: 40, max: null, unit: 'mm', noScale: true, desc: 'third row-pitch search candidate. With only two, the search became seed-sensitive once the fill term existed (default seed found dense at 462, seedbase=1 at 473); three pitches take that dependence out' },
       xMargin:      { value: 60, min: 0, max: null, unit: 'mm', noScale: true, desc: 'auto-layout sheet x margin' },
       yMargin:      { value: 118, min: 0, max: null, unit: 'mm', noScale: true, desc: 'auto-layout sheet y margin (instrument tier headroom)' },
       stackField:   { value: 24, min: 8, max: null, unit: 'mm', desc: 'field bubble stack gap above tap host' },
@@ -203,6 +224,13 @@ const PID_RULES = {
       // ambiguous or unknown - a guessed size is worse than none.
       valveSize:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'show the derived line size above each valve' },
       valveSizeMaxHop: { value: 4, min: 1, max: 12, unit: 'count', desc: 'how far to walk through junctions looking for sized equipment. The junction network is looped, so a larger value reaches unrelated equipment across the drawing' },
+      // Sheet-utilisation term (9.68). `fillEntityMin` is the guard that makes this
+      // different from the reverted `util` weight: below this many placed items a
+      // drawing is not penalised for being small, because a small process cannot fill a
+      // sheet and charging it for that is charging the user for their process. Above it,
+      // a sparse drawing is a layout defect and is priced as one.
+      fillEntityMin: { value: 8, min: 0, max: null, unit: 'count', desc: 'placed items below which the utilisation term does not apply, so a genuinely small process is not penalised' },
+      fillTarget:    { value: 0.62, min: 0, max: 1, unit: 'fraction', desc: 'sheet-area fraction the layout aims for. 0 disables the term' },
       equipList:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'clone each equipment annotation into one row along the top edge of the sheet' },
             equipListRowH: { value: 12, min: 8, max: null, unit: 'mm', desc: 'height of one tag-list item: a bold tag line plus a grey type line under it, which sits 5.5mm below the tag (the same offset the equipment annotation uses)' },
 equipListPad:  { value: 4, min: 0, max: null, unit: 'mm', desc: 'clear space between the tag list and the drawing below it' },

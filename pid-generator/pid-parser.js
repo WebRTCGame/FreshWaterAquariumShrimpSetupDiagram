@@ -9,6 +9,12 @@
 // Methods are static; they reference SYMBOL_KEYS / symbolSize which are defined later in the file
 // but only called after full evaluation, so the forward reference is safe.
 // Uses geometric_objects.js ({x,y} natively, no per-call conversion).
+// Per-candidate row pitch, set from the parse options so the layout search can try
+// several (9.68). Declared HERE, at module scope, because a bare assignment in the
+// opts block only creates the global lazily -- after the set site has already run.
+// The router reads this in preference to ruleParam('layout.rowSpacing').
+var PID_ROW_SPACING = null;
+
 var PIDEngine = {
   /** Distance between two {x,y} points. */
   dist(a, b) {
@@ -549,9 +555,14 @@ throw new Error(`pid parser: unrecognized line "${line}"`);
       if (opts && opts.layoutOrder) data.layoutOrder = opts.layoutOrder;
       if (opts && opts.coordIters !== undefined) PID_COORD_ITERS = opts.coordIters;
       if (opts && opts.minSep !== undefined) PID_MIN_SEP = opts.minSep;
+  // rowSpacing as a SEARCH dimension (9.68). Same override shape as minSep: the
+  // router needs a per-candidate value and ruleParam is global, so the option is
+  // carried on a module-level override the router reads in preference to the rule.
+    if (opts && opts.rowSpacing !== undefined) PID_ROW_SPACING = opts.rowSpacing;
       autoLayout(data);
       PID_COORD_ITERS = null;
       PID_MIN_SEP = null;
+  PID_ROW_SPACING = null;   // per-candidate row pitch override; see the note at the set site
     }
     // sheet clamp: nothing may sit outside the drawn border (runs after autoLayout,
     // which re-resolves relative placements)

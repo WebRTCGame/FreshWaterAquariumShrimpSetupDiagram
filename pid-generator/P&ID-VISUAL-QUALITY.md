@@ -3461,6 +3461,70 @@ The right fix is to the check, not the layout: compare like with like, or drop t
 assertion and report the multi-start score as a diagnostic alongside the default rather
 than as a pass/fail gate. Filed as **T0.3**. Until then this line is expected to be red
 and is left visible.
+### 9.70 Centre the drawing, and stop lying about tag widths
+
+Two more defects, both found by looking at a render rather than at a score.
+
+#### 1. The fit wrap threw all the slack in one direction
+
+```js
+wrap = `<g transform="translate(${pad - minX * k} ${pad - minY * k}) scale(${k})">`;
+```
+
+That anchors the content's **top-left** to the frame corner, so any drawing shorter than
+the sheet sat hard against the top with every spare millimetre dumped below it. On the
+demo that was ~158mm of dead space along the bottom edge plus an entirely empty lower-left
+quadrant — and the content looked "pushed up" rather than merely small.
+
+It also **silently discarded the centring `autoLayout` had already done**, because that
+works in layout coordinates and the wrap re-anchors afterwards. Two passes, one invisible:
+the same class of bug as 9.65's overlay coordinates and 9.64's audit.
+
+Now centred: `translate(pad + (dw - cw*k)/2 - minX*k, ...)`. The slack splits evenly, which
+is what a drafter does by eye.
+
+#### 2. The collision metric was measuring bold caps as if they were mixed case
+
+`textBox` used `0.55em` for everything. That is the **mixed-case** average, and the
+equipment tags and valve tags are **bold uppercase**, nearer `0.68em`. Every bold tag box
+was therefore about 20% too narrow.
+
+That is not a rounding detail, it is why the demo reported **`labelCollisions: 0`** while
+`V-103 GATE VALVE` visibly sits on top of `FV-101 CONTROL VALVE` and `PSV-101` overlaps
+the pair. The metric could not see the pile-up, so **the layout had no reason to avoid it**
+— to the engine there was nothing there to avoid. Same root cause as T4.4 and as the
+reverted `drawnWidth` in 9.60: a flat average cannot express the difference.
+
+Added `WIDTH_EM = { regular: 0.55, medium: 0.58, bold: 0.68 }` and carried a **role**
+through the valve label stack (`[string, size, offset, role]`) so each row is measured with
+the factor that matches how it is actually drawn. The tag line is bold; the type and state
+lines are not.
+
+#### Effect
+
+```
+                    before    after
+  demo util          40%       66%
+  demo score        360       356
+  spike labelColl     3         2
+```
+
+Utilisation on the demo is now **66%**, up from 40% before this pass and from the 61% the
+fill term alone bought. The score is marginally better too, so the wider boxes are finding
+placements that were already fine rather than forcing churn.
+
+#### What is still wrong, named precisely
+
+The drawing is still an **L**: a long horizontal run to V-104 in the bottom-right, and
+an empty lower-left quadrant. Utilisation reads 66% because it measures the bounding-box
+**area**, and an L-shaped bbox is mostly empty. **A drawing can use area badly and still
+score well on area** — that is a limit of the metric, not of the layout.
+
+The cause is the layered assignment: every depth level gets a full-width column, so the
+last element of a long chain is stranded a whole row away from everything else. Fixing it
+means the constraint-declaring rewrite (T2) — per-level width proportional to its own
+occupancy — not another score term. The valve cluster in the middle is the other visible
+problem and it is now at least *measurable*, which it was not before.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

@@ -356,7 +356,20 @@ function renderInto(svg, data, themeName) {
 // (see the assembly), so the frame, title block, north arrow, legend and the
 // equipment tag list all stay at 1:1 as intended.
 k = Math.min((W - 2 * pad) / cw, (H - 2 * pad) / ch);
-      wrap = `<g transform="translate(${pad - minX * k} ${pad - minY * k}) scale(${k})">`;
+      // Centre the scaled content in the drawable area, do not anchor its top-left.
+    //
+    // This was throwing away the slack in one direction. `pad - minX*k` puts the
+    // content's minimum at the frame corner, so any drawing shorter than the sheet sat
+    // hard against the TOP with every spare millimetre dumped below it -- the demo had
+    // ~158mm of dead space along the bottom edge and a completely empty lower-left
+    // quadrant. It also silently discarded the centring `autoLayout` had already done,
+    // since that works in layout coordinates and the wrap re-anchors afterwards.
+    //
+    // Centring splits the slack evenly, which is what a drafter does by eye.
+    const dw = W - 2 * pad, dh = H - 2 * pad;
+    const tx = pad + (dw - cw * k) / 2 - minX * k;
+    const ty = pad + (dh - ch * k) / 2 - minY * k;
+    wrap = `<g transform="translate(${tx} ${ty}) scale(${k})">`;
     } else {
       W = maxX + 20; H = maxY + 20;
     }
@@ -1545,8 +1558,21 @@ const shiftFor = (lineIdx, x) => {
     // pipe's longest straight segment, on a short leader offset off the line (never
     // on it), rotated with the segment. Collision-scored against boxes/bubbles.
     // ponytail: text box in pidTextBoxes math (audit agrees by construction)
-    const textBox = (x, y, str, fnt, mid = true) => {
-      const w = String(str).length * fnt * 0.55, h = fnt * 1.15;
+    // Advance width per em, by ROLE. 0.55em is the mixed-case average and it was used
+  // for everything, including the BOLD uppercase tag lines -- which are nearer 0.68em.
+  // That made every bold tag box about 20% too narrow, so the collision metric could
+  // not see overlaps that are obvious on the sheet: the demo reports
+  // `labelCollisions: 0` while V-103 GATE VALVE sits on top of FV-101 CONTROL VALVE.
+  // The layout then has no reason to avoid the pile-up, because to it there is none.
+  //
+  // Same root cause as T4.4 (the metric counts characters, so it cannot be
+  // case-sensitive) and the same reason `drawnWidth` was reverted in 9.60: a flat
+  // average cannot express the difference. These factors at least separate the roles
+  // that actually differ.
+  const WIDTH_EM = { regular: 0.55, medium: 0.58, bold: 0.68 };
+  const widthEm = (str, fnt, em) => String(str == null ? '' : str).length * fnt * (em || WIDTH_EM.regular);
+  const textBox = (x, y, str, fnt, mid = true, em) => {
+      const w = widthEm(str, fnt, em), h = fnt * 1.15;
       return mid ? { x0: x - w / 2, x1: x + w / 2, y0: y - h, y1: y } : { x0: x, x1: x + w, y0: y - h, y1: y };
     };
     // ponytail: L6 — nozzle tags pick the clear side (default normal, else
@@ -1732,7 +1758,7 @@ const shiftFor = (lineIdx, x) => {
         // tag below the equipment, close to the symbol
         const ty = e.y + s / 2 + 3.5;
         g += `<text x="${e.x}" y="${ty}" text-anchor="middle" font-size="${fs(3.2)}" font-weight="bold" fill="#111" text-decoration="underline" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-        eqBoxes.push(textBox(e.x, ty, tag, fs(3.2)));
+        eqBoxes.push(textBox(e.x, ty, tag, fs(3.2), true, WIDTH_EM.bold));
         if (!e.noTypeLabel) g += `<text x="${e.x}" y="${ty + 5.5}" text-anchor="middle" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(TYPE_LABELS[e.type] || e.type)}</text>`;
         if (!e.noTypeLabel) eqBoxes.push(textBox(e.x, ty + 5.5, TYPE_LABELS[e.type] || e.type, fs(2.8)));
       }
@@ -1795,17 +1821,18 @@ const shiftFor = (lineIdx, x) => {
         const tx = vertical ? v.x + s / 2 + 3 : v.x;
         const ty = vertical ? v.y + 1 : v.y + s / 2 + 3.5;
         const typeLabel = TYPE_LABELS[v.type] || v.type;
-        const rows = [[tag, fs(3.0), 0]];
+        // [string, size, offset, width-em-role] -- the role travels with the row so the
+        const rows = [[tag, fs(3.0), 0, WIDTH_EM.bold]];
         if (!v.noTypeLabel) rows.push([typeLabel, fs(2.8), 5.5]);
-        if (state) rows.push([state, fs(2.3), 10.5]); // emission-fixed offsets
+        if (state) rows.push([state, fs(2.3), 10.5, WIDTH_EM.regular]); // emission-fixed offsets
         // Derived line size (T7.12). Added as a ROW of the existing stack rather than
         // drawn independently, so it inherits the above/below flip and the collision
         // test at 1734. A separately positioned size would have to re-implement both.
         // Blue like the line designations, because that is what it is: a property of
         // the pipe, not of the valve.
         const sizeLabel = v.sizeLabel || '';
-        if (sizeLabel) rows.push([sizeLabel, fs(2.3), 15.5]);
-        const stackBoxes = (fx, fy, mid, dir) => rows.map(([str, fnt, off]) => mid
+        if (sizeLabel) rows.push([sizeLabel, fs(2.3), 15.5, WIDTH_EM.regular]);
+        const stackBoxes = (fx, fy, mid, dir) => rows.map(([str, fnt, off, role]) => mid
           ? textBox(fx, fy + dir * off, str, fnt)
           : { x0: fx - (dir < 0 ? String(str).length * fnt * 0.55 : 0), x1: fx + (dir < 0 ? 0 : String(str).length * fnt * 0.55), y0: fy - fnt * 1.15, y1: fy });
         const zones = [...nozzleBoxes, ...eqBoxes];

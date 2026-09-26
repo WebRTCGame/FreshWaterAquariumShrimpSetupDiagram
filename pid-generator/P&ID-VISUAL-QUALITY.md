@@ -2486,7 +2486,44 @@ strings, and capitals are wider, so a collision visible only after uppercasing i
 invisible to it. `REGRESS OK` after the change is expected - and also means the metric
 can now under-report. Filed as T4.4.
 
-### 9.55 Still outstanding after this pass
+### 9.56 Is the 3-order search still earning its cost? No - and the proof is why
+
+Asked whether the layout pass sequence should be played with. Before changing it, worth
+knowing whether the *existing* search over orders is still pulling its weight - because
+the orders were chosen when routing behaved differently, and since then 26 valve ports
+moved onto their axis, `crossesLine` was wired in, all type went uppercase, and the A*
+started rejecting crossing shortcuts. Any of those could have made one order dominate.
+
+Measured by forcing each order alone (source transformed in memory, engine file never
+touched; the substitution is verified and aborts rather than silently measuring the full
+search three times):
+
+```
+  sheet        JIV      JVI      VJI    winner
+  demo         335      235      394    JVI
+  spike       1265      993      996    JVI
+  dense        438      345      299    VJI
+  min           72       68       68    JVI
+  split         45       45       45    JIV
+
+  wins: JVI 3   VJI 1   JIV 1
+```
+
+**Three distinct winners across five sheets.** No single order is right, so the search is
+not redundant and cannot be collapsed to one. The spread is also large - 235 vs 394 on the
+demo is 68% - so this is a load-bearing dimension, not a tiebreak.
+
+That is the answer to "should we play with the sequence": the orders already disagree
+sheet by sheet, which is the *symptom* of the passes being coupled through each other's
+leftovers. Shuffling would not fix that and would need re-shuffling. The cure stays T2 -
+declare the constraints so the passes stop depending on sequence at all.
+
+One incidental find: `min` and `split` score identically under all three orders (68/68/68
+and 45/45/45). Small sheets do not care about pass order, so the order dimension could be
+skipped for them. That is a micro-optimisation, not a correctness issue.
+
+### 9.57 Still outstanding after this pass
+- **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 
 - **Annotation type is 1.0-1.9 mm over the stated print band on every sheet**, and
   `typeFloor` flattens three roles onto 3.5 mm. Both are decisions rather than defects,

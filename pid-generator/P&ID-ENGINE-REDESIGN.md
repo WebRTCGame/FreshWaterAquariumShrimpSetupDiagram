@@ -508,6 +508,17 @@ Four items raised in review that are **not** done. Recorded here so they are not
 each with the open question that has to be answered before implementation — not just a
 title.
 
+- [ ] **T7.13** **Pipes do not record which port they connect to.** Found while scoping
+  T7.12: a pipe record is `{from: "J-0", to: "V-101"}` with **no port name on either
+  end**. The valve-port binding is *inferred* inside the router and never stored. So
+  "the process line the valve is on" - and with it any per-end property, including line
+  size - is not recoverable from the data model at all; it exists only as a routing
+  decision. **This is the real blocker for T7.12**, not the two-ends ambiguity recorded
+  there. The fix is small and well defined: have the router publish its port binding
+  (per pipe, the `(entity, port)` chosen at each end). Worth doing on its own merits -
+  it would also let the validator check port capacity and lead-in against *declared*
+  bindings instead of inferred ones.
+
 - [ ] **T3.6** **Equipment list / schedule along the top edge**, as on a real P&ID.
   Requested: "we need each equipment listed along the top edge of the page as a
   callout/annotation". **Deferred only because it is a feature, not a patch** — it

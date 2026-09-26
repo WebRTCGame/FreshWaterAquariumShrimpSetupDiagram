@@ -2654,6 +2654,60 @@ equipment annotation this list clones uses 5.5mm for the identical pair of sizes
 had hardcoded 3.6 from stale numbers instead of copying the drawing, so the clone was
 drawn tighter than its source. Reading the audit names - `"C-101" & "column" @(28,30)`
 - is what identified it; the totals alone said only "worse".
+### 9.60 T4.4 attempted, measured, reverted — the width model is not case-sensitive
+
+**Obituary. The fix was correct, addressed a real defect, and was still dead code,
+so it is not in the tree.**
+
+T4.4 reads "label-collision metric measures the authored strings, not the drawn ones",
+and the justification looked airtight: all drawing type is uppercased by CSS
+(`svg[data-theme] text{text-transform:uppercase}`, ~2211), so an estimate made from the
+authored string measures a shape that is never rendered, and uppercase is wider, so the
+metric under-reports.
+
+I routed all four width estimators through one `drawnWidth(str, fnt)` that uppercases
+first, then measured the corpus with and without it:
+
+```
+  case                with drawnWidth   without        delta
+  spike              997/3            997/3          same
+  dense              299/0            299/0          same
+  min                 68/0             68/0          same
+  split               45/0             45/0          same
+```
+
+**Nothing moved**, so it came out. The reason is the part I should have seen first:
+the metric does not measure glyphs, it counts **characters** — `str.length * fnt *
+0.55` — and `toUpperCase()` does not change `.length` for ordinary text.
+"Centrifugal Pump" and "CENTRIFUGAL PUMP" are both 16 characters, both 30.80mm.
+The old metric was *right by luck*.
+
+So the real diagnosis is different from the filed one. The defect is **not** that the
+metric reads the authored string; it is that a flat 0.55em average advance **cannot
+express case at all**. Real uppercase is wider than mixed case at equal character
+count — `M W L C G Q` against `i l t I` — and a single average factor discards exactly
+that. Uppercasing the string before counting characters is the wrong operation; the
+width model has to be per-character, or measured.
+
+The self-test earned its place by failing. Of four cases, the one designed to prove the
+check "fires" reported 0 collisions: I had mis-set the gap, and the honest output was
+"this does not fire", which is what a vacuous check looks like from the inside. The
+other three passed, and would have passed with the fix absent — which is the tell.
+
+Two things a real fix needs, neither cheap:
+
+1. **Measure, do not estimate.** The project already drives headless Chrome for visual
+   regression, so `getComputedTextLength()` on the live text node gives the true advance
+   for the real font, for the real string, after the CSS transform. That makes the
+   metric exact *and* case-correct for free, and it also retires the 0.55em fudge and
+   the `1.15em` height guess. This is the fix worth doing.
+2. **Or a per-character advance table**, calibrated against the actual drawing face.
+   The font is a CSS stack, so the table is only valid for the resolved face — which is
+   an argument for (1) rather than against it.
+
+Kept from the attempt: the knowledge that the metric counts characters, and therefore
+that **no amount of string-level cleverness will make it case-sensitive**. Anyone who
+picks this up again should start at the width model, not at the string.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

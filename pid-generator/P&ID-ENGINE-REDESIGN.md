@@ -576,15 +576,22 @@ title. T3.6 is now closed and its six open questions are answered in place.
   *Deviation:* it renders **below** the valve, not above as asked — it is a fourth row
   of the existing label stack, so it inherits the above/below flip and the collision
   test instead of reimplementing them. Flagged rather than quietly claimed as done.
-- [ ] **T4.4** **Label-collision metric measures the authored strings, not the drawn
-  glyphs.** Introduced as a side effect of the uppercase change (all type is now
-  uppercase via CSS, so the data keeps its authored case). Capitals are wider than
-  mixed case, so a collision that only appears once the text is uppercased is
-  **invisible to the metric** — `REGRESS OK` after the change is expected *and* means
-  the metric can now under-report. Needs the collision test to run on the rendered
-  (uppercased, measured) string rather than the source string. Cheap, but it silently
-  weakens an existing check until done.
+- [ ] **T4.4** **The label-collision metric counts characters, so it cannot be
+  case-sensitive.** Re-diagnosed 2026-09-26 (log 9.60); the original wording was wrong.
+  It did NOT measure "the authored string" in any meaningful sense — it counts
+  `str.length * fnt * 0.55`, and `toUpperCase()` does not change `.length` for ordinary
+  text, so uppercasing before counting is a no-op. Measured: routing all four width
+  estimators through an uppercasing helper moved **nothing** on any of the four corpus
+  sheets, so that fix was reverted as dead code.
 
+  The real defect: a flat 0.55em average advance **cannot express case**, because real
+  uppercase is wider than mixed case at equal character count (`M W L C` vs `i l t`).
+  *Fix worth doing:* stop estimating. The project already drives headless Chrome, so
+  `getComputedTextLength()` on the live text node gives the true advance for the real
+  font and the real string after the CSS transform — exact, case-correct, and it also
+  retires the 0.55em and 1.15em guesses. A per-character table is the alternative and is
+  worse, because the font is a CSS stack and the table would only be valid for the
+  resolved face.
 - [ ] **T3.7** **Routing is bounded by the sheet, not by the placement zone.** Two
   different things share the word "margin" and they are not the same. Entities are
   placed inside x 48..816 / y 42..481 (`pid-router.js:823-831`), but the A* is bounded

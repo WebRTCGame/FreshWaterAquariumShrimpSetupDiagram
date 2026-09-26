@@ -1362,7 +1362,26 @@ function aStar(start, goal, obstacles, cell, ctx) {
   };
   // a shortcut must never cross an existing line (max on-line cell penalty) â€” the
   // staircase it replaces skirted the corridor; the shortcut must not re-introduce
-  // a crossing the A* had deliberately avoided
+  // a crossing the A* had deliberately avoided.
+  //
+  // WIRED IN 2026-09-26 (T6.4). This function was dead: the comment above described
+  // a guard that was never applied, so every shortcut was accepted on `segClear`
+  // and the cost gate alone. Measured consequence, by comparing the A* path before
+  // and after smoothing and taking the set difference of crossing points:
+  // smoothing re-introduced crossings in 156 of 251 A* calls on `spike` and 52 of
+  // 94 on `dense` (22% of randomised congestion routings). Calling the guard
+  // exactly as the comment describes removes 12 crossings across the corpus and
+  // moves the engine's own objective 1723 -> 1492, with zero validator errors.
+  // Disabling smoothing instead is worse on both counts (20 crossings but score
+  // 1817), so the guard is the right lever, not removing the pass.
+  //
+  // Note the cost gate is ALSO independently vacuous whenever the replaced
+  // staircase contains a diagonal: `pathPenalty` returns Infinity for a diagonal
+  // pair and `removed` is a sum, so a single diagonal makes the comparison
+  // vacuously true. Diagonals only enter at the two pinned off-grid port ends, so
+  // every shortcut anchored at a path end was accepted regardless of cost. That is
+  // a second, separate hole and is NOT fixed here — it needs a cost model, not a
+  // veto. Logged for follow-up.
   const crossesLine = (a, b) => {
     const steps = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) / cell;
     for (let t = 0.5; t < steps; t += 1) {
@@ -1382,12 +1401,13 @@ function aStar(start, goal, obstacles, cell, ctx) {
         let replace = null;
         if (a.x === b.x || a.y === b.y) {
           // axis-aligned shortcut: straight through
-          if (segClear(a, b) && pathPenalty(a, b) <= removed) replace = [];
+          if (segClear(a, b) && !crossesLine(a, b) && pathPenalty(a, b) <= removed) replace = [];
         } else {
           // L-shaped shortcut: collapse the staircase to a single corner (H-then-V
           // preferred â€” matches the horizontal-precedence drafting rule)
           for (const corner of [{ x: b.x, y: a.y }, { x: a.x, y: b.y }]) {
             if (!segClear(a, corner) || !segClear(corner, b)) continue;
+            if (crossesLine(a, corner) || crossesLine(corner, b)) continue;
             if (pathPenalty(a, corner) + pathPenalty(corner, b) <= removed) { replace = [corner]; break; }
           }
         }

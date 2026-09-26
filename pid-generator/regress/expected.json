@@ -5,24 +5,19 @@
    "warnings": [
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
-    "[PID-VAL-002] control valve \"V-102\": controller \"TIC-101\" should sit directly above the valve (actuator up)",
-    "[PID-VAL-002] control valve \"V-105\": controller \"PIC-101\" should sit directly above the valve (actuator up)",
-    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (660mm) — instrument pair far apart; consider moving the receiver",
-    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (514mm) — instrument pair far apart; consider moving the receiver",
-    "[PID-SIG-002] signal \"PIC-101 -> V-105\": very long run (1227mm) — instrument pair far apart; consider moving the receiver",
-    "[PID-GEO-002] geometry \"D-101 -> P-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the D-101 port",
-    "[PID-GEO-002] geometry \"LIC-102 -> P-102\": port lead-in only 10.0mm (< 14mm) — bend too close to the LIC-102 port",
-    "[PID-GEO-002] geometry \"PIC-101 -> V-105\": port lead-in only 8.0mm (< 14mm) — bend too close to the PIC-101 port",
-    "[PID-GEO-002] geometry \"TIC-101 -> V-102\": port lead-in only 6.5mm (< 14mm) — bend too close to the V-102 port",
+    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (535mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (605mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
+    "[PID-GEO-002] geometry \"V-102 -> C-101\": port lead-in only 7.0mm (< 14mm) — bend too close to the C-101 port",
     "[PID-INS-006] tap \"FT-101 -> P-101\": 56.0mm of sideways travel for a 70mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"TT-101 -> R-101\": 35.0mm of sideways travel for a 129mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 162mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 149mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 207mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-GEO-005] line \"TT-101 -> TIC-101\" passes through PSV-101"
+    "[PID-INS-005] tap \"TT-101\": shares 88mm of process corridor (reads as one line) — move the bubble or add a via"
    ],
-   "warningsTotal": 16,
+   "warningsTotal": 11,
    "score": {
-    "total": 1185,
+    "total": 988,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -41,19 +36,19 @@
      "overlapLen": 12
     },
     "routing": {
-     "crossings": 30,
-     "pp": 13,
-     "ps": 14,
-     "ss": 3,
-     "bends": 84,
-     "length": 9091,
+     "crossings": 19,
+     "pp": 10,
+     "ps": 7,
+     "ss": 2,
+     "bends": 94,
+     "length": 8018,
      "nonOrtho": 0
     },
     "sheet": {
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 1
     },
     "lines": {
      "overlaps": 0,
@@ -61,12 +56,12 @@
      "astarGiveups": 0
     },
     "instruments": {
-     "tapReachTotal": 197,
-     "maxSignalLen": 465
+     "tapReachTotal": 186,
+     "maxSignalLen": 235
     },
     "issues": {
      "errors": 0,
-     "warnings": 16
+     "warnings": 11
     }
    }
   },
@@ -74,52 +69,60 @@
    "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 138",
    "counts": {
     "0": 0,
-    "3": 26,
-    "4": 1,
+    "3": 15,
+    "4": 2,
     "5": 0,
     "6": 0,
-    "7": 0,
-    "8": 0,
+    "7": 1,
+    "8": 1,
     "9": 0,
-    "10": 0,
-    "11": 88,
+    "10": 2,
+    "11": 89,
     "13": 0
    },
    "lists": {
     "0": [],
     "3": [
-     "TT-101~tap-> X R-101->V-102 @(660,168)",
-     "TT-101~tap-> X V-102->C-101 @(660,168)",
-     "FV-101->R-101 X P-103->J-3 @(658,255)",
-     "V-102->C-101 X V-105->C-101 @(585,105)",
-     "V-102->C-101 X V-105->C-101 @(213,105)",
-     "V-102->C-101 X P-103->J-3 @(605,168)",
-     "V-102->C-101 X P-103->J-3 @(585,115)",
-     "V-102->C-101 X P-103->J-3 @(213,115)",
-     "V-102->C-101 X PT-101->PIC-101 @(213,125)",
-     "V-102->C-101 X PIC-101->V-105 @(355,90)",
-     "C-101->E-102 X PIC-101->V-105 @(355,180)",
-     "J-4->V-105 X PIC-101->V-105 @(714,320)",
-     "J-4->V-105 X PIC-101->V-105 @(714,320)",
-     "V-105->C-101 X P-103->J-3 @(201,115)",
-     "V-105->C-101 X TT-101->TIC-101 @(665,105)"
+     "PT-101~tap-> X V-102->C-101 @(545,145)",
+     "R-101->V-102 X R-101->PSV-101 @(695,170)",
+     "R-101->V-102 X R-101->PSV-101 @(695,170)",
+     "V-102->C-101 X P-103->J-3 @(490,115)",
+     "V-102->C-101 X P-103->J-3 @(220,115)",
+     "D-101->P-102 X LT-102->LIC-102 @(671,300)",
+     "V-105->C-101 X P-103->J-3 @(210,115)",
+     "J-4->E-103 X C-101->E-101 @(280,305)",
+     "J-4->E-103 X C-101->E-101 @(280,305)",
+     "J-4->E-103 X E-101->V-103 @(445,348)",
+     "J-4->E-103 X E-101->V-103 @(445,348)",
+     "P-103->J-3 X R-101->PSV-101 @(735,145)",
+     "P-103->J-3 X R-101->PSV-101 @(735,145)",
+     "P-103->J-3 X TT-101->TIC-101 @(705,135)",
+     "P-103->J-3 X PT-101->PIC-101 @(565,115)"
     ],
     "4": [
-     "LT-101~tap-> & C-101->E-101 overlap 26mm at y=250"
+     "TT-101~tap-> & P-103->J-3 overlap 7mm at x=750",
+     "LT-101~tap-> & C-101->E-101 overlap 25mm at y=295"
     ],
     "5": [],
     "6": [],
-    "7": [],
-    "8": [],
+    "7": [
+     "\"relief valve\" & \"TT\" @(735,134)"
+    ],
+    "8": [
+     "P-103->J-3 1mm (160,305)->(159,305)"
+    ],
     "9": [],
-    "10": [],
+    "10": [
+     "PT-101~tap-> X V-102->C-101 @(545,145)",
+     "V-105->C-101 X P-103->J-3 @(210,115)"
+    ],
     "11": [
-     "content 760x392mm bbox (50,75)->(810,467) | 99% W x 89% H | drawable 768x439mm | sheet 864x559mm"
+     "content 750x402mm bbox (60,65)->(810,467) | 98% W x 91% H | drawable 768x439mm | sheet 864x559mm"
     ],
     "13": []
    }
   },
-  "budget": 1067
+  "budget": 889
  },
  "min": {
   "harness": {
@@ -223,7 +226,7 @@
    ],
    "warningsTotal": 1,
    "score": {
-    "total": 293,
+    "total": 294,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -242,12 +245,12 @@
      "overlapLen": 12
     },
     "routing": {
-     "crossings": 7,
-     "pp": 3,
+     "crossings": 6,
+     "pp": 2,
      "ps": 3,
      "ss": 1,
-     "bends": 29,
-     "length": 2635,
+     "bends": 35,
+     "length": 2709,
      "nonOrtho": 0
     },
     "sheet": {
@@ -275,23 +278,22 @@
    "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 55",
    "counts": {
     "0": 0,
-    "3": 5,
+    "3": 4,
     "4": 0,
     "5": 0,
     "6": 0,
     "7": 0,
-    "8": 3,
+    "8": 0,
     "9": 0,
     "10": 0,
-    "11": 27,
-    "13": 1
+    "11": 29,
+    "13": 0
    },
    "lists": {
     "0": [],
     "3": [
-     "V-1->P-1 X FV-1->C-1 @(515,223)",
-     "V-1->P-1 X LT-1->LIC-1 @(300,200)",
-     "V-2->C-1 X LT-1->LIC-1 @(300,234)",
+     "J-1->V-2 X LT-1->LIC-1 @(295,185)",
+     "V-2->C-1 X LT-1->LIC-1 @(308,230)",
      "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)",
      "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)"
     ],
@@ -299,22 +301,16 @@
     "5": [],
     "6": [],
     "7": [],
-    "8": [
-     "FV-1->C-1 2mm (370,223)->(370,225)",
-     "FV-1->C-1 2mm (370,225)->(368,225)",
-     "V-2->C-1 1mm (450,234)->(450,235)"
-    ],
+    "8": [],
     "9": [],
     "10": [],
     "11": [
-     "content 469x197mm bbox (186,165)->(655,362) | 61% W x 45% H | drawable 768x439mm | sheet 864x559mm"
+     "content 469x206mm bbox (186,156)->(655,362) | 61% W x 47% H | drawable 768x439mm | sheet 864x559mm"
     ],
-    "13": [
-     "fills only 45% of drawable height (< 45%) — content is 61% W x 45% H; consider splitting the sheet or adding scope"
-    ]
+    "13": []
    }
   },
-  "budget": 264
+  "budget": 265
  },
  "split": {
   "harness": {

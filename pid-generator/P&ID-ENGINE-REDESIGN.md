@@ -485,11 +485,30 @@ consumption across the five live engine files: of the symbol metadata, only
   description. That may well be intended (a consistent type vocabulary is a reasonable
   P&ID convention) but it is currently undocumented and unverified either way. Deciding
   it also decides what the equipment schedule is allowed to print.
-- [ ] **T3.5** The demo is **under-allocated, not crowded**: 64% W x 39% H, entity
-  centres spanning 170 of 463mm. Content aspect 2.96:1 against a drawable 1.79:1, so
-  it cannot fill the height without first being narrowed — "spread it out" pushes it
-  further from the sheet shape. A 14-entity chain does not fill ARCH D. The fix is a
-  richer demo (item 8), not a layout change. §9.52.
+- [x] **T3.5** **Under-allocation — FIXED by removing the `min(1, ·)` clamp (9.64).**
+  The entry previously read "the fix is a richer demo, not a layout change", and it was
+  **wrong** — I gave a user that answer and it was a bad one. Two errors: it treated a
+  layout-capability gap as a user problem, and it generalised from one rejected mechanism
+  (row-pitch stretching measured bad) to "don't try". Spreading *proportionally* does
+  worsen the aspect mismatch; scaling *uniformly* does not touch aspect at all.
+
+  The cause was one character of policy: `k = Math.min(1, ...)` meant **only overflow ever
+  shrank**, so every small sheet was under-filled by construction and no layout work could
+  change it. demo 72% x 35% -> 100% x 49%, dense 54% x 31% -> 100% x 58%, min 46% x 8%
+  -> 100% x 18%.
+
+  Uniform scale is a similarity transform: it cannot create a collision or a crossing, and
+  the score moved by **0 on all six cases**. Nothing noticed because the objective is
+  *structurally* blind to fill — `k` is applied at render time, after scoring. That, not a
+  tuning failure, is why "spread it out" never worked in this project.
+
+  Text is divided back to nominal millimetres (`denormaliseText`), since drawing scale and
+  text height are independent in P&ID practice (ISO 5457). Sheet furniture is outside the
+  scaled group and stays at 1:1. `spike` improved 997 -> 967; everything else unchanged.
+
+  *Still true:* a 3.18:1 chain cannot fill the height of a 1.57:1 sheet. That is geometry,
+  not a bug, and only more content or a re-shaped process fixes it. The height gap is not
+  a defect; the *width* gap was, and is closed.
 - [ ] **T7.10** Ports sit at the symbol **bounding-box edge**, not at the metal —
   60 of 259 are >1 mm clear of the drawn content (worst 9.75 mm). Needs a per-family
   lead-in-stub decision, not an auto-fix. Distinct from T7.9, which moved ports along

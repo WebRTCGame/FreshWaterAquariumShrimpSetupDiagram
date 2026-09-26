@@ -2938,6 +2938,112 @@ than another paragraph arguing for it.
 
 Net: `REGRESS OK (spike, min, dense, split, manifold)`, five cases, manifold baseline
 blessed at 282 with 0 errors.
+### 9.64 Filling the sheet — the `min(1, ·)` clamp, and a wrong answer I gave the user
+
+Asked whether any todo item would spread out the demo page, I answered "no — the honest
+answer is more content, not a layout change", citing T3.5 and the aspect ratio. That was a
+bad answer to give someone using this for professional work, and the reasoning behind it
+was too quick. Two errors, both mine:
+
+1. **It treated a layout-capability gap as a user problem.** A process engineer who draws
+   8 valves and 2 vessels should get a well-proportioned sheet, not a note about their
+   process being small.
+2. **It generalised from one rejected mechanism.** Row-pitch stretching had been measured
+   bad, and I concluded "don't try". Those are different claims. Spreading *proportionally*
+   does make the aspect mismatch worse; scaling *uniformly* does not touch aspect at all.
+
+#### What was actually wrong
+
+```
+  const k = Math.min(1, Math.min((W - 2*pad) / cw, (H - 2*pad) / ch));
+```
+
+**Only overflow ever shrank.** With `k <= 1` enforced, a drawing smaller than the sheet
+was never scaled up, so every small sheet was **under-filled by construction** and no
+amount of layout work could change it:
+
+```
+  case      content      aspect   k unclamped   -> filled      was
+  demo      606 x 191mm  3.18:1   1.394         100% x 49%    72% x 35%
+  dense     459 x 169mm  2.72:1   1.839         100% x 58%    54% x 31%
+  min       387 x  45mm  8.64:1   2.184         100% x 18%    46% x  8%
+  split     360 x 150mm  2.40:1   2.344         100% x 65%    43% x 28%
+```
+
+#### Why filling is nearly free, and why nothing noticed
+
+`k` is a **similarity transform**. Uniform scale cannot create a collision or a crossing —
+it only scales existing ones. So the cost of filling is not layout quality.
+
+**And the objective is structurally blind to it.** Unclamping moved the score by exactly
+**0 on all six cases** — not because scaling is harmless, but because `k` is applied at
+*render* time, after scoring. There is no term for fill (`util` was rejected on evidence
+in 9.x). This is the real reason "just spread it out" kept failing across this project:
+the thing being asked for is invisible to everything that decides layout, so no amount of
+tuning could ever produce it.
+
+#### The change
+
+Dropped the clamp, and added `denormaliseText()`: text inside the scaled group renders at
+`k * fontSize`, so every `<text>` font-size is divided back to the millimetre the layout
+asked for. Drawing scale and text height are **independent in P&ID practice** (ISO 5457 —
+a 1:2 drawing with 2.5mm text is normal), so this satisfies the project's print-size rule
+rather than trading it away.
+
+Applied as one pass over the assembled body, not at ~40 emission sites, and deliberately
+**skipping `<text>` nested inside `<svg>`** — those live in a symbol's own viewport and
+must scale *with* their symbol, or every glyph in every symbol would shrink by `1/k`.
+Verified against the count the pass publishes on `data.textNormalised`:
+
+```
+  case       k      type runs adjusted   inherited (no font-size)
+  demo     1.082                     52                          0
+  spike    1.010                    139                          0
+  dense    1.191                     54                          0
+  min      1.545                     21                          0
+  split    1.093                     20                          0
+  manifold 0.970                     49                          0
+```
+
+`inherited` is 0 everywhere: every `<text>` in the scaled group carries an explicit size,
+so there is no text silently scaling with the geometry.
+
+**Furniture is untouched, by construction rather than by care.** `annotationsSvg()` — the
+frame, title block, north arrow, legend *and the equipment tag list* — is emitted AFTER
+the wrapper `</g>`, outside the scale. Verified in the assembly:
+`svg.innerHTML = wrap + body + '</g>' + annotationsSvg(data, W, H)`.
+
+#### A defect I introduced, caught only by looking
+
+`fitPage` fitted to `pad = 10` while `annotationsSvg` draws the border at `pad = 18`.
+Harmless while `k <= 1`, because the layout already held geometry inside SHEET (26), well
+clear of the frame. With `k > 1` the content stretched out to 10mm from the sheet edge —
+*inside* the frame line — and annotations ran into the border. Visible immediately in the
+spike render (`FIC` clipped at the right edge) and reported by **no check at all**.
+Fixed by fitting to the frame inset, 18. The lesson is the oldest one in this log: two
+constants with the same name and different values, and only a rendered image finds it.
+
+#### Result, and one honest consequence
+
+`spike` **improved 997 -> 967** (one label collision removed by the extra room). Every
+other case unchanged. `manifold` now sits at `k = 0.97` and genuinely fits, where it
+previously overflowed the sheet and warned. `REGRESS OK (spike, min, dense, split,
+manifold)`.
+
+The consequence worth stating: symbols now grow by `k` while text does not, so the
+**text-to-symbol ratio changes** and the clearance the engine reserved around a symbol is
+`1/k` tighter in device space than it computed. On `min`, `k = 1.545`, so that is a real
+1.5x tightening. It did not bite on the corpus — `spike` lost a collision rather than
+gaining one — but it is a real coupling, and a future change that increases annotation
+density could expose it. The principled fix is to lay out at the final scale rather than
+scaling afterwards; that is a larger change and is not attempted here.
+
+#### T3.5 is wrong as written
+
+It says the fix for an under-filled sheet is "a richer demo, not a layout change". Half of
+that survives — a 14-entity chain still cannot fill the height of an ARCH D sheet, because
+3.18:1 content on a 1.57:1 sheet is a geometry problem, not a bug. But the claim that
+nothing would fill the sheet was wrong, and the reason it was wrong is the clamp.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

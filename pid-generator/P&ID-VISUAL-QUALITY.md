@@ -3525,6 +3525,66 @@ last element of a long chain is stranded a whole row away from everything else. 
 means the constraint-declaring rewrite (T2) — per-level width proportional to its own
 occupancy — not another score term. The valve cluster in the middle is the other visible
 problem and it is now at least *measurable*, which it was not before.
+### 9.71 Valves had no minimum separation at all
+
+The ugliest thing on the demo was five valves piled in the middle with their label
+stacks on top of each other. Measured, not guessed:
+
+```
+  FV-101  V-105     18.0mm   <-- tighter than one symbol: OVERLAPPING
+  FV-101  PSV-101   25.0mm   <-- overlapping
+  V-103   V-105     28.3mm   <-- overlapping
+  V-101   V-106     29.2mm   <-- overlapping
+  3 valves inside a 60x60mm box
+```
+
+**Why nothing stopped it.** `layout.minSep` (45mm) is documented as "min vertical
+separation between entities" and 9.66 measured it **inert on the demo across 45-95mm**. Now
+it is explicable: `SEP` is used in exactly **one** place, `pid-router.js:242`,
+`cursor = yOf[e.id] + SEP` — the **column packing** loop. Valves are placed by
+`passValves`, which never sees it. So the rule exists, is named as though it governs
+this, and governs something else entirely.
+
+`passDecrowd` *does* include valves (`[...equipment, ...valves]`) but only pushes in **Y**,
+4 iterations, with no floor. A dense cluster cannot converge under that.
+
+#### The fix, and the part that was wrong first
+
+Added a hard minimum centre distance, displacing along whichever axis needs the smaller
+move. First version used `entityHalf` (the glyph) for both axes and only moved the worst
+pair from 18.0mm to **25.0mm**, leaving three still overlapping. That was wrong for a
+reason worth stating: **side by side, what collides is the LABEL STACK, not the glyph.**
+A gate-valve bowtie is ~16mm of ink; its stack reads `V-105 / GATE VALVE / N/C / 4"` and
+the type line alone is ~28mm at 3.9mm type. A floor set from the glyph half is a floor the
+labels walk straight through.
+
+So the floor is **role-aware**: `needY` keeps the glyph + label-zone rule (labels hang
+below, so a sideways shove can put one on top of a neighbour — the original reason the
+pass is vertical), and `needX` uses the widest line of the two stacks at 0.62em.
+
+```
+  tight pairs   4  ->  3  ->  1     (18.0mm -> 25.0mm -> 28.3mm worst pair)
+```
+
+Raising the iteration count from 3x to 12x changed **nothing**, so it is back at 3x:
+converged, and the extra passes were pure cost.
+
+#### What it cost, stated plainly
+
+Demo utilisation **66% -> 44%**. Separating the valves grew the bounding box, which shrank
+`k`, which rendered the drawing smaller. That is a genuine trade and the score agrees it
+is roughly neutral (**356 -> 354**). I took it: overlapping labels look broken, and 44%
+with clean labels reads better than 66% with a pile. **Legibility beat the fill number.**
+
+It also revealed that the fill term is measuring the wrong moment: it scores the layout
+**before** `passDecrowd` repairs it, so it rewards a candidate that the repair then undoes.
+Noted, not fixed — the fix is to score after the repair, which means moving scoring later
+in the pipeline and is not a small change.
+
+`spike` gained substantially: **941 -> 879**, crossings **18 -> 11**, label collisions
+2 -> 1, utilisation 57% -> 73%, and audit `[4]` collinear overlap 1 -> 0.
+
+Final: spike 879, dense 445, min 68, split 45, manifold 282.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

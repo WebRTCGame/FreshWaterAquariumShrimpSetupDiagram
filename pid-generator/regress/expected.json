@@ -5,20 +5,19 @@
    "warnings": [
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
+    "[PID-LAY-001] content (750x565mm) exceeds sheet (864x559mm) — reduce scale or layout",
     "[PID-TXT-001] annotation type OVER: 24 run(s) at 3.6mm, 34 run(s) at 3.9mm, 12 run(s) at 4.2mm, 34 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (490mm) — instrument pair far apart; consider moving the receiver",
     "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
-    "[PID-GEO-002] geometry \"FT-101 -> FIC-101\": port lead-in only 5.0mm (< 14mm) — bend too close to the FT-101 port",
-    "[PID-GEO-002] geometry \"FT-101 -> FIC-101\": port lead-in only 12.0mm (< 14mm) — bend too close to the FIC-101 port",
-    "[PID-GEO-002] geometry \"LT-101 -> LIC-101\": port lead-in only 10.5mm (< 14mm) — bend too close to the LIC-101 port",
-    "[PID-INS-006] tap \"FT-101 -> P-101\": 56.0mm of sideways travel for a 70mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-GEO-002] geometry \"FT-101 -> FIC-101\": port lead-in only 10.0mm (< 14mm) — bend too close to the FT-101 port",
+    "[PID-GEO-002] geometry \"TT-101 -> TIC-101\": port lead-in only 5.0mm (< 14mm) — bend too close to the TIC-101 port",
+    "[PID-GEO-002] geometry \"PIC-101 -> V-105\": port lead-in only 5.0mm (< 14mm) — bend too close to the PIC-101 port",
     "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 149mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 150mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer"
+    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 114mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-GEO-005] line \"J-3 -> T-102\" passes through E-103"
    ],
-   "warningsTotal": 12,
+   "warningsTotal": 11,
    "score": {
-    "total": 941,
+    "total": 879,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -38,39 +37,39 @@
      "fill": 400
     },
     "fill": {
-     "w": 80,
-     "h": 72,
-     "util": 57,
-     "gap": 0.05,
+     "w": 76,
+     "h": 97,
+     "util": 73,
+     "gap": 0,
      "entities": 29
     },
     "routing": {
-     "crossings": 18,
-     "pp": 11,
-     "ps": 6,
+     "crossings": 11,
+     "pp": 6,
+     "ps": 4,
      "ss": 1,
-     "bends": 86,
-     "length": 6469,
+     "bends": 88,
+     "length": 7515,
      "nonOrtho": 0
     },
     "sheet": {
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 2
+     "labelCollisions": 1
     },
     "lines": {
      "overlaps": 0,
      "ungapped": 0,
-     "astarGiveups": 0
+     "astarGiveups": 1
     },
     "instruments": {
-     "tapReachTotal": 119,
-     "maxSignalLen": 260
+     "tapReachTotal": 235,
+     "maxSignalLen": 301
     },
     "issues": {
      "errors": 0,
-     "warnings": 12
+     "warnings": 11
     }
    }
   },
@@ -78,55 +77,50 @@
    "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 166",
    "counts": {
     "0": 0,
-    "3": 13,
-    "4": 1,
+    "3": 9,
+    "4": 0,
     "5": 0,
     "6": 0,
-    "7": 2,
-    "8": 0,
+    "7": 1,
+    "8": 1,
     "9": 0,
     "10": 1,
-    "11": 82,
+    "11": 80,
     "13": 0
    },
    "lists": {
     "0": [],
     "3": [
-     "PT-101~tap-> X V-102->C-101 @(520,155)",
-     "V-101->P-101 X P-103->J-3 @(230,270)",
-     "FV-101->R-101 X P-103->J-3 @(608,270)",
-     "R-101->V-102 X R-101->PSV-101 @(645,180)",
-     "R-101->V-102 X R-101->PSV-101 @(645,180)",
-     "D-101->P-102 X P-103->J-3 @(625,270)",
-     "J-4->V-105 X PT-101->PIC-101 @(420,110)",
-     "J-4->E-103 X V-103->P-103 @(495,305)",
-     "J-4->E-103 X LT-101->LIC-101 @(445,305)",
-     "J-4->E-103 X LT-101->LIC-101 @(445,305)",
-     "C-101->E-101 X P-103->J-3 @(315,270)",
-     "P-103->J-3 X FIC-101->FV-101 @(443,260)",
-     "P-103->J-3 X FIC-101->FV-101 @(443,260)"
+     "LT-101~tap-> X C-101->E-102 @(325,105)",
+     "R-101->V-102 X R-101->PSV-101 @(660,140)",
+     "R-101->V-102 X R-101->PSV-101 @(660,140)",
+     "C-101->E-102 X J-4->E-103 @(390,225)",
+     "E-102->D-101 X J-4->E-103 @(430,225)",
+     "J-4->V-105 X LT-102->LIC-102 @(565,40)",
+     "J-4->V-105 X LT-102->LIC-102 @(565,40)",
+     "J-4->E-103 X LT-101->LIC-101 @(490,325)",
+     "FT-103->FIC-103 X LIC-102->P-102 @(681,275)"
     ],
-    "4": [
-     "LT-101~tap-> & C-101->E-101 overlap 26mm at y=248"
-    ],
+    "4": [],
     "5": [],
     "6": [],
     "7": [
-     "\"4\"x3\"\" & \"101\" @(440,251)",
-     "\"control valve\" & \"4\"-PG-101-1E1-H-INS-50-T\" @(218,192)"
+     "\"2\"-CW-104-1E1-H-INS-50-T\" & \"T-102\" @(475,26)"
     ],
-    "8": [],
+    "8": [
+     "C-101->E-101 2mm (355,225)->(357,225)"
+    ],
     "9": [],
     "10": [
-     "PT-101~tap-> X V-102->C-101 @(520,155)"
+     "LT-101~tap-> X C-101->E-102 @(325,105)"
     ],
     "11": [
-     "content 663x416mm bbox (98,61)->(760,477) | 86% W x 95% H | drawable 768x439mm | sheet 864x559mm"
+     "content 628x427mm bbox (113,50)->(740,477) | 82% W x 97% H | drawable 768x439mm | sheet 864x559mm"
     ],
     "13": []
    }
   },
-  "budget": 847
+  "budget": 791
  },
  "min": {
   "harness": {

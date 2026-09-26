@@ -733,6 +733,59 @@ function autoLayout(data) {
       }
       if (!moved) break;
     }
+
+    // ---- hard floor: no two symbols may OVERLAP --------------------------
+    //
+    // The loop above pushes only in Y, which cannot converge in a dense cluster:
+    // measured on the demo, FV-101 and V-105 sat 18.0mm apart centre to centre with
+    // 30mm symbols, i.e. overlapping by 12mm, and three valves shared a 60x60mm box.
+    // `minSep` does not help -- it is used in exactly one place, the COLUMN packing
+    // loop at line 242, so valves placed by passValves never see it.
+    //
+    // So: enforce a real minimum centre distance, and move along whichever axis needs
+    // the SMALLER displacement. Y-only is kept when y is the cheaper move because
+    // label stacks hang below the symbol and a sideways shove can put a label on top
+    // of a neighbour -- the reason the original pass is vertical.
+    // Side by side, the thing that visibly collides is the LABEL STACK, not the glyph.
+    // A gate-valve bowtie is ~16mm of ink, but its stack reads
+    // "V-105 / GATE VALVE / N/C / 4\"" and the type line alone is ~28mm at 3.9mm type.
+    // Using the glyph half for the x axis therefore sets a floor the labels blow
+    // straight through, which is why the first version of this fix moved the worst pair
+    // from 18.0mm only to 25.0mm and left three still overlapping.
+    //
+    // So: y axis keeps the glyph + label-zone rule (stacked labels hang below), x axis
+    // uses the widest line of the two stacks. 0.62em is deliberately conservative for
+    // the grey caps of a type label.
+    const labelHalf = (e) => {
+      const lines = [e.tag || e.id || '', (typeof TYPE_LABELS !== 'undefined' && TYPE_LABELS[e.type]) || e.type || ''];
+      let w = 0;
+      for (const s2 of lines) w = Math.max(w, String(s2).length * 0.62 * ((s2 === lines[0] ? 4.2 : 3.9)));
+      return w / 2;
+    };
+    const gapAir = ruleParam('layout.valveGap', 2);
+    const needY = (a, b) => half(a) + half(b) + ruleParam('layout.labelZone', 16) * ruleParam('layout.decrowdZone', 1);
+    const needX = (a, b) => Math.max(half(a) + half(b), labelHalf(a) + labelHalf(b)) + gapAir;
+    for (let it = 0; it < ruleParam('layout.decrowdIters', 4) * 3; it++) {
+      let moved = false;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let k = i + 1; k < nodes.length; k++) {
+          const a = nodes[i], b = nodes[k];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const dist = Math.hypot(dx, dy);
+          const want = (Math.abs(dy) <= Math.abs(dx) * 0.35) ? needX(a, b) : needY(a, b);
+          if (dist >= want) continue;
+          const push = (want - dist) / 2;
+          if (dist < 1e-6) { a.x -= push; b.x += push; }        // coincident: split in x
+          else if (Math.abs(dy) <= Math.abs(dx) * 0.35) {
+            a.x -= push * (dx / dist); b.x += push * (dx / dist);   // side by side: x
+          } else {
+            a.y -= push * (dy / dist); b.y += push * (dy / dist);   // stacked: y
+          }
+          moved = true;
+        }
+      }
+      if (!moved) break;
+    }
   };
   passDecrowd();
 

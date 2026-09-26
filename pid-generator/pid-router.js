@@ -757,12 +757,12 @@ function autoLayout(data) {
     // uses the widest line of the two stacks. 0.62em is deliberately conservative for
     // the grey caps of a type label.
     const labelHalf = (e) => {
-      const lines = [e.tag || e.id || '', (typeof TYPE_LABELS !== 'undefined' && TYPE_LABELS[e.type]) || e.type || ''];
+      const lines = [e.tag || e.id || '', TYPE_LABELS[e.type] || e.type || ''];
       let w = 0;
       for (const s2 of lines) w = Math.max(w, String(s2).length * 0.62 * ((s2 === lines[0] ? 4.2 : 3.9)));
       return w / 2;
     };
-    const gapAir = ruleParam('layout.valveGap', 2);
+    const gapAir = ruleParam('layout.decrowdAir', 6);
     const needY = (a, b) => half(a) + half(b) + ruleParam('layout.labelZone', 16) * ruleParam('layout.decrowdZone', 1);
     const needX = (a, b) => Math.max(half(a) + half(b), labelHalf(a) + labelHalf(b)) + gapAir;
     for (let it = 0; it < ruleParam('layout.decrowdIters', 4) * 3; it++) {

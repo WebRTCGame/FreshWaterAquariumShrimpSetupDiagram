@@ -28,7 +28,7 @@ for (const m of R(/<path\b[^>]*>/g, s)) {
     if (cmd === 'M') { cur = [{ x, y }]; subs.push(cur); }
     else if (cur) cur.push({ x, y });
   }
-  pipes.push({ from, to, cls, subs, label: cls === 'nozzle' ? `nozzle@${Math.round(subs[0][0].x)},${Math.round(subs[0][0].y)}` : cls === 'tap' ? `${from.replace(/^tap-/, '')}~tap->` : `${from}->${to}` });
+  pipes.push({ from, to, cls, subs, sw: +((tag.match(/stroke-width="([\d.]+)"/) || [])[1] || 0), label: cls === 'nozzle' ? `nozzle@${Math.round(subs[0][0].x)},${Math.round(subs[0][0].y)}` : cls === 'tap' ? `${from.replace(/^tap-/, '')}~tap->` : `${from}->${to}` });
 }
 const segsOf = (p) => p.subs.flatMap((sp) => sp.slice(1).map((pt, i) => [sp[i], pt]));
 const lenOf = (p) => segsOf(p).reduce((a, [u, v]) => a + Math.abs(v.x - u.x) + Math.abs(v.y - u.y), 0);
@@ -259,6 +259,83 @@ console.log(`\n[10] CROSSINGS WITHOUT A GAP BREAK: ${uncovered.length}`);
 for (const c of uncovered.slice(0, 20)) console.log(`  ${c.a} X ${c.b} @(${c.x},${c.y})`);
 
 // ---------------------------------------------------------------------------
+  // [12] MARKER SCALE -- do the node dot and the flow arrow belong to the pipe they are
+  // drawn on? Both were fixed constants that ignored it: the dot was r=2.5, a 5mm disc,
+  // carrying a fill attribute the stylesheet silently overrode, and the arrow a fixed 3mm
+  // wide on pipes measuring 0.4mm to 3.2mm. Neither showed up in any score term, and an
+  // audit that never looks at them cannot notice them being wrong again.
+  //
+  // A junction dot is legitimately a little wider than its pipe -- it has to read as a
+  // node rather than as a thickness -- so the floor is generous. The point is to catch a
+  // dot that has become a blob, which is exactly what 5mm on a 1.4mm pipe was.
+  const DOT_MAX = 2.0, ARROW_MAX = 1.5;
+  const distToSeg = (px, py, [a, b]) => {
+    const dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+    let u = L2 ? ((px - a.x) * dx + (py - a.y) * dy) / L2 : 0;
+    u = Math.max(0, Math.min(1, u));
+    return Math.hypot(px - (a.x + u * dx), py - (a.y + u * dy));
+  };
+  const markers = [];
+  for (const m of R(/<circle class="pid-junction-dot" cx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"/g, s)) {
+    const cx = +m[1], cy = +m[2], rad = +m[3];
+    let best = null, bd = Infinity;
+    for (const p of pipes) {
+      if (!p.sw) continue;
+      for (const sg of segsOf(p)) {
+        const d = distToSeg(cx, cy, sg);
+        if (d < bd) { bd = d; best = p; }
+      }
+    }
+    if (!best || bd > rad + 1.5) continue;          // not actually sitting on a pipe
+    const ratio = (2 * rad) / best.sw;
+    if (ratio > DOT_MAX) markers.push(`junction dot ${(2 * rad).toFixed(1)}mm on a ${best.sw}mm pipe = ${ratio.toFixed(1)}x (> ${DOT_MAX}x)`);
+  }
+  for (const m of R(/<polygon points="([^"]+)" fill="[^"]+" opacity="0.7" data-pipe-w="([\d.]+)"\/>/g, s)) {
+    const pw = +m[2];
+    const pts = m[1].split(' ').map((p) => p.split(',').map(Number));
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    const w = Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    const ratio = w / pw;
+    if (ratio > ARROW_MAX) markers.push(`flow arrow ${w.toFixed(1)}mm wide on a ${pw}mm pipe = ${ratio.toFixed(1)}x (> ${ARROW_MAX}x)`);
+  }
+  console.log(`
+[12] MARKER SCALE (dot <= ${DOT_MAX}x pipe, arrow <= ${ARROW_MAX}x pipe): ${markers.length}`);
+  for (const mk of markers) console.log(`  ${mk}`);
+
+  // [14] TAG INSIDE BUBBLE -- does the instrument tag actually FIT its circle?
+  //
+  // The emitter used hardcoded baselines of +0.5 and +5.5, which is not the centre of the
+  // ink they produce. At typeScale 1.3 the block spans -2.5..+6.17 about the bubble centre,
+  // so the loop number hung about 1.5mm out of the BOTTOM of the circle and every
+  // instrument on every sheet read as "LT  -101" with the number outside the bubble.
+  //
+  // The bubble glyph is a nested <svg x y width height> holding circle r=40 in a 100-unit
+  // viewBox, so drawn radius = 0.4 * width and centre = (x + w/2, y + h/2). Containment is
+  // scale-invariant, so the wrapper transform does not need undoing here.
+  const CAP = 0.72, DESC = 0.20;
+  // Print tolerance, not a fudge: 0.25mm is the conventional CAD plotting tolerance,
+  // and without it a 0.02mm overshoot from float noise is reported as a defect. On
+  // spike that was 12 of 18 hits, which is how a guard trains its reader to ignore
+  // it. The check still fires on every genuine overshoot (6x on spike, 1x on demo).
+  const TAG_TOL = 0.25;
+  const spills = [];
+  for (const g of R(/<g data-pid-id="([^"]+)" class="ly-instrument">([\s\S]*?)<\/g>/g, s)) {
+    const body = g[2];
+    const sv = /<svg x="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/.exec(body);
+    if (!sv) continue;
+    const cx = +sv[1] + +sv[3] / 2, cy = +sv[2] + +sv[4] / 2, r = 0.4 * +sv[3];
+    for (const m of R(/<text x="(-?[\d.]+)" y="(-?[\d.]+)" text-anchor="middle" font-size="([\d.]+)"(?: font-weight="(\w+)")?[^>]*>([^<]*)<\/text>/g, body)) {
+      const x = +m[1], y = +m[2], f = +m[3], str = m[5];
+      const em = m[4] === 'bold' ? 0.68 : 0.55;
+      const vcen = (y - CAP * f + y + DESC * f) / 2 - cy;
+      const corner = Math.hypot((str.length * f * em) / 2, vcen);
+      if (corner > r + TAG_TOL) spills.push(`${g[1]} "${str}" needs ${corner.toFixed(2)}mm but the bubble radius is ${r.toFixed(2)}mm (${((corner / r - 1) * 100).toFixed(0)}% over)`);
+    }
+  }
+  console.log(`
+[14] TAG INSIDE BUBBLE (tag ink within its circle): ${spills.length}`);
+  for (const sp3 of spills) console.log(`  ${sp3}`);
+
 // [11] SHEET UTILISATION  +  [13] SPARSE SHEET
 //
 // These exist because every other check here measures a DEFECT, and a sheet can

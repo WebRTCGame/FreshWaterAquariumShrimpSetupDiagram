@@ -5,19 +5,25 @@
    "warnings": [
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
-    "[PID-LAY-001] content (750x565mm) exceeds sheet (864x559mm) — reduce scale or layout",
+    "[PID-INS-020] tag \"FIC-101\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"TIC-101\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"LIC-101\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"FIC-103\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"PIC-101\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"LIC-102\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
     "[PID-TXT-001] annotation type OVER: 24 run(s) at 3.6mm, 34 run(s) at 3.9mm, 12 run(s) at 4.2mm, 34 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (541mm) — instrument pair far apart; consider moving the receiver",
     "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
-    "[PID-GEO-002] geometry \"FT-101 -> FIC-101\": port lead-in only 10.0mm (< 14mm) — bend too close to the FT-101 port",
-    "[PID-GEO-002] geometry \"TT-101 -> TIC-101\": port lead-in only 5.0mm (< 14mm) — bend too close to the TIC-101 port",
-    "[PID-GEO-002] geometry \"PIC-101 -> V-105\": port lead-in only 5.0mm (< 14mm) — bend too close to the PIC-101 port",
+    "[PID-GEO-002] geometry \"D-101 -> P-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the D-101 port",
+    "[PID-INS-006] tap \"FT-101 -> P-101\": 54.0mm of sideways travel for a 70mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 149mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 114mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-GEO-005] line \"J-3 -> T-102\" passes through E-103"
+    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 150mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-005] tap \"TT-101\": shares 88mm of process corridor (reads as one line) — move the bubble or add a via"
    ],
-   "warningsTotal": 11,
+   "warningsTotal": 17,
    "score": {
-    "total": 879,
+    "total": 914,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -37,39 +43,39 @@
      "fill": 400
     },
     "fill": {
-     "w": 76,
-     "h": 97,
-     "util": 73,
-     "gap": 0,
+     "w": 80,
+     "h": 72,
+     "util": 57,
+     "gap": 0.05,
      "entities": 29
     },
     "routing": {
-     "crossings": 11,
-     "pp": 6,
-     "ps": 4,
+     "crossings": 18,
+     "pp": 9,
+     "ps": 8,
      "ss": 1,
-     "bends": 88,
-     "length": 7515,
+     "bends": 83,
+     "length": 7088,
      "nonOrtho": 0
     },
     "sheet": {
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 1
+     "labelCollisions": 0
     },
     "lines": {
      "overlaps": 0,
      "ungapped": 0,
-     "astarGiveups": 1
+     "astarGiveups": 0
     },
     "instruments": {
-     "tapReachTotal": 235,
-     "maxSignalLen": 301
+     "tapReachTotal": 129,
+     "maxSignalLen": 215
     },
     "issues": {
      "errors": 0,
-     "warnings": 11
+     "warnings": 17
     }
    }
   },
@@ -77,61 +83,75 @@
    "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 166",
    "counts": {
     "0": 0,
-    "3": 9,
-    "4": 0,
+    "3": 10,
+    "4": 2,
     "5": 0,
     "6": 0,
-    "7": 1,
+    "7": 0,
     "8": 1,
     "9": 0,
     "10": 1,
-    "11": 80,
-    "13": 0
+    "11": 79,
+    "12": 0,
+    "13": 0,
+    "14": 6
    },
    "lists": {
     "0": [],
     "3": [
-     "LT-101~tap-> X C-101->E-102 @(325,105)",
-     "R-101->V-102 X R-101->PSV-101 @(660,140)",
-     "R-101->V-102 X R-101->PSV-101 @(660,140)",
-     "C-101->E-102 X J-4->E-103 @(390,225)",
-     "E-102->D-101 X J-4->E-103 @(430,225)",
-     "J-4->V-105 X LT-102->LIC-102 @(565,40)",
-     "J-4->V-105 X LT-102->LIC-102 @(565,40)",
-     "J-4->E-103 X LT-101->LIC-101 @(490,325)",
-     "FT-103->FIC-103 X LIC-102->P-102 @(681,275)"
+     "R-101->V-102 X R-101->PSV-101 @(645,180)",
+     "R-101->V-102 X R-101->PSV-101 @(645,180)",
+     "V-102->C-101 X PT-101->PIC-101 @(500,130)",
+     "V-105->C-101 X P-103->J-3 @(225,120)",
+     "J-4->E-103 X E-101->V-103 @(445,358)",
+     "J-4->E-103 X E-101->V-103 @(445,358)",
+     "P-103->J-3 X R-101->PSV-101 @(685,155)",
+     "P-103->J-3 X R-101->PSV-101 @(685,155)",
+     "P-103->J-3 X TT-101->TIC-101 @(655,145)",
+     "P-103->J-3 X PT-101->PIC-101 @(500,120)"
     ],
-    "4": [],
+    "4": [
+     "TT-101~tap-> & P-103->J-3 overlap 7mm at x=700",
+     "LT-101~tap-> & C-101->E-101 overlap 20mm at y=248"
+    ],
     "5": [],
     "6": [],
-    "7": [
-     "\"2\"-CW-104-1E1-H-INS-50-T\" & \"T-102\" @(475,26)"
-    ],
+    "7": [],
     "8": [
-     "C-101->E-101 2mm (355,225)->(357,225)"
+     "P-103->J-3 1mm (210,315)->(209,315)"
     ],
     "9": [],
     "10": [
-     "LT-101~tap-> X C-101->E-102 @(325,105)"
+     "P-103->J-3 X PT-101->PIC-101 @(500,120)"
     ],
     "11": [
-     "content 628x427mm bbox (113,50)->(740,477) | 82% W x 97% H | drawable 768x439mm | sheet 864x559mm"
+     "content 663x402mm bbox (98,75)->(760,477) | 86% W x 91% H | drawable 768x439mm | sheet 864x559mm"
     ],
-    "13": []
+    "12": [],
+    "13": [],
+    "14": [
+     "FIC-101 \"FIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)",
+     "TIC-101 \"TIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)",
+     "LIC-101 \"LIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)",
+     "FIC-103 \"FIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)",
+     "PIC-101 \"PIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)",
+     "LIC-102 \"LIC\" needs 4.93mm but the bubble radius is 4.00mm (23% over)"
+    ]
    }
   },
-  "budget": 791
+  "budget": 823
  },
  "min": {
   "harness": {
    "errors": [],
    "warnings": [
+    "[PID-INS-020] tag \"FIC-1\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
     "[PID-TXT-001] annotation type OVER: 4 run(s) at 3.6mm, 6 run(s) at 3.9mm, 2 run(s) at 4.2mm, 6 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 5.5mm (< 14mm) — bend too close to the FIC-1 port"
    ],
-   "warningsTotal": 2,
+   "warningsTotal": 3,
    "score": {
-    "total": 68,
+    "total": 73,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -183,7 +203,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 2
+     "warnings": 3
     }
    }
   },
@@ -200,7 +220,9 @@
     "9": 0,
     "10": 0,
     "11": 11,
-    "13": 1
+    "12": 0,
+    "13": 1,
+    "14": 0
    },
    "lists": {
     "0": [],
@@ -218,23 +240,27 @@
     "11": [
      "content 442x82mm bbox (54,240)->(496,322) | 58% W x 19% H | drawable 768x439mm | sheet 864x559mm"
     ],
+    "12": [],
     "13": [
      "fills only 19% of drawable height (< 45%) — content is 58% W x 19% H; consider splitting the sheet or adding scope"
-    ]
+    ],
+    "14": []
    }
   },
-  "budget": 61
+  "budget": 66
  },
  "dense": {
   "harness": {
    "errors": [],
    "warnings": [
     "[PID-VAL-004] control valve \"V-2\" has no defined fail action",
+    "[PID-INS-020] tag \"FIC-1\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
+    "[PID-INS-020] tag \"LIC-1\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
     "[PID-TXT-001] annotation type OVER: 8 run(s) at 3.6mm, 16 run(s) at 3.9mm, 6 run(s) at 4.2mm, 14 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
    ],
-   "warningsTotal": 2,
+   "warningsTotal": 4,
    "score": {
-    "total": 445,
+    "total": 455,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -286,7 +312,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 2
+     "warnings": 4
     }
    }
   },
@@ -303,7 +329,9 @@
     "9": 0,
     "10": 0,
     "11": 40,
-    "13": 0
+    "12": 0,
+    "13": 0,
+    "14": 2
    },
    "lists": {
     "0": [],
@@ -323,10 +351,15 @@
     "11": [
      "content 469x291mm bbox (186,121)->(655,412) | 61% W x 66% H | drawable 768x439mm | sheet 864x559mm"
     ],
-    "13": []
+    "12": [],
+    "13": [],
+    "14": [
+     "FIC-1 \"FIC\" needs 4.45mm but the bubble radius is 4.00mm (11% over)",
+     "LIC-1 \"LIC\" needs 4.45mm but the bubble radius is 4.00mm (11% over)"
+    ]
    }
   },
-  "budget": 401
+  "budget": 410
  },
  "split": {
   "harness": {
@@ -405,7 +438,9 @@
     "9": 0,
     "10": 0,
     "11": 27,
-    "13": 0
+    "12": 0,
+    "13": 0,
+    "14": 0
    },
    "lists": {
     "0": [],
@@ -420,7 +455,9 @@
     "11": [
      "content 425x214mm bbox (128,248)->(553,462) | 55% W x 49% H | drawable 768x439mm | sheet 864x559mm"
     ],
-    "13": []
+    "12": [],
+    "13": [],
+    "14": []
    }
   },
   "budget": 41
@@ -430,13 +467,14 @@
    "errors": [],
    "warnings": [
     "[PID-LAY-001] content (854x474mm) exceeds sheet (864x559mm) — reduce scale or layout",
+    "[PID-INS-020] tag \"FIC-1\" needs a 5.2mm bubble but has 4.0mm: the tag will not fit inside",
     "[PID-TXT-001] annotation type OVER: 9 run(s) at 3.6mm, 16 run(s) at 3.9mm, 8 run(s) at 4.2mm, 11 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"V-4 -> J-H\": port lead-in only 6.0mm (< 14mm) — bend too close to the V-4 port",
     "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 10.0mm (< 14mm) — bend too close to the T-2 port"
    ],
-   "warningsTotal": 4,
+   "warningsTotal": 5,
    "score": {
-    "total": 282,
+    "total": 287,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -488,7 +526,7 @@
     },
     "issues": {
      "errors": 0,
-     "warnings": 4
+     "warnings": 5
     }
    }
   },
@@ -505,7 +543,9 @@
     "9": 0,
     "10": 0,
     "11": 83,
-    "13": 0
+    "12": 0,
+    "13": 0,
+    "14": 1
    },
    "lists": {
     "0": [],
@@ -525,9 +565,13 @@
     "11": [
      "content 753x372mm bbox (55,85)->(808,457) | 98% W x 85% H | drawable 768x439mm | sheet 864x559mm"
     ],
-    "13": []
+    "12": [],
+    "13": [],
+    "14": [
+     "FIC-1 \"FIC\" needs 5.33mm but the bubble radius is 4.00mm (33% over)"
+    ]
    }
   },
-  "budget": 254
+  "budget": 258
  }
 }

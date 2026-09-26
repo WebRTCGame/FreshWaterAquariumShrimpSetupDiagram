@@ -585,7 +585,12 @@ k = Math.min((W - 2 * pad) / cw, (H - 2 * pad) / ch);
       geometries.push({
         p, pts: orth, signal, style,
         stroke: signal ? '#444' : (p.stroke || '#1E90FF'),
-        width: signal ? 0.4 : 0.6,
+        // From the rules. This was a hardcoded 0.6mm, i.e. a hairline: every process
+        // pipe on the demo measured 0.6mm while the equipment boxes were 70x45mm. It is
+        // the root of two filed rendering defects -- a 3mm flow arrow and a 5mm junction
+        // disc both read as oversized because the pipe UNDER them was too thin, not
+        // because they were.
+        width: signal ? ruleParam('routing.signalWidth', 0.35) : ruleParam('routing.processWidth', 1.4),
         label: p.label && !view.hideLabels ? p.label : null,
         labelOnce: p.line && labeledLines.has(p.line),
         pA, pB,
@@ -1541,7 +1546,12 @@ const shiftFor = (lineIdx, x) => {
           const dx = b.x - a.x, dy = b.y - a.y;
           const dir = fwd ? 1 : -1; // forward = a→b, reverse = b→a
           // arrow triangle: 3mm long, 1.5mm half-width
-          const AL = 3, AW = 1.5;
+          // Sized FROM the pipe, not as a constant. The fixed 1.5mm half-width put a
+          // 3mm arrow on pipes measuring 0.4mm to 3.2mm -- 7.5x the thinnest and 1.9x
+          // the widest -- which is why the demo reads as a scatter of blue wedges
+          // rather than as flow direction along a line.
+          const AW = Math.max(0.45, g.width * ruleParam('annotation.arrowFrac', 0.8) * 0.5);
+          const AL = AW * 2 * ruleParam('annotation.arrowRatio', 2.4);
           if (Math.abs(dx) > Math.abs(dy)) {
             // horizontal segment — arrow points left or right
             const sx = dir * Math.sign(dx);
@@ -1878,9 +1888,54 @@ const shiftFor = (lineIdx, x) => {
     if (view.chips) g += chip(inst.x, inst.y, sizeOf(inst), inst.tag);
     g += embedSymbolRaw(glyph, inst.x, inst.y, sizeOf(inst), inst.rotation);
     if (!view.hideLabels) {
-      // full tag inside the bubble: letters + loop number (ISA convention)
-      g += `<text x="${inst.x}" y="${inst.y + 0.5}" text-anchor="middle" font-size="${fs(3.2)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(letters)}</text>`;
-      if (loop) g += `<text x="${inst.x}" y="${inst.y + 5.5}" text-anchor="middle" font-size="${fs(2.6)}" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(loop)}</text>`;
+      // Full tag inside the bubble: letters + loop number (ISA convention).
+      //
+      // The offsets were a hardcoded +0.5 / +5.5, which is NOT the centre of the ink they
+      // produce. Measured on the demo at typeScale 1.3: "LT" is fs(3.2)=4.16mm, so its cap
+      // top sits at 0.5 - 0.72*4.16 = -2.5, while the loop baseline at +5.5 puts its
+      // descenders at +6.17. The block spans -2.5..+6.17 -- 8.7mm tall, centred at +1.84,
+      // i.e. sitting 1.84mm LOW inside a bubble of radius 0.4*size.
+      //
+      // Consequence, and it is on every instrument on every sheet: the loop number hangs
+      // about 1.5mm out of the BOTTOM of the circle, so the sheet reads "LT  -101" with
+      // the number outside the bubble. The bubble SIZE was never wrong -- the block was
+      // simply not centred in it.
+      //
+      // Deriving the shift from the metrics also makes it correct at any typeScale. fs() and
+      // sizeOf() both scale, but not by a guaranteed common factor, and a fixed offset
+      // only happened to land near-centre at one setting.
+      const CAP = 0.72, DESC = 0.20;
+      const fL = fs(3.2), fN = fs(2.6);
+      const tagLines = [[letters, fL, WIDTH_EM.bold, 0.5]];
+      if (loop) tagLines.push([loop, fN, WIDTH_EM.regular, 5.5]);
+      let bTop = Infinity, bBot = -Infinity;
+      for (const [, f, , off] of tagLines) {
+        bTop = Math.min(bTop, off - CAP * f);
+        bBot = Math.max(bBot, off + DESC * f);
+      }
+      const shift = -(bTop + bBot) / 2;   // centre the ink block on inst.y
+      // Radius the block actually needs: the worst corner of any line, measured against the
+      // drawn bubble (0.4 * size, since the glyph is circle r=40 in a 100-unit viewBox).
+      let need = 0;
+      for (const [str, f, em, off] of tagLines) {
+        const y = off + shift;
+        need = Math.max(need, Math.hypot(widthEm(str, f, em) / 2, y - (CAP - DESC) * f / 2));
+      }
+      for (const [str, f, em, off] of tagLines) {
+        g += `<text x="${inst.x}" y="${(inst.y + off + shift).toFixed(2)}" text-anchor="middle" font-size="${f}" font-weight="${em === WIDTH_EM.bold ? 'bold' : 'normal'}" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(str)}</text>`;
+      }
+      // A tag that still will not fit is a layout bug, not something to paper over. Record
+      // it so it is countable instead of the sheet quietly showing a number outside its
+      // bubble.
+      // 0.25mm is the conventional CAD plotting tolerance, so an overshoot below that is
+      // not a defect worth a warning. Matching audit [14] matters: a validator and an
+      // audit that disagree on a threshold are worse than either one alone.
+      const TAG_TOL = 0.25;
+      const rDrawn = 0.4 * sizeOf(inst);
+      if (need > rDrawn + TAG_TOL) {
+        (data.warnings || (data.warnings = [])).push(
+          `[PID-INS-020] tag "${inst.tag}" needs a ${need.toFixed(1)}mm bubble but has ${rDrawn.toFixed(1)}mm: the tag will not fit inside`);
+      }
     }
     // explicit process tap: precomputed in the tap pass (min-length landing,
     // tap always breaks). Only the gap-cut emission happens here.
@@ -1945,7 +2000,13 @@ const shiftFor = (lineIdx, x) => {
       body += `</g>`;
       continue;
     }
-    body += `<circle class="pid-junction-dot" cx="${j.x}" cy="${j.y}" r="2.5" fill="#1E90FF" data-pid-id="${j.id}"/>`;
+    // Diameter from the rule, and NO fill attribute: the stylesheet
+    // circle.pid-junction-dot{fill:<theme>} beats a presentation attribute, so the old
+    // fill="#1E90FF" never took effect and the dot rendered theme-black. A dead
+    // attribute is worse than no attribute -- it reads as intent and audits as a
+    // colour that is not on the sheet. The theme is the single owner of colour.
+    const jd = ruleParam('annotation.junctionDot', 2.5) / 2;
+    body += `<circle class="pid-junction-dot" cx="${j.x}" cy="${j.y}" r="${jd}" data-pid-id="${j.id}"/>`;
   }
 
   // nozzles on used connections

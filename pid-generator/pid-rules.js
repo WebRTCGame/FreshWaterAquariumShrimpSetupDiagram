@@ -153,6 +153,14 @@ const PID_RULES = {
       gapMinRun:    { value: 8, min: 2, max: null, unit: 'mm', desc: 'straight run required each side of a full gap' },
       nozzleLead:   { value: 14, min: 4, max: null, unit: 'mm', desc: 'axial straight run forced at every nozzle tip' },
       junctionStubMin: { value: 6, min: 2, max: null, unit: 'mm', desc: 'minimum fan-out stub at junction nodes' },
+      // Line WEIGHTS at 1:1. These were hardcoded in the renderer as
+      // `width: signal ? 0.4 : 0.6`, so all 16 process pipes on the demo were 0.6mm
+      // -- a hairline. That one constant is why the flow arrows read as oversized
+      // (a 3mm arrow on a 0.6mm pipe) and why the junction dot read as a blob (a 5mm
+      // disc on a 0.6mm pipe). Neither the arrow nor the dot was wrong in absolute
+      // terms; they were wrong RELATIVE to a pipe too thin to carry them.
+      processWidth: { value: 1.4, min: 0.1, max: 6, unit: 'mm', noScale: true, desc: 'process pipe stroke weight at 1:1. 0.6 was a hairline; ISO 5457 drawing practice wants a line heavy enough to read as a pipe' },
+      signalWidth:  { value: 0.35, min: 0.05, max: 4, unit: 'mm', noScale: true, desc: 'instrument/signal line stroke weight at 1:1' },
       sheetMargin:  { value: 26, min: 0, max: null, unit: 'mm', desc: 'sheet bounds inset (routing/search/placement)' },
       searchMargin: { value: 160, min: 50, max: null, unit: 'mm', desc: 'A* local search box around the direct route' },
       bendPenalty:  { value: 20, min: 0, max: null, unit: 'cost', desc: 'A* turn cost' },
@@ -180,6 +188,7 @@ const PID_RULES = {
       freeSlot:     { value: 45, min: 20, max: null, unit: 'mm', desc: 'instrument slot exclusion radius' },
       labelZone:    { value: 16, min: 0, max: null, unit: 'mm', desc: 'label keep-out below equipment/valves in stacking' },
       valveGap:     { value: 14, min: 6, max: null, unit: 'mm', desc: 'valve-to-equipment-port clearance in snapping' },
+      decrowdAir:   { value: 14, min: 0, max: null, unit: 'mm', desc: 'clear air passDecrowd enforces between two symbol EDGES once the label-zone gap is already satisfied. Separate from layout.valveGap, which is port-snapping clearance and must not double as de-crowding' },
       valveClear:   { value: 16, min: 6, max: null, unit: 'mm', desc: 'min centre-to-centre spacing between valves on a shared span' },
       minSep:       { value: 45, min: 20, max: null, unit: 'mm', desc: 'min vertical separation between entities sharing a depth rank' },
       decrowd:      { value: 1, min: 0, max: 1, unit: 'bool', desc: 'separate entities whose label stacks would overlap' },
@@ -204,6 +213,9 @@ const PID_RULES = {
     annotation: {
       typeScale:    { value: 1.4, min: 1, max: 3, unit: 'factor', desc: 'type size multiplier over base sizes' },
       typeFloor:    { value: 3.5, min: 2, max: null, unit: 'mm', desc: 'minimum rendered text size' },
+      junctionDot:  { value: 2.5, min: 0.5, max: null, unit: 'mm', noScale: true, desc: 'DIAMETER of a junction node dot. Was a hardcoded r=2.5, i.e. a 5mm solid disc 1.5-5x the width of the pipe it sits on, which read as a blob rather than a node' },
+      arrowFrac:    { value: 0.8, min: 0.1, max: 2, unit: 'fraction', noScale: true, desc: 'flow-direction arrow half-width as a fraction of the PIPE stroke width it sits on. Was a fixed 1.5mm, so a 3mm-wide arrow landed on pipes from 0.4mm to 3.2mm wide' },
+      arrowRatio:   { value: 2.4, min: 1, max: 6, unit: 'ratio', noScale: true, desc: 'flow-direction arrow length as a multiple of its own width' },
       // Print-legibility band for component and line text, checked by PID-TXT-001.
       // Defaults are the project's stated print-correct sizes: 3.5mm body, 2.6mm
       // line tags. Deliberately NOT widened to match what the engine currently

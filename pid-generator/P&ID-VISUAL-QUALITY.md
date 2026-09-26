@@ -3585,6 +3585,129 @@ in the pipeline and is not a small change.
 2 -> 1, utilisation 57% -> 73%, and audit `[4]` collinear overlap 1 -> 0.
 
 Final: spike 879, dense 445, min 68, split 45, manifold 282.
+### 9.72 The pipe was a hairline, and the tag was never centred in its bubble
+
+Two of the three rendering defects filed in 9.67 turned out to share one cause, and the
+third was arithmetic that had never been done.
+
+#### The root: process pipes were 0.6mm
+
+```js
+// pid-renderer.js:588 -- the whole of it
+width: signal ? 0.4 : 0.6,
+```
+
+Measured from the emitted markup, **all 16 process pipes on the demo were 0.6mm** while
+the equipment boxes were 70x45mm. At 1:1 that is a hairline, not a pipe.
+
+This reframes both other defects. They were not oversized in absolute terms -- a 3mm flow
+arrow and a 5mm junction disc are both reasonable marks. They were absurd *relative to a
+0.6mm pipe*:
+
+```
+  arrow   3.0mm wide  on pipes 0.4mm .. 3.21mm   ->  1.9x the widest, 7.5x the thinnest
+  dot     5.0mm disc   on a 0.6mm pipe            ->  8.3x
+```
+
+The junction probe settled it: every dot sits at distance **0.00mm** from a 0.6mm process
+pipe. It was never sitting on a signal line -- my first reading of the audit output was
+wrong, and the probe corrected it.
+
+Now `routing.processWidth` (1.4mm) and `routing.signalWidth` (0.35mm). **Measured free**:
+rendering the demo at 0.6 and at 1.4 produced identical `[3] [4] [6] [7] [8] [11]` -- the
+same layout, byte for byte. Nothing in the search reads stroke width.
+
+The arrow and the dot were also made proportional to the pipe they sit on
+(`annotation.arrowFrac` 0.8, `annotation.arrowRatio` 2.4, `annotation.junctionDot` 2.5mm
+diameter) rather than left as constants, so the relationship is now explicit and
+rule-driven instead of accidental. The junction dot also **lost its `fill="#1E90FF"`**:
+`circle.pid-junction-dot{fill:#000000}` beats a presentation attribute, so the attribute
+never took effect. A dead attribute is worse than none -- it reads as intent and audits as
+a colour that is not on the sheet.
+
+#### The arithmetic that had never been done: the tag is not centred in its bubble
+
+```js
+g += `<text ... y="${inst.y + 0.5}" font-size="${fs(3.2)}" ...>${letters}</text>`;
+g += `<text ... y="${inst.y + 5.5}" font-size="${fs(2.6)}" ...>${loop}</text>`;
+```
+
+At typeScale 1.3: `LT` is fs(3.2) = 4.16mm, so its cap top is at `0.5 - 0.72*4.16` = -2.5.
+The loop baseline at +5.5 puts descenders at +6.17. The block spans **-2.5..+6.17** --
+8.7mm tall, centred at **+1.84**, i.e. sitting 1.84mm LOW in a bubble of radius
+`0.4 * size` = 4.00mm.
+
+So the loop number hung about **1.5mm out of the bottom of the circle**, on every
+instrument on every sheet. The bubble SIZE was never wrong. The block was simply not
+centred in it.
+
+The shift is now derived from the metrics (cap top to descender bottom, halved), which
+also makes it correct at any typeScale -- `fs()` and `sizeOf()` both scale but not by a
+guaranteed common factor, and a fixed offset only landed near-centre at one setting.
+
+```
+                     before    after
+  demo  [14] tag lines outside   5        1
+  spike [14] tag lines outside  18        6
+  spike worst overshoot        35%   ->  23%  (3-letter tags, see below)
+  spike loop-number overshoot  35%   ->   0.5% (4.02mm vs 4.00mm)
+```
+
+#### Two new checks, and what they cost
+
+`[12] MARKER SCALE` -- is the dot/arrow proportionate to its pipe? Proven both ways by
+construction, since pipe width is the variable: **3 hits at 0.6mm, 0 at 1.4mm**, with
+every other audit item identical.
+
+`[14] TAG INSIDE BUBBLE` -- does the tag ink fit its circle? It initially reported 18 on
+spike, of which **12 were 0.02mm over** -- float noise, and 12 false positives out of 18 is
+exactly how a guard trains its reader to ignore it (the failure mode that disarmed audit
+item `[1]` in 9.64). Now carries a **0.25mm print tolerance**, the conventional CAD
+plotting tolerance, and reports 6 on spike and 1 on the demo -- every genuine overshoot,
+and silent on the noise. The tolerance was chosen as the print tolerance and then verified
+to still fire; it was not chosen to make a number pass. `PID-INS-020` in the renderer uses
+the same 0.25mm, because a validator and an audit that disagree on a threshold are worse
+than either alone.
+
+**This made the scores worse, and the reason is worth more than the fix.**
+
+```
+            before    after
+  spike        879     914
+  dense        445     455
+  min           68      73
+  split         45      45
+  manifold     282     287
+```
+
+Attribution, by single-variable probe with hash-verified restore:
+
+- `processWidth` **refuted** -- 0.6 and 1.4 give identical `[3]=10 [4]=2 [7]=0` on spike.
+- `decrowdAir` cannot be it either: the floor kept the same value (14) under its new name.
+- The tag centring **is** it: forcing `shift = 0` restores `[3]=9 [4]=0 [7]=1`.
+
+And the mechanism is the finding. Moving the tag text by 1.8mm cannot move a pipe, a
+bubble or a tap leader -- yet the layout changed, because **the candidate score is computed
+from the annotation boxes, so a cosmetic text move re-rolls which layout wins.** The two
+spike candidates are near-tied and a 1.8mm shift breaks the tie arbitrarily, landing on a
+worse one: 2 new collinear tap/pipe overlaps, crossings 9->10, labels 1->0.
+
+So the search, not the fix, is what is fragile. Filed:
+
+- **T6.16** -- the candidate score must not depend on where a tag sits *inside its own
+  bubble*. The bubble does not move; the text inside it does. Score the bubble.
+- **T6.17** -- 3-letter tags (`FIC` `TIC` `LIC`) need a 4.93mm bubble and have 4.00mm.
+  The remedy is the symbol-bundle bubble size, because `symbolSize()` feeds BOTH
+  `entityHalf()` in the router and `sizeOf()` in the renderer. Growing it in the renderer
+  alone is what regressed before (spike 997 -> 1274), because the layout then reserves less
+  room than the drawing occupies. This is T6.15 in new clothes and it is still a legibility
+  call: bigger bubbles, or smaller letters.
+- **T6.18** -- spike's 2 new collinear tap/pipe overlaps. The engine's `lines.overlaps`
+  does not count a tap leader against a process pipe, so the search cannot see them.
+
+The centring is kept. It fixes a defect that is on every instrument on every sheet, and the
+cost is a fragile search re-rolling a near-tie -- which is now measured and filed rather
+than latent.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

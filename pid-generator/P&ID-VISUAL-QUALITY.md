@@ -2708,6 +2708,96 @@ Two things a real fix needs, neither cheap:
 Kept from the attempt: the knowledge that the metric counts characters, and therefore
 that **no amount of string-level cleverness will make it case-sensitive**. Anyone who
 picks this up again should start at the width model, not at the string.
+### 9.61 T3.7 closed — the premise was false, and so was the fix I built for it
+
+T3.7 claimed routing escaped its margins: "measured: `spike` lines reach x 830, past
+the 816 entity limit, and `spike` entities themselves reach 820, 4mm outside their own
+zone", and wanted a check that tests the zone rather than the sheet.
+
+**The claim is false, and it was a coordinate-space error.** Content sits inside
+`<g transform="translate(20 22)">`, so SVG/pre-margin coordinates are 20 less than
+sheet coordinates. 830 − 20 = 810, which is inside 816; 820 − 20 = 800, likewise. Both
+numbers were pre-margin values read as sheet values. This is the **fourth** time this
+trap has produced a false claim in this project, and the third time it was a number I
+had already written down.
+
+Measured properly, against every bound that matters:
+
+```
+  sheet 0..864 0..559     frame 18..846 / 18..541
+  SHEET (routing.sheetMargin 26) 26..838 / 26..533   <- what A* and PID-SHT-001 use
+  drawing zone (centring target) 48..816 / 42..481
+
+  case    verts  outSHEET  outFRAME  outZONE
+  demo     96         0          0         0
+  spike   192         0          0         2      <- 0.5mm on one line
+  dense    77         0          0         0
+  min      23         0          0         1      <- 8mm, a feed line from off-sheet
+  split    19         0          0         0
+```
+
+Nothing escapes SHEET anywhere. The 2 zone overshoots are 0.5mm and 8mm, the 8mm being
+`FEED-1 -> P-1` on the smallest sheet — a supply arriving from outside the battery
+limit, which *should* reach further left than the centring target, because the zone is
+a soft target for centring and not a hard bound.
+
+**There are four constants here and all of them are called "margin":**
+
+```
+  sheet edge                      0
+  border frame (printed)         18
+  SHEET / routing bound          26   <- A* bounds and PID-SHT-001
+  drawing zone (centring target) 48   <- layout.xMargin 60, halved
+```
+
+T3.7 exists because I read SHEET as the sheet edge and the zone as the same thing.
+That conflation is the whole defect, and it is a documentation defect rather than a
+code one.
+
+#### The check I built for it, and why it came out
+
+I added `PID-SHT-002`, asserting geometry stays inside the printed **frame** (18) rather
+than merely inside the sheet — reasoning that the safety was *coincidental*, holding only
+while `sheetMargin < 18`, so it should be asserted rather than inherited.
+
+**That reasoning was wrong in a way worth spelling out: 002 is strictly weaker than
+001.** Outside-SHEET (26) is a strict subset of outside-FRAME (18), so 002 can never
+fire on geometry 001 has not already reported. It is not a weaker check, it is a
+redundant one. Removed.
+
+It was also caught by a self-test that could not do its job. I tried to demonstrate the
+gap by loosening `sheetMargin` to 5, expecting 001 silent and 002 firing. Instead both
+went silent — because loosening the bound changes the layout, and the routes changed
+enough that nothing violated anything. **A self-test whose failure mode is "the thing
+under test stopped happening" is not a self-test of that thing.** The honest signal was
+in the impossibility argument above, which was available before I wrote any code.
+
+#### A probe that lied, and what it cost
+
+Midway through, a probe reported **21 `PID-SHT-001` warnings on spike** at the shipped
+default, and a `__pidGeo` scan reported **0 vertices outside SHEET**. Both cannot be
+true, and I spent real effort on it.
+
+Resolution: the probe was running with `PID-SHT-002` still in the tree. With the shipped
+code, `PID-SHT-001` fires **0 times, deterministic across 5 identical runs**, and 0
+vertices escape SHEET. The 21 is **not reproducible with shipped code and I could not
+explain it**, so I am recording it as unexplained rather than building on it. It is the
+one loose end here.
+
+Two process notes. First, the count itself was briefly wrong: I counted occurrences of
+the bare string `PID-SHT-001` in harness output, which matches a diagnostic list of
+every check code the validator knows about, and reported 21 "warnings" on a sheet that
+emits none. Count the message, not the code. Second, the toggle-a-rule-on-disk probe is
+genuinely dangerous: `harness2.mjs` exits non-zero when it emits warnings — which is
+exactly the outcome under test — and the throw skipped the restore, leaving
+`sheetMargin: 5` in the working tree. `spawnSync` plus `try/finally` is the only safe
+shape for that pattern, and the restore must be hash-verified.
+
+#### What T3.7 actually leaves behind
+
+No code change; the tree is byte-identical to the last commit. The deliverable is the
+four-constant table above, which should be the first thing anyone reads before touching
+margins again. `T3.7` is closed as **not a defect**.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

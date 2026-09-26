@@ -592,17 +592,42 @@ title. T3.6 is now closed and its six open questions are answered in place.
   retires the 0.55em and 1.15em guesses. A per-character table is the alternative and is
   worse, because the font is a CSS stack and the table would only be valid for the
   resolved face.
-- [ ] **T3.7** **Routing is bounded by the sheet, not by the placement zone.** Two
-  different things share the word "margin" and they are not the same. Entities are
-  placed inside x 48..816 / y 42..481 (`pid-router.js:823-831`), but the A* is bounded
-  only by `SHEET`, so **lines can enter the border frame and the title-block band** —
-  measured: `spike` lines reach x 830, past the 816 entity limit, and `spike` entities
-  themselves reach 820, 4 mm outside their own zone. `PID-SHT-001` only tests
-  off-sheet, so nothing reports either. Wants one shared margin constant, a check that
-  tests the zone rather than the sheet, and a decision on whether the title-block band
-  is hard-forbidden to routing. Directly relevant to T3.6, which will move the top
-  margin.
+- [x] **T3.7** **Routing margins — NOT A DEFECT. Premise and remedy both wrong.**
+  Closed 2026-09-26 (log 9.61), **no code change; the tree is byte-identical.**
 
+  The filed measurement was a coordinate-space error. Content sits inside
+  `<g transform="translate(20 22)">`, so the quoted x 830 and 820 were pre-margin
+  values read as sheet values: 830−20 = 810 and 820−20 = 800, both inside the 816 limit.
+  Fourth time this trap has produced a false claim here, third time from a number I had
+  already written down.
+
+  Measured against every bound, nothing escapes: 0 vertices outside SHEET on all five
+  sheets, 0 outside the frame, 0 off-sheet, 0 in the title-block band. The only zone
+  overshoots are 0.5mm (spike) and 8mm (`FEED-1 -> P-1` on min, a supply arriving from
+  off-sheet, which *should* exceed the centring target — the zone is a soft target, not
+  a hard bound).
+
+  *The deliverable is the four-constant table, which is a documentation defect, not a
+  code one — read it before touching margins again:*
+
+  ```
+  sheet edge                      0
+  border frame (printed)         18
+  SHEET / routing bound          26   <- A* bounds and PID-SHT-001 test this
+  drawing zone (centring target) 48   <- layout.xMargin 60, halved
+  ```
+
+  The requested check (test the zone, or the frame) was rejected on a proof, not a
+  measurement: outside-SHEET is a strict subset of outside-FRAME, so a frame check can
+  never fire on geometry PID-SHT-001 has not already reported. It is redundant, not
+  weaker. Built, caught, removed.
+
+  **One loose end, recorded rather than resolved:** a probe reported 21 PID-SHT-001
+  warnings on spike while a `__pidGeo` scan reported 0 escapes. It was running with the
+  redundant check still in the tree. With shipped code 001 fires 0 times, deterministic
+  over 5 runs. The 21 is **not reproducible and unexplained** — worth a look by whoever
+  next touches the validator, since if a 002-like change *can* perturb 001 that is a
+  coupling nobody intended.
 ## Sequenced recommendation
 
 If only three things get done, do these:

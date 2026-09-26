@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" >
+<line x1="60" y1="100" x2="60" y2="70" stroke="currentColor" stroke-width="2" fill="none"/><path d="M60 70 L45 60 L60 50 L45 40 L60 30 L45 20 L60 10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="70" x2="85" y2="70" stroke="currentColor" stroke-width="2" fill="none"/>
+</svg>

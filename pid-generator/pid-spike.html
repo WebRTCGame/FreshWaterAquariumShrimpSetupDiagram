@@ -10,115 +10,290 @@
       #pid-source { width: 100%; height: 130px; font-family: monospace; font-size: 11px; }
       .hint { font-size: 11px; color: #666; margin: 4px 0; }
       #graphDiv svg [data-pid-id] { cursor: grab; }
+      #toggles { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; align-items: center; }
+      #toggles label { font-size: 12px; display: flex; align-items: center; gap: 3px; cursor: pointer;
+        padding: 2px 8px; border: 1px solid #ccc; border-radius: 4px; background: #f8f8f8; user-select: none; }
+      #toggles label:hover { background: #e8e8e8; }
+      #toggles input:checked + span { font-weight: bold; }
+      #toggles .sep { width: 1px; height: 18px; background: #ccc; margin: 0 4px; }
+      .overlay-layer { pointer-events: none; }
+      /* ---- sheet viewer: fixed viewport, zoom/pan via viewBox only ---- */
+      /* The SVG is always the WHOLE sheet; zoom rewrites the viewBox window, so
+         no drawing coordinate is ever touched and exports stay 1:1. */
+      #graphWrap {
+        position: relative; height: 72vh; min-height: 420px; overflow: hidden;
+        border: 1px solid #d0d0d0; background: #f4f4f4; border-radius: 3px;
+        cursor: grab; touch-action: none; user-select: none;
+      }
+      #graphWrap.panning { cursor: grabbing; }
+      #graphDiv, #graphDiv svg { display: block; width: 100%; height: 100%; }
+      #zoombar { display: flex; gap: 6px; align-items: center; margin: 6px 0; }
+      #zoombar button {
+        padding: 2px 9px; cursor: pointer; font-size: 12px;
+        border: 1px solid #ccc; border-radius: 4px; background: #f8f8f8;
+      }
+      #zoombar button:hover { background: #e8e8e8; }
+      #zoomPct { font-size: 12px; color: #555; min-width: 52px; text-align: center; }
+      #zoomHint { font-size: 11px; color: #666; }
+      #zoombar .sep { width: 1px; height: 18px; background: #ccc; margin: 0 4px; }
     </style>
   </head>
   <body>
     <div id="status">rendering...</div>
     <div id="warnings"></div>
     <div class="hint">Drag any component to reposition it - the DSL source below updates automatically.</div>
-    <div id="graphDiv"></div>
+    <div id="toggles">
+      <label><input type="checkbox" id="tog-grid" onchange="drawOverlays()"><span>Grid</span></label>
+      <label><input type="checkbox" id="tog-sheet" onchange="drawOverlays()"><span>Sheet bounds</span></label>
+      <div class="sep"></div>
+      <label><input type="checkbox" id="tog-bbox" onchange="drawOverlays()"><span>Component boxes</span></label>
+      <label><input type="checkbox" id="tog-exclusion" onchange="drawOverlays()"><span>Exclusion zones</span></label>
+      <label><input type="checkbox" id="tog-ports" onchange="drawOverlays()"><span>Ports & nozzles</span></label>
+      <div class="sep"></div>
+      <label><input type="checkbox" id="tog-pipes" onchange="drawOverlays()"><span>Pipe routes</span></label>
+      <label><input type="checkbox" id="tog-crossings" onchange="drawOverlays()"><span>Crossings</span></label>
+      <label><input type="checkbox" id="tog-labels" onchange="drawOverlays()"><span>Label boxes</span></label>
+      <div class="sep"></div>
+      <label><input type="checkbox" id="tog-all" onchange="toggleAll(this.checked)"><span>All</span></label>
+    </div>
+    <button id="exportSvg" onclick="exportSVG()" style="margin: 4px 0; padding: 4px 12px; cursor: pointer;">Export SVG</button>
+    <div id="zoombar">
+      <button id="zoomOut" title="Zoom out">&minus;</button>
+      <span id="zoomPct">100%</span>
+      <button id="zoomIn" title="Zoom in">+</button>
+      <button id="zoomFit" title="Fit the whole sheet (F)">Fit sheet</button>
+      <button id="zoomOne" title="True 1:1 — one SVG unit = 1mm (0)">1:1</button>
+      <span id="zoomHint">wheel = zoom &middot; drag empty space = pan &middot; drag a symbol = move it</span>
+      <span class="sep"></span>
+      <button id="themeBtn" title="Toggle CAD (black model space, colour per layer) / Print (dark ink on white)">Theme: Print</button>
+    </div>
+    <div id="graphWrap"><div id="graphDiv"></div></div>
     <hr>
     <textarea id="pid-source" spellcheck="false"></textarea>
-    <script src="pid-svg-library/bundle/symbols.js"></script>
-    <script src="P&IDGenerator.js"></script>
+    <script src="pid-rules.js?v=20260920"></script>
+    <script src="pid-collide.js?v=20260920"></script>
+    <script src="geometric_objects.js?v=20260920"></script>
+    <script src="pid-symbols-bundle.js?v=20260920"></script>
+    <script src="pid-parser.js?v=20260920"></script>
+    <script src="pid-router.js?v=20260920"></script>
+    <script src="pid-validator.js?v=20260920"></script>
+    <script src="pid-renderer.js?v=20260920"></script>
     <script>
       const pidSource = `pid
 layout auto
 fit page
 stub 8
-title "Reactor & Distillation Unit"
-project "PID Generator Demo"
+title "TK-101 Pump-Out to Battery Limit"
+project "Tank Farm - Product Pumphouse"
 sheet 1 of 1
-rev "A" "2026-08-16" "Initial issue"
+rev "1" "2026-09-06" "Issued for Review"
 
-line N2-001 size 4 service PG number 101 spec 1E1 ins H thick 50 trace T
-line N2-002 size 3 service PW number 102 spec 1E1 ins H thick 50 trace T
-line N2-003 size 2 service PW number 103 spec 1E1 ins H thick 50 trace T
-line N2-004 size 2 service CW number 104 spec 1E1 ins H thick 50 trace T
-line N2-005 size 2 service CW number 105 spec 1E1 ins H thick 50 trace T
-line N2-006 size 3 service PW number 106 spec 1E1 ins H thick 50 trace T
+line L-101 size 4 service HC number 101 spec 1C1 ins H thick 25
+line L-102 size 3 service HC number 102 spec 1C1 ins H thick 25
+line L-104 size 2 service HC number 104 spec 1C1
 
 version 1
 
-equipment T-101 tank
-valve V-101 gate
-equipment P-101 pump
-instrument FT-101 field
-instrument FIC-101 dcs
-valve FV-101 control
-valve PSV-101 relief above R-101 offset 40,0
-equipment R-101 reactor
-instrument TT-101 field
-instrument TIC-101 dcs
-valve V-102 control
-equipment C-101 tower
-instrument LT-101 field
-instrument LIC-101 dcs
-equipment E-101 kettle-reboiler
-valve V-103 control
-equipment P-103 pump
-instrument FT-103 field
-instrument FIC-103 dcs
-stub UTIL-1
-stub UTIL-2
-stub FLARE-1
-junction J-3
-junction J-4
-equipment E-102 heat-exchanger
-instrument PT-101 field
-instrument PIC-101 dcs
-equipment D-101 drum
-valve V-105 control rotated 90
-equipment P-102 pump
-instrument LT-102 field
-instrument LIC-102 dcs
-equipment E-103 heat-exchanger
-equipment T-102 tank
+equipment TK-101 tank "Product storage tank" service "Storage" area "Tank Farm" status existing
+nozzle NZ-TK-O on TK-101 port outlet size 4" rating 150
+nozzle NZ-TK-LT on TK-101 port top size 2" rating 150
+equipment P-101 pump "Loading pump" service "Transfer" area "Pumphouse" status existing
+nozzle NZ-P101-S on P-101 port suction size 4" rating 150
+nozzle NZ-P101-D on P-101 port discharge size 3" rating 150
+valve V-101 gate "Suction block" normal open
+valve V-102 check "Discharge check"
+valve V-103 gate "Manifold inlet block" normal open
+valve FV-101 control "Flow control" normal open fail closed mode auto
+valve V-104 gate "Manifold outlet block" normal open
+valve V-105 gate "Bypass block" normal closed
+valve V-106 gate "Tank drain" normal closed
+valve PSV-101 relief "Thermal relief" set-pressure 150psi
+nozzle NZ-PSV101 on PSV-101 port inlet size 2" rating 150
+junction J-0
+junction J-1
+junction J-2
+offpage OP-101 ref "Battery limit, to loading"
+offpage OP-CD ref "Closed drain header"
+instrument LT-101 field "Tank level transmitter" service "Storage"
+instrument FT-101 field "Loading flow transmitter" service "Transfer"
+instrument FIC-101 dcs "Loading flow controller" loop 101
+instrument PI-101 field "Discharge pressure gauge" service "Transfer"
 
-T-101.outlet -> V-101 line N2-001
-V-101 -> P-101 line N2-001
-P-101 -> FV-101 line N2-001
-FV-101 -> R-101.left line N2-001
-R-101.right -> V-102.left line N2-002
-V-102.right -> C-101.feed line N2-002
-C-101.overhead -> E-102.tube_in line N2-003
-E-102.tube_out -> D-101.inlet line N2-003
-D-101.outlet -> P-102.suction line N2-003
-P-102.discharge -> J-4
-J-4 -> V-105.left line N2-004
-V-105.right -> C-101.reflux line N2-004
-J-4 -> E-103.tube_in line N2-005
-E-103.tube_out -> J-3 line N2-005
-C-101.bottoms -> E-101.inlet line N2-006
-E-101.outlet -> V-103 line N2-006
-V-103 -> P-103 line N2-006
-P-103 -> J-3 line N2-006
-J-3 -> T-102 line N2-006
-R-101.top -> PSV-101
-PSV-101 -> FLARE-1
-UTIL-1 -> E-102.shell_in line N2-004
-E-102.shell_out -> UTIL-2
+TK-101.outlet -> J-0 line L-101 flow forward
+J-0 -> V-101.left line L-101 flow forward
+V-101.right -> P-101.suction line L-101 flow forward
+J-0 -> V-106.left line L-104 flow forward
+V-106.right -> OP-CD line L-104 flow forward
+P-101.discharge -> V-102.left line L-102 flow forward
+V-102.right -> J-1 line L-102 flow forward
+J-1 -> V-103.left line L-102 flow forward
+V-103.right -> FV-101.left line L-102 flow forward
+FV-101.right -> V-104.left line L-102 flow forward
+V-104.right -> J-2 line L-102 flow forward
+J-1 -> V-105.left line L-102 flow forward
+V-105.right -> J-2 line L-102 flow forward
+J-2 -> OP-101 line L-102 flow forward
+J-1 -> PSV-101.inlet
+PSV-101.discharge -> OP-CD
+protects PSV-101 -> P-101
+discharges PSV-101 -> OP-CD
 
+tap LT-101 -> TK-101.top
+tap FT-101 -> P-101.discharge.line
+tap PI-101 -> P-101.discharge.line
 signal FT-101 -> FIC-101 electrical
-tap FT-101 -> P-101
 signal FIC-101 -> FV-101 electrical
-signal TT-101 -> TIC-101 electrical
-tap TT-101 -> R-101
-signal LT-101 -> LIC-101 electrical
-tap LT-101 -> C-101
-signal LIC-101 -> V-103 electrical
-signal PT-101 -> PIC-101 electrical
-tap PT-101 -> D-101
-signal LT-102 -> LIC-102 electrical
-tap LT-102 -> D-101
-signal FT-103 -> FIC-103 electrical
-tap FT-103 -> P-103
-signal LIC-102 -> P-102 electrical
-signal PIC-101 -> V-105 electrical
-signal TIC-101 -> V-102 electrical
+alarm LAH-101 from LT-101 condition high
+alarm LAL-101 from LT-101 condition low
 `;
 
       let pidResult = null;
+
+      // ---- sheet viewer (viewBox zoom/pan) --------------------------------
+      // ponytail: the printed sheet is a fixed ARCH/ANSI D, and at 1 unit = 1mm
+      // that is ~909 units wide — roughly 2.5 screens. So the whole sheet can
+      // never be shown at 1:1; the default view is "fit", and zoom exists so the
+      // reader can stop seeing everything at once. That is correct sheet-viewer
+      // behaviour, not a defect.
+      //
+      // CRITICAL: this is a VIEW transform only. Zoom rewrites the viewBox and
+      // never a drawing coordinate, so a zoomed screen still exports a 1:1 sheet.
+      const view = { k: 1, cx: 0, cy: 0, ready: false };
+      const KMIN = 0.15, KMAX = 12;
+
+      function sheetSize() {
+        // Authoritative source is the MODEL, never the live viewBox. applyView()
+        // rewrites the viewBox, so reading it back feeds the zoomed window in as
+        // if it were the sheet — a feedback bug that made "Fit sheet" emit a
+        // corrupt viewBox after any zoom (and would have cropped exports).
+        const v = pidResult && pidResult.data && pidResult.data.view;
+        if (v && +v.sheetW > 0 && +v.sheetH > 0) return { w: +v.sheetW, h: +v.sheetH };
+        const svg = document.getElementById('graphDiv-svg');
+        const m = svg && svg.getAttribute('viewBox');
+        if (m) { const p = m.split(/[\s,]+/).map(Number); if (p.length === 4 && p[2] > 0) return { w: p[2], h: p[3] }; }
+        return { w: 864, h: 559 };
+      }
+      // Rewrite the viewBox window from the view state. Nothing else changes.
+      function applyView() {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) return;
+        const { w, h } = sheetSize();
+        const vw = w / view.k, vh = h / view.k;
+        view.cx = Math.max(vw / 2, Math.min(w - vw / 2, view.cx));
+        view.cy = Math.max(vh / 2, Math.min(h - vh / 2, view.cy));
+        svg.setAttribute('viewBox', `${view.cx - vw / 2} ${view.cy - vh / 2} ${vw} ${vh}`);
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        const z = document.getElementById('zoomPct');
+        if (z) z.textContent = Math.round(view.k * 100) + '%';
+      }
+      function setZoom(k, anchorClientX, anchorClientY) {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) return;
+        const { w, h } = sheetSize();
+        const r = svg.getBoundingClientRect();
+        // preserveAspectRatio=meet letterboxes; find the drawn sub-rect so the
+        // point under the cursor stays under the cursor.
+        const scale = Math.min(r.width / w, r.height / h);
+        const offX = (r.width - w * scale) / 2, offY = (r.height - h * scale) / 2;
+        const ax = anchorClientX !== undefined ? (anchorClientX - r.left - offX) / scale : view.cx;
+        const ay = anchorClientY !== undefined ? (anchorClientY - r.top - offY) / scale : view.cy;
+        const nk = Math.max(KMIN, Math.min(KMAX, k));
+        if (nk === view.k) return;
+        // keep the anchor point fixed: it sits at fraction f of the window, and
+        // the window shrinks by nk/k, so the centre must move to compensate.
+        const fx = (ax - view.cx) / (w / view.k), fy = (ay - view.cy) / (h / view.k);
+        view.cx = ax - fx * (w / nk);
+        view.cy = ay - fy * (h / nk);
+        view.k = nk;
+        applyView();
+      }
+      function fitSheet() { view.k = 1; const { w, h } = sheetSize(); view.cx = w / 2; view.cy = h / 2; applyView(); }
+      function zoomOneToOne() {
+        // 1:1 means one SVG unit = one CSS pixel. The wrapper is sized in px, so
+        // k is (sheet mm) / (wrapper px) — i.e. fit scaled up to true size.
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) return;
+        const r = svg.getBoundingClientRect();
+        const { w, h } = sheetSize();
+        const scale = Math.min(r.width / w, r.height / h);
+        view.k = 1 / scale; view.cx = view.cx; view.cy = view.cy; applyView();
+      }
+
+      function enableViewer() {
+        const wrap = document.getElementById('graphWrap');
+        const svg = document.getElementById('graphDiv-svg');
+        if (!wrap || !svg || wrap.dataset.viewerOn === '1') return;
+        wrap.dataset.viewerOn = '1';
+
+        wrap.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          setZoom(view.k * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX, e.clientY);
+        }, { passive: false });
+
+        // Pan on empty space only. A pointerdown that lands on a symbol is left
+        // alone so drag-to-move + toSource round-trip keeps working.
+        wrap.addEventListener('pointerdown', (e) => {
+          const onSymbol = e.target.closest && e.target.closest('[data-pid-id]');
+          const wantPan = e.button === 1 || e.shiftKey || !onSymbol;
+          if (!wantPan) return;
+          e.preventDefault();
+          wrap.classList.add('panning');
+          const start = { x: e.clientX, y: e.clientY, cx: view.cx, cy: view.cy };
+          const move = (ev) => {
+            const svg2 = document.getElementById('graphDiv-svg');
+            if (!svg2) return;
+            const r = svg2.getBoundingClientRect();
+            const { w, h } = sheetSize();
+            const scale = Math.min(r.width / w, r.height / h);
+            view.cx = start.cx - (ev.clientX - start.x) / scale;
+            view.cy = start.cy - (ev.clientY - start.y) / scale;
+            applyView();
+          };
+          const up = () => {
+            wrap.classList.remove('panning');
+            window.removeEventListener('pointermove', move);
+            window.removeEventListener('pointerup', up);
+          };
+          window.addEventListener('pointermove', move);
+          window.addEventListener('pointerup', up);
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (/INPUT|TEXTAREA|SELECT/.test(document.activeElement && document.activeElement.tagName)) return;
+        if (e.key === 'f' || e.key === 'F') { fitSheet(); e.preventDefault(); }
+        else if (e.key === '0') { zoomOneToOne(); e.preventDefault(); }
+        else if (e.key === '+' || e.key === '=') { setZoom(view.k * 1.25); e.preventDefault(); }
+        else if (e.key === '-') { setZoom(view.k / 1.25); e.preventDefault(); }
+      });
+      document.getElementById('zoomFit').addEventListener('click', fitSheet);
+      document.getElementById('zoomOne').addEventListener('click', zoomOneToOne);
+      document.getElementById('zoomIn').addEventListener('click', () => setZoom(view.k * 1.25));
+      document.getElementById('zoomOut').addEventListener('click', () => setZoom(view.k / 1.25));
+
+      // ---- drafting theme toggle (D4) ---------------------------------------
+      // CAD = black model space, one colour per layer (AutoCAD-style).
+      // Print = dark ink on white: the ARCH/ANSI D deliverable.
+      // Re-renders rather than restyles: the theme is baked into the emitted SVG
+      // (stylesheet + background rect), which is what makes an EXPORTED file
+      // self-contained and correct in any viewer.
+      let curTheme = 'print';
+      function applyThemeChrome(theme) {
+        curTheme = theme;
+        const b = document.getElementById('themeBtn');
+        if (b) b.textContent = 'Theme: ' + (theme === 'cad' ? 'CAD' : 'Print');
+        // the letterbox around the sheet must not glare against a black sheet
+        const wrap = document.getElementById('graphWrap');
+        if (wrap) { wrap.style.background = theme === 'cad' ? '#101010' : '#f4f4f4'; }
+      }
+      function renderTheme(theme) {
+        applyThemeChrome(theme);
+        pidResult = PIDGenerator.renderPid(pidSource, 'graphDiv', { theme });
+        enableDrag(); enableViewer(); applyView(); drawOverlays();
+      }
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        renderTheme(curTheme === 'cad' ? 'print' : 'cad');
+      });
 
       function enableDrag() {
         const svg = document.getElementById('graphDiv-svg');
@@ -140,7 +315,7 @@ signal TIC-101 -> V-102 electrical
         });
         svg.addEventListener('pointermove', (e) => {
           if (!dragging) return;
-          const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+          const grid = (pidResult.data.view && pidResult.data.view.grid) || 5;
           const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
           const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
           dragging.grp.setAttribute('transform', `translate(${dx} ${dy})`);
@@ -148,7 +323,7 @@ signal TIC-101 -> V-102 electrical
         svg.addEventListener('pointerup', (e) => {
           if (!dragging) return;
           try {
-            const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+            const grid = (pidResult.data.view && pidResult.data.view.grid) || 5;
             const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
             const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
             const entity = [...pidResult.data.equipment, ...pidResult.data.valves,
@@ -162,6 +337,9 @@ signal TIC-101 -> V-102 electrical
             pidResult = PIDGenerator.renderPid(src, 'graphDiv');
             document.getElementById('status').textContent = 'UPDATED - component moved, source regenerated';
             enableDrag();
+            enableViewer();
+            applyView();   // keep the reader's zoom/pan across the re-render
+            drawOverlays();
           } catch (err) {
             console.error('drag update failed:', err);
             document.getElementById('status').textContent = 'FAIL on update: ' + err.message;
@@ -193,11 +371,242 @@ signal TIC-101 -> V-102 electrical
           document.getElementById('warnings').textContent = errTxt +
             (pidResult.warnings.length ? 'WARNINGS:\n' + pidResult.warnings.join('\n') : '');
           enableDrag();
+          enableViewer();
+          fitSheet();
+          drawOverlays();
         } catch (e) {
           document.getElementById('status').textContent = 'FAIL: ' + e.message;
           console.error(e);
         }
       })();
+      function exportSVG() {
+        // Export is the PRINT deliverable, full 1:1 sheet, whatever is on screen.
+        // So build it from a throwaway print-theme render into a DETACHED
+        // container — re-rendering into #graphDiv would replace the drawing the
+        // reader is looking at, and cloning the live SVG would bake in the
+        // current zoom AND the current theme.
+        const host = document.createElement('div');
+        host.id = 'pidExportHost';
+        host.style.display = 'none';
+        document.body.appendChild(host);
+        let svg;
+        try {
+          PIDGenerator.renderPid(pidSource, 'pidExportHost', { theme: 'print' });
+          svg = document.getElementById('pidExportHost-svg');
+        } finally {
+          host.remove();
+        }
+        if (!svg) { alert('No SVG rendered yet'); return; }
+        // ponytail: XMLSerializer, not outerHTML — HTML serialization drops the
+        // xmlns and leaves void elements unclosed, so the file breaks standalone.
+        // Force the explicit sheet window: the renderer already emits 0 0 W H
+        // here, but pinning it means export can never inherit a viewer viewBox.
+        const full = sheetSize();
+        svg.setAttribute('viewBox', `0 0 ${full.w} ${full.h}`);
+        svg.setAttribute('width', full.w);
+        svg.setAttribute('height', full.h);
+        const clone = svg.cloneNode(true);
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        clone.setAttribute('font-family', 'sans-serif');
+        const svgData = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pid-spike-export.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // ---- overlay system ----
+      function toggleAll(checked) {
+        document.querySelectorAll('#toggles input[type=checkbox]:not(#tog-all)')
+          .forEach(cb => { cb.checked = checked; });
+        drawOverlays();
+      }
+      function isOn(id) { return document.getElementById(id).checked; }
+      function ns(tag) { return document.createElementNS('http://www.w3.org/2000/svg', tag); }
+      function attrs(el, a) { for (const [k,v] of Object.entries(a)) el.setAttribute(k, v); }
+
+      function drawOverlays() {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg || !pidResult) return;
+        // remove old overlay layer
+        const old = svg.getElementById('pid-overlays');
+        if (old) old.remove();
+        if (!isOn('tog-grid') && !isOn('tog-sheet') && !isOn('tog-bbox') &&
+            !isOn('tog-exclusion') && !isOn('tog-ports') && !isOn('tog-pipes') &&
+            !isOn('tog-crossings') && !isOn('tog-labels')) return;
+        const g = ns('g'); g.id = 'pid-overlays'; g.classList.add('overlay-layer');
+        const data = pidResult.data;
+        const grid = data.view.grid || 5;
+        const sw = data.view.sheetW || 864, sh = data.view.sheetH || 559;
+
+        // -- Grid --
+        if (isOn('tog-grid')) {
+          const gg = ns('g'); gg.setAttribute('opacity', '0.15');
+          for (let x = 0; x <= sw; x += grid) {
+            const l = ns('line'); attrs(l, { x1: x, y1: 0, x2: x, y2: sh, stroke: '#888', 'stroke-width': 0.3 });
+            gg.appendChild(l);
+          }
+          for (let y = 0; y <= sh; y += grid) {
+            const l = ns('line'); attrs(l, { x1: 0, y1: y, x2: sw, y2: y, stroke: '#888', 'stroke-width': 0.3 });
+            gg.appendChild(l);
+          }
+          g.appendChild(gg);
+        }
+
+        // -- Sheet bounds --
+        if (isOn('tog-sheet')) {
+          const r = ns('rect'); attrs(r, { x: 0, y: 0, width: sw, height: sh,
+            fill: 'none', stroke: '#d32f2f', 'stroke-width': 1.5, 'stroke-dasharray': '6 3' });
+          g.appendChild(r);
+          // margins
+          const xm = data.view.xMargin || 60, ym = data.view.yMargin || 118;
+          const mr = ns('rect'); attrs(mr, { x: xm, y: ym, width: sw - 2*xm, height: sh - 2*ym,
+            fill: 'none', stroke: '#d32f2f', 'stroke-width': 0.5, 'stroke-dasharray': '3 3', opacity: 0.4 });
+          g.appendChild(mr);
+          // sheet label
+          const t = ns('text'); attrs(t, { x: 4, y: 12, fill: '#d32f2f', 'font-size': 5, opacity: 0.6 });
+          t.textContent = `Sheet ${sw}x${sh}mm`; g.appendChild(t);
+        }
+
+        // -- Component bounding boxes --
+        if (isOn('tog-bbox')) {
+          const SC = data.view.symbolScale || 1;
+          for (const e of [...data.equipment, ...data.valves]) {
+            const sym = e.symbol || (PIDEngine._isInst ? 'instrument-bubble' : 'pip/equipment/vessel-vertical');
+            // approximate size from glyph registry
+            let sz = 20;
+            try { sz = glyphSizeOf(e.symbol || 'pip/equipment/vessel-vertical') * (e.scale || 1) * SC; } catch {}
+            const r = ns('rect'); attrs(r, { x: e.x - sz/2, y: e.y - sz/2, width: sz, height: sz,
+              fill: '#2196f3', 'fill-opacity': 0.06, stroke: '#2196f3', 'stroke-width': 0.3, 'stroke-dasharray': '2 2' });
+            g.appendChild(r);
+            // label
+            const t = ns('text'); attrs(t, { x: e.x - sz/2, y: e.y - sz/2 - 1.5, fill: '#2196f3', 'font-size': 3.5, opacity: 0.6 });
+            t.textContent = e.id; g.appendChild(t);
+          }
+          for (const inst of data.instruments) {
+            const r = ns('rect'); attrs(r, { x: inst.x - 8, y: inst.y - 8, width: 16, height: 16,
+              fill: '#9c27b0', 'fill-opacity': 0.06, stroke: '#9c27b0', 'stroke-width': 0.3, 'stroke-dasharray': '2 2' });
+            g.appendChild(r);
+          }
+        }
+
+        // -- Exclusion zones (component bodies + padding) --
+        if (isOn('tog-exclusion')) {
+          const PAD = 4;
+          for (const e of [...data.equipment, ...data.valves]) {
+            let sz = 20;
+            try { sz = glyphSizeOf(e.symbol || 'pip/equipment/vessel-vertical') * (e.scale || 1) * (data.view.symbolScale || 1); } catch {}
+            const r = ns('rect'); attrs(r, { x: e.x - sz/2 - PAD, y: e.y - sz/2 - PAD,
+              width: sz + 2*PAD, height: sz + 2*PAD,
+              fill: '#f44336', 'fill-opacity': 0.04, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
+            g.appendChild(r);
+          }
+          // junction exclusion (6mm radius)
+          for (const j of data.junctions) {
+            const c = ns('circle'); attrs(c, { cx: j.x, cy: j.y, r: 6,
+              fill: '#f44336', 'fill-opacity': 0.04, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
+            g.appendChild(c);
+          }
+          // instrument exclusion (14mm radius)
+          for (const i of data.instruments) {
+            const c = ns('circle'); attrs(c, { cx: i.x, cy: i.y, r: 14,
+              fill: '#f44336', 'fill-opacity': 0.03, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
+            g.appendChild(c);
+          }
+        }
+
+        // -- Ports & nozzle tips --
+        if (isOn('tog-ports')) {
+          for (const nz of (data.nozzles || [])) {
+            if (nz.tipPosition) {
+              const c = ns('circle'); attrs(c, { cx: nz.tipPosition.x, cy: nz.tipPosition.y, r: 1.5,
+                fill: '#ff9800', stroke: '#e65100', 'stroke-width': 0.3 });
+              g.appendChild(c);
+            }
+            if (nz.position) {
+              const c = ns('circle'); attrs(c, { cx: nz.position.x, cy: nz.position.y, r: 1,
+                fill: 'none', stroke: '#ff9800', 'stroke-width': 0.3 });
+              g.appendChild(c);
+            }
+          }
+          // junction dots
+          for (const j of data.junctions) {
+            const c = ns('circle'); attrs(c, { cx: j.x, cy: j.y, r: 2,
+              fill: '#4caf50', stroke: '#2e7d32', 'stroke-width': 0.3 });
+            g.appendChild(c);
+          }
+        }
+
+        // -- Pipe routing paths --
+        if (isOn('tog-pipes')) {
+          const geos = globalThis.__pidGeo || [];
+          for (const geo of geos) {
+            if (geo.pts.length < 2) continue;
+            const d = geo.pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+            const path = ns('path'); attrs(path, { d, fill: 'none',
+              stroke: geo.tap ? '#ff5722' : (geo.kind === 'signal' ? '#9c27b0' : '#2196f3'),
+              'stroke-width': geo.tap ? 0.4 : 0.6, opacity: 0.7, 'stroke-linejoin': 'round' });
+            g.appendChild(path);
+            // direction arrow at midpoint
+            if (geo.pts.length >= 2) {
+              const mid = Math.floor(geo.pts.length / 2);
+              const a = geo.pts[mid - 1] || geo.pts[0], b = geo.pts[mid];
+              const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+              const ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+              const arrow = ns('polygon');
+              attrs(arrow, { points: '-2,-1 2,0 -2,1', fill: '#2196f3', opacity: 0.5,
+                transform: `translate(${mx.toFixed(1)},${my.toFixed(1)}) rotate(${ang.toFixed(0)})` });
+              g.appendChild(arrow);
+            }
+          }
+        }
+
+        // -- Crossings --
+        if (isOn('tog-crossings')) {
+          const geos = globalThis.__pidGeo || [];
+          for (let i = 0; i < geos.length; i++) {
+            for (let j = i + 1; j < geos.length; j++) {
+              const segsI = PIDEngine.segs(geos[i].pts);
+              const segsJ = PIDEngine.segs(geos[j].pts);
+              for (const si of segsI) for (const sj of segsJ) {
+                const x = PIDEngine.crossing(si, sj);
+                if (x && PIDEngine.isRealCrossing(si, sj)) {
+                  const c = ns('circle'); attrs(c, { cx: x.x, cy: x.y, r: 3,
+                    fill: 'none', stroke: '#f44336', 'stroke-width': 0.5, 'stroke-dasharray': '1 1' });
+                  g.appendChild(c);
+                  const t = ns('text'); attrs(t, { x: x.x + 3, y: x.y - 2, fill: '#f44336', 'font-size': 3, opacity: 0.7 });
+                  t.textContent = 'X'; g.appendChild(t);
+                }
+              }
+            }
+          }
+        }
+
+        // -- Label collision boxes --
+        if (isOn('tog-labels')) {
+          const texts = svg.querySelectorAll('text');
+          for (const t of texts) {
+            const content = t.textContent.trim();
+            if (!content) continue;
+            const x = parseFloat(t.getAttribute('x'));
+            const y = parseFloat(t.getAttribute('y'));
+            if (isNaN(x) || isNaN(y)) continue;
+            const fs = parseFloat(t.getAttribute('font-size')) || 4;
+            const w = content.length * fs * 0.55;
+            const h = fs * 1.2;
+            const mid = t.getAttribute('text-anchor') === 'middle';
+            const r = ns('rect'); attrs(r, {
+              x: mid ? x - w/2 : x, y: y - h, width: w, height: h,
+              fill: '#4caf50', 'fill-opacity': 0.05, stroke: '#4caf50', 'stroke-width': 0.15 });
+            g.appendChild(r);
+          }
+        }
+
+        svg.appendChild(g);
+      }
     </script>
   </body>
 </html>

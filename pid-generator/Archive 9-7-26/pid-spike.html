@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>pid spike</title>
+    <style>
+      body { font-family: sans-serif; margin: 8px; }
+      #status { font-weight: bold; }
+      #warnings { color: #b45309; font-size: 12px; margin: 6px 0; white-space: pre-wrap; }
+      #pid-source { width: 100%; height: 130px; font-family: monospace; font-size: 11px; }
+      .hint { font-size: 11px; color: #666; margin: 4px 0; }
+      #graphDiv svg [data-pid-id] { cursor: grab; }
+    </style>
+  </head>
+  <body>
+    <div id="status">rendering...</div>
+    <div id="warnings"></div>
+    <div class="hint">Drag any component to reposition it - the DSL source below updates automatically.</div>
+    <button id="exportSvg" onclick="exportSVG()" style="margin: 4px 0; padding: 4px 12px; cursor: pointer;">Export SVG</button>
+    <div id="graphDiv"></div>
+    <hr>
+    <textarea id="pid-source" spellcheck="false"></textarea>
+    <script src="pid-rules.js?v=1788022128"></script>
+    <script src="pid-collide.js?v=1788022128"></script>
+    <script src="geometric_objects.js?v=1788022128"></script>
+    <script src="pid-symbols-bundle.js?v=1788022128"></script>
+    <script src="pid-parser.js?v=1788022128"></script>
+    <script src="pid-router.js?v=1788022128"></script>
+    <script src="pid-validator.js?v=1788022128"></script>
+    <script src="pid-renderer.js?v=1788025639"></script>
+    <script>
+      const pidSource = `pid
+layout auto
+fit page
+stub 8
+title "TK-101 Pump-Out to Battery Limit"
+project "Tank Farm - Product Pumphouse"
+sheet 1 of 1
+rev "1" "2026-09-06" "Issued for Review"
+
+line L-101 size 4 service HC number 101 spec 1C1 ins H thick 25
+line L-102 size 3 service HC number 102 spec 1C1 ins H thick 25
+line L-104 size 2 service HC number 104 spec 1C1
+
+version 1
+
+equipment TK-101 tank "Product storage tank" service "Storage" area "Tank Farm" status existing
+nozzle NZ-TK-O on TK-101 port outlet size 4" rating 150
+nozzle NZ-TK-LT on TK-101 port top size 2" rating 150
+equipment P-101 pump "Loading pump" service "Transfer" area "Pumphouse" status existing
+nozzle NZ-P101-S on P-101 port suction size 4" rating 150
+nozzle NZ-P101-D on P-101 port discharge size 3" rating 150
+valve V-101 gate "Suction block" normal open
+valve V-102 check "Discharge check"
+valve V-103 gate "Manifold inlet block" normal open
+valve FV-101 control "Flow control" normal open fail closed mode auto
+valve V-104 gate "Manifold outlet block" normal open
+valve V-105 gate "Bypass block" normal closed
+valve V-106 gate "Tank drain" normal closed
+valve PSV-101 relief "Thermal relief" set-pressure 150psi
+nozzle NZ-PSV101 on PSV-101 port inlet size 2" rating 150
+junction J-0
+junction J-1
+junction J-2
+offpage OP-101 ref "Battery limit, to loading"
+offpage OP-CD ref "Closed drain header"
+instrument LT-101 field "Tank level transmitter" service "Storage"
+instrument FT-101 field "Loading flow transmitter" service "Transfer"
+instrument FIC-101 dcs "Loading flow controller" loop 101
+instrument PI-101 field "Discharge pressure gauge" service "Transfer"
+
+TK-101.outlet -> J-0 line L-101
+J-0 -> V-101.left line L-101
+V-101.right -> P-101.suction line L-101
+J-0 -> V-106.left line L-104
+V-106.right -> OP-CD line L-104
+P-101.discharge -> V-102.left line L-102
+V-102.right -> J-1 line L-102
+J-1 -> V-103.left line L-102
+V-103.right -> FV-101.left line L-102
+FV-101.right -> V-104.left line L-102
+V-104.right -> J-2 line L-102
+J-1 -> V-105.left line L-102
+V-105.right -> J-2 line L-102
+J-2 -> OP-101 line L-102
+J-1 -> PSV-101.inlet
+PSV-101.discharge -> OP-CD
+protects PSV-101 -> P-101
+discharges PSV-101 -> OP-CD
+
+tap LT-101 -> TK-101.top
+tap FT-101 -> P-101.discharge.line
+tap PI-101 -> P-101.discharge.line
+signal FT-101 -> FIC-101 electrical
+signal FIC-101 -> FV-101 electrical
+alarm LAH-101 from LT-101 condition high
+alarm LAL-101 from LT-101 condition low
+`;
+
+      let pidResult = null;
+
+      function enableDrag() {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) return;
+        let dragging = null;
+        svg.addEventListener('pointerdown', (e) => {
+          const chipEl = e.target.closest('[data-pid-id]');
+          if (!chipEl) return;
+          const wrap = svg.querySelector('g[transform*="scale"]');
+          const ctm = wrap ? wrap.getCTM() : svg.getCTM();
+          dragging = {
+            id: chipEl.getAttribute('data-pid-id'),
+            grp: chipEl.closest('g[data-pid-id]') || chipEl,
+            startX: e.clientX, startY: e.clientY,
+            scale: ctm ? ctm.a : 1
+          };
+          dragging.grp.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+        svg.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+          const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
+          const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
+          dragging.grp.setAttribute('transform', `translate(${dx} ${dy})`);
+        });
+        svg.addEventListener('pointerup', (e) => {
+          if (!dragging) return;
+          try {
+            const grid = (pidResult.data.view && pidResult.data.view.grid) || 20;
+            const dx = Math.round((e.clientX - dragging.startX) / dragging.scale / grid) * grid;
+            const dy = Math.round((e.clientY - dragging.startY) / dragging.scale / grid) * grid;
+            const entity = [...pidResult.data.equipment, ...pidResult.data.valves,
+              ...pidResult.data.instruments, ...pidResult.data.junctions]
+              .find(x => (x.id || x.tag) === dragging.id);
+            if (entity) { entity.x += dx; entity.y += dy; }
+            dragging.grp.removeAttribute('transform');
+            dragging = null;
+            const src = PIDGenerator.toSource(pidResult.data);
+            document.getElementById('pid-source').value = src;
+            pidResult = PIDGenerator.renderPid(src, 'graphDiv');
+            document.getElementById('status').textContent = 'UPDATED - component moved, source regenerated';
+            enableDrag();
+          } catch (err) {
+            console.error('drag update failed:', err);
+            document.getElementById('status').textContent = 'FAIL on update: ' + err.message;
+          }
+        });
+      }
+
+      (() => {
+        try {
+          pidResult = PIDGenerator.renderPid(pidSource, 'graphDiv');
+          document.getElementById('pid-source').value = pidSource;
+          let roundTrip = '';
+          try {
+            const rt = PIDGenerator.parse(PIDGenerator.toSource(pidResult.data));
+            roundTrip = (rt.data.equipment.length === pidResult.data.equipment.length &&
+              rt.data.valves.length === pidResult.data.valves.length &&
+              rt.data.instruments.length === pidResult.data.instruments.length &&
+              rt.data.pipes.length === pidResult.data.pipes.length) ? 'round-trip OK' : 'round-trip MISMATCH';
+          } catch (rtErr) { roundTrip = 'round-trip FAIL: ' + rtErr.message; }
+          document.getElementById('status').textContent = 'RENDER OK - ' + pidResult.data.equipment.length + ' equipment, ' +
+            pidResult.data.valves.length + ' valves, ' + pidResult.data.instruments.length + ' instruments, ' +
+            pidResult.data.pipes.length + ' connections (' + roundTrip + ')';
+          if (pidResult.score) {
+            const rt = pidResult.score.routing, an = pidResult.score.annotations, im = pidResult.score.instruments;
+            document.getElementById('status').textContent += ' | score ' + pidResult.score.total +
+              ' (xings ' + rt.crossings + ' [' + rt.pp + 'p/' + rt.ps + 's/' + rt.ss + 's], bends ' + rt.bends + ', len ' + rt.length + 'mm, labels ' + an.labelCollisions + ', taps ' + im.tapReachTotal + 'mm, sig ' + im.maxSignalLen + 'mm)';
+          }
+          const errTxt = pidResult.errors.length ? 'ERRORS:\n' + pidResult.errors.map(e => e.message).join('\n') + '\n\n' : '';
+          document.getElementById('warnings').textContent = errTxt +
+            (pidResult.warnings.length ? 'WARNINGS:\n' + pidResult.warnings.join('\n') : '');
+          enableDrag();
+        } catch (e) {
+          document.getElementById('status').textContent = 'FAIL: ' + e.message;
+          console.error(e);
+        }
+      })();
+      function exportSVG() {
+        const svg = document.getElementById('graphDiv-svg');
+        if (!svg) { alert('No SVG rendered yet'); return; }
+        // ponytail: XMLSerializer, not outerHTML — HTML serialization drops the
+        // xmlns and leaves void elements unclosed, so the file breaks standalone
+        const clone = svg.cloneNode(true);
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        clone.setAttribute('font-family', 'sans-serif');
+        const svgData = '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pid-spike-export.svg';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    </script>
+  </body>
+</html>

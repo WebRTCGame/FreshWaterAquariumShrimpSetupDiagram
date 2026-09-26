@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 80" >
+<line x1="10" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="2" fill="none"/><rect x="72" y="26" width="10" height="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M90 30 Q98 22 106 30 Q114 38 122 30" stroke="currentColor" stroke-width="1" fill="none"/><path d="M90 50 Q98 42 106 50 Q114 58 122 50" stroke="currentColor" stroke-width="1" fill="none"/>
+</svg>

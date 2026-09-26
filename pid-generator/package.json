@@ -1,0 +1,12 @@
+{
+  "name": "pid-generator",
+  "private": true,
+  "version": "1.0.0",
+  "description": "P&ID DSL: text -> semantic model -> validated orthogonal SVG",
+  "scripts": {
+    "test": "node test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

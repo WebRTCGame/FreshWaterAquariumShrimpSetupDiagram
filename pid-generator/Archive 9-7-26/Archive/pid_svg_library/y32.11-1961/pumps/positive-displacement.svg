@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
+  <metadata>
+    <symbol>
+      <id>positive_displacement_pump</id>
+      <category>pump</category>
+      <description>Positive displacement pump</description>
+      <standard>original-standards-inspired</standard>
+      <version>1.0.0</version>
+      <connections>
+        <connection id="suction" x="10" y="50" type="pipe"/>
+        <connection id="discharge" x="90" y="50" type="pipe"/>
+      </connections>
+    </symbol>
+  </metadata>
+  <defs>
+    <style type="text/css">
+    .sym-stroke { stroke: #1a1a1a; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sym-fill { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <g id="positive-displacement">
+    <rect x="30" y="30" width="40" height="40" class="sym-fill"/>
+    <circle cx="50" cy="50" r="10" class="sym-stroke"/>
+    <line x1="10" y1="50" x2="30" y2="50" class="sym-stroke sym-thick"/>
+    <line x1="70" y1="50" x2="90" y2="50" class="sym-stroke sym-thick"/>
+  </g>
+</svg>

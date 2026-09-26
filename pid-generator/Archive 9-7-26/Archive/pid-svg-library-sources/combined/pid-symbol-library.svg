@@ -1,0 +1,820 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 2990" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="1320" height="2990" fill="white"/>
+<text x="660.0" y="35" font-size="26" text-anchor="middle" font-weight="bold">P&amp;ID Symbol Library — ISA-5.1 / PIP PNSM0001-0002 / ASME Y32.11-1961</text>
+<g transform="translate(45.0,80.0) scale(0.9167)" stroke="black" color="black">
+<polygon points="15,60 37.5,15 82.5,15 105,60 82.5,105 37.5,105" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">108</text>
+</g>
+<text x="100.0" y="210" font-size="10" text-anchor="middle">computer function</text>
+<text x="100.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="22" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">TIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">201</text>
+</g>
+<text x="260.0" y="210" font-size="10" text-anchor="middle">controller</text>
+<text x="260.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="182" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PI</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">102</text>
+</g>
+<text x="420.0" y="210" font-size="10" text-anchor="middle">field instrument</text>
+<text x="420.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="342" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,80.0) scale(0.9167)" stroke="black" color="black">
+<polygon points="60,15 105,60 60,105 15,60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">XL</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">208</text>
+</g>
+<text x="580.0" y="210" font-size="10" text-anchor="middle">final control element logic</text>
+<text x="580.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="502" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">FIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">207</text>
+</g>
+<text x="740.0" y="210" font-size="10" text-anchor="middle">indicating controller</text>
+<text x="740.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="662" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PI</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">203</text>
+</g>
+<text x="900.0" y="210" font-size="10" text-anchor="middle">indicator</text>
+<text x="900.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="822" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">101</text>
+</g>
+<text x="1060.0" y="210" font-size="10" text-anchor="middle">instrument bubble</text>
+<text x="1060.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="982" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,80.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">103</text>
+</g>
+<text x="1220.0" y="210" font-size="10" text-anchor="middle">panel instrument</text>
+<text x="1220.0" y="223" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="1142" y="80" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,250.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="54" x2="105" y2="54" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="66" x2="105" y2="66" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">104</text>
+</g>
+<text x="100.0" y="380" font-size="10" text-anchor="middle">panel instrument auxiliary</text>
+<text x="100.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="22" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,250.0) scale(0.9167)" stroke="black" color="black">
+<rect x="15" y="15" width="90" height="90" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="15" x2="105" y2="105" stroke="currentColor" stroke-width="2" fill="none"/><line x1="105" y1="15" x2="15" y2="105" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">109</text>
+</g>
+<text x="260.0" y="380" font-size="10" text-anchor="middle">plc function</text>
+<text x="260.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="182" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,250.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">TR</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">204</text>
+</g>
+<text x="420.0" y="380" font-size="10" text-anchor="middle">recorder</text>
+<text x="420.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="342" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,250.0) scale(0.9167)" stroke="black" color="black">
+<rect x="15" y="15" width="90" height="90" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">105</text>
+</g>
+<text x="580.0" y="380" font-size="10" text-anchor="middle">shared display</text>
+<text x="580.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="502" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,250.0) scale(0.9167)" stroke="black" color="black">
+<rect x="15" y="15" width="90" height="90" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="54" x2="105" y2="54" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="66" x2="105" y2="66" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">107</text>
+</g>
+<text x="740.0" y="380" font-size="10" text-anchor="middle">shared display panel aux</text>
+<text x="740.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="662" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,250.0) scale(0.9167)" stroke="black" color="black">
+<rect x="15" y="15" width="90" height="90" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="2" fill="none"/><line x1="15" y1="60" x2="105" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PIC</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">106</text>
+</g>
+<text x="900.0" y="380" font-size="10" text-anchor="middle">shared display panel front</text>
+<text x="900.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="822" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,250.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PSH</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">205</text>
+</g>
+<text x="1060.0" y="380" font-size="10" text-anchor="middle">switch</text>
+<text x="1060.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="982" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,250.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PY</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">206</text>
+</g>
+<text x="1220.0" y="380" font-size="10" text-anchor="middle">transducer</text>
+<text x="1220.0" y="393" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="1142" y="250" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,420.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">TT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">202</text>
+</g>
+<text x="100.0" y="550" font-size="10" text-anchor="middle">transmitter</text>
+<text x="100.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/instruments</text>
+<rect x="22" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M20 15 H55 A30 30 0 0 1 55 95 H20 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="20" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="80" x2="20" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="85" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="45" y="58" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">&amp;</text>
+</g>
+<text x="260.0" y="550" font-size="10" text-anchor="middle">and</text>
+<text x="260.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="182" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M20 15 H55 A30 30 0 0 1 55 95 H20 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="92" cy="55" r="7" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="30" x2="20" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="20" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="80" x2="20" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="99" y1="55" x2="118" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="45" y="58" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">&amp;</text>
+</g>
+<text x="420.0" y="550" font-size="10" text-anchor="middle">nand</text>
+<text x="420.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="342" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M15 15 Q45 15 55 55 Q45 95 15 95 Q35 55 15 15 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="62" cy="55" r="7" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="30" x2="18" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="22" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="80" x2="18" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="69" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="35" y="58" font-size="16" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">&#8805;1</text>
+</g>
+<text x="580.0" y="550" font-size="10" text-anchor="middle">nor</text>
+<text x="580.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="502" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M20 20 L20 90 L75 55 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="82" cy="55" r="7" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="20" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="89" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="42" y="58" font-size="16" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">1</text>
+</g>
+<text x="740.0" y="550" font-size="10" text-anchor="middle">not</text>
+<text x="740.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="662" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M15 15 Q45 15 55 55 Q45 95 15 95 Q35 55 15 15 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="30" x2="18" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="22" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="80" x2="18" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="55" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="35" y="58" font-size="16" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">&#8805;1</text>
+</g>
+<text x="900.0" y="550" font-size="10" text-anchor="middle">or</text>
+<text x="900.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="822" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,424.6) scale(0.9167)" stroke="black" color="black">
+<path d="M20 15 Q50 15 60 55 Q50 95 20 95 Q40 55 20 15 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 15 Q32 55 12 95" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="30" x2="16" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="55" x2="24" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="0" y1="80" x2="16" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><text x="40" y="58" font-size="14" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">=1</text>
+</g>
+<text x="1060.0" y="550" font-size="10" text-anchor="middle">xor</text>
+<text x="1060.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/logic</text>
+<rect x="982" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,420.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">AT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">305</text>
+</g>
+<text x="1220.0" y="550" font-size="10" text-anchor="middle">analysis</text>
+<text x="1220.0" y="563" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="1142" y="420" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">DT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">306</text>
+</g>
+<text x="100.0" y="720" font-size="10" text-anchor="middle">density</text>
+<text x="100.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="22" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">FT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">303</text>
+</g>
+<text x="260.0" y="720" font-size="10" text-anchor="middle">flow</text>
+<text x="260.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="182" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">FE</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">307</text>
+</g>
+<text x="420.0" y="720" font-size="10" text-anchor="middle">flow orifice</text>
+<text x="420.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="342" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">LT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">304</text>
+</g>
+<text x="580.0" y="720" font-size="10" text-anchor="middle">level</text>
+<text x="580.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="502" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">LDT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">309</text>
+</g>
+<text x="740.0" y="720" font-size="10" text-anchor="middle">level differential</text>
+<text x="740.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="662" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">MT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">314</text>
+</g>
+<text x="900.0" y="720" font-size="10" text-anchor="middle">multivariable</text>
+<text x="900.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="822" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">ZT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">313</text>
+</g>
+<text x="1060.0" y="720" font-size="10" text-anchor="middle">position</text>
+<text x="1060.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="982" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,590.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">301</text>
+</g>
+<text x="1220.0" y="720" font-size="10" text-anchor="middle">pressure</text>
+<text x="1220.0" y="733" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="1142" y="590" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,760.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">PDT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">308</text>
+</g>
+<text x="100.0" y="890" font-size="10" text-anchor="middle">pressure differential</text>
+<text x="100.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="22" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,760.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">ST</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">310</text>
+</g>
+<text x="260.0" y="890" font-size="10" text-anchor="middle">speed</text>
+<text x="260.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="182" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,760.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">TT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">302</text>
+</g>
+<text x="420.0" y="890" font-size="10" text-anchor="middle">temperature</text>
+<text x="420.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="342" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,760.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">VT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">311</text>
+</g>
+<text x="580.0" y="890" font-size="10" text-anchor="middle">vibration</text>
+<text x="580.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="502" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,760.0) scale(0.9167)" stroke="black" color="black">
+<circle cx="60" cy="60" r="45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="51" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">WT</text><text x="60" y="75" font-size="17" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">312</text>
+</g>
+<text x="740.0" y="890" font-size="10" text-anchor="middle">weight</text>
+<text x="740.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/measurement</text>
+<rect x="662" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,794.4) scale(0.6875)" stroke="black" color="black">
+<path d="M10 30 H60 M60 30 A8 8 0 0 1 76 30 M76 30 H150" stroke="currentColor" stroke-width="2" fill="none"/><line x1="83" y1="0" x2="83" y2="60" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="890" font-size="10" text-anchor="middle">binding crossing not connected</text>
+<text x="900.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="822" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,794.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="2,6"/>
+</g>
+<text x="1060.0" y="890" font-size="10" text-anchor="middle">capillary tube</text>
+<text x="1060.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="982" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,794.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="80" y1="0" x2="80" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="80" cy="30" r="4" fill="currentColor" stroke="none"/>
+</g>
+<text x="1220.0" y="890" font-size="10" text-anchor="middle">connected junction</text>
+<text x="1220.0" y="903" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="1142" y="760" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="30" cy="30" r="4" fill="currentColor" stroke="none"/><circle cx="54" cy="30" r="4" fill="currentColor" stroke="none"/><circle cx="78" cy="30" r="4" fill="currentColor" stroke="none"/><circle cx="102" cy="30" r="4" fill="currentColor" stroke="none"/><circle cx="126" cy="30" r="4" fill="currentColor" stroke="none"/>
+</g>
+<text x="100.0" y="1060" font-size="10" text-anchor="middle">digital</text>
+<text x="100.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="22" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="10,6"/>
+</g>
+<text x="260.0" y="1060" font-size="10" text-anchor="middle">electrical</text>
+<text x="260.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="182" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="14,4,2,4"/>
+</g>
+<text x="420.0" y="1060" font-size="10" text-anchor="middle">electromagnetic sonic guided</text>
+<text x="420.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="342" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="30" y1="24" x2="30" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="50" y1="24" x2="50" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="70" y1="24" x2="70" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="90" y1="24" x2="90" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="110" y1="24" x2="110" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="130" y1="24" x2="130" y2="36" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="1060" font-size="10" text-anchor="middle">hydraulic</text>
+<text x="580.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="502" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4,4"/>
+</g>
+<text x="740.0" y="1060" font-size="10" text-anchor="middle">internal system link software</text>
+<text x="740.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="662" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="1,10" stroke-linecap="round"/>
+</g>
+<text x="900.0" y="1060" font-size="10" text-anchor="middle">mechanical link</text>
+<text x="900.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="822" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,964.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="30" y1="24" x2="22" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="54" y1="24" x2="46" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="78" y1="24" x2="70" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="102" y1="24" x2="94" y2="36" stroke="currentColor" stroke-width="2" fill="none"/><line x1="126" y1="24" x2="118" y2="36" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="1060" font-size="10" text-anchor="middle">pneumatic</text>
+<text x="1060.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/signals</text>
+<rect x="982" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,939.2) scale(0.9167)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><path d="M25 15 A35 25 0 0 1 95 15 L95 50 L25 50 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="25" y1="32" x2="95" y2="32" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1220.0" y="1060" font-size="10" text-anchor="middle">actuator</text>
+<text x="1220.0" y="1073" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="1142" y="930" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="14" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="1230" font-size="10" text-anchor="middle">ball</text>
+<text x="100.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="22" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><ellipse cx="60" cy="60" rx="6" ry="16" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="1230" font-size="10" text-anchor="middle">butterfly</text>
+<text x="260.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="182" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<line x1="10" y1="60" x2="110" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><path d="M45 40 L45 80 L85 60 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="1230" font-size="10" text-anchor="middle">check valve</text>
+<text x="420.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="342" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M20 90 L60 60 L60 100 L20 70 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M100 90 L60 60 L60 100 L100 70 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="60" x2="60" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><path d="M40 10 A20 20 0 0 1 80 10 L80 30 L40 30 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="1230" font-size="10" text-anchor="middle">control valve</text>
+<text x="580.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="502" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M45 40 Q60 25 75 40" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="740.0" y="1230" font-size="10" text-anchor="middle">diaphragm valve</text>
+<text x="740.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="662" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="1230" font-size="10" text-anchor="middle">gate</text>
+<text x="900.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="822" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="1230" font-size="10" text-anchor="middle">globe</text>
+<text x="1060.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="982" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1109.2) scale(0.9167)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="55" x2="85" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="55" x2="60" y2="20" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="14" r="6" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1220.0" y="1230" font-size="10" text-anchor="middle">hand actuator</text>
+<text x="1220.0" y="1243" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="1142" y="1100" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="30" r="20" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="34" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">M</text>
+</g>
+<text x="100.0" y="1400" font-size="10" text-anchor="middle">motor actuator</text>
+<text x="100.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="22" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M55 44 L65 60 L55 76" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="1400" font-size="10" text-anchor="middle">needle valve</text>
+<text x="260.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="182" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><rect x="30" y="20" width="60" height="30" stroke="currentColor" stroke-width="2" fill="none"/><rect x="45" y="26" width="14" height="18" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="1400" font-size="10" text-anchor="middle">piston actuator</text>
+<text x="420.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="342" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><rect x="52" y="46" width="16" height="28" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="1400" font-size="10" text-anchor="middle">plug valve</text>
+<text x="580.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="502" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<path d="M40 90 L40 60 L60 30 L80 60 L80 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="45" y1="30" x2="75" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="30" x2="60" y2="10" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="740.0" y="1400" font-size="10" text-anchor="middle">relief safety</text>
+<text x="740.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="662" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><rect x="35" y="15" width="50" height="35" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="15" x2="85" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><line x1="85" y1="15" x2="35" y2="50" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="1400" font-size="10" text-anchor="middle">solenoid actuator</text>
+<text x="900.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="822" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1279.2) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 60 L60 30 L60 90 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M60 30 L60 10" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="1400" font-size="10" text-anchor="middle">three way</text>
+<text x="1060.0" y="1413" font-size="8" fill="#888" text-anchor="middle">isa-5.1/valves</text>
+<rect x="982" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1274.2) scale(0.8462)" stroke="black" color="black">
+<rect x="30" y="40" width="60" height="60" stroke="currentColor" stroke-width="3" fill="none"/><path d="M30 40 A30 12 0 0 1 90 40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="10" x2="60" y2="80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="45" y1="80" x2="75" y2="88" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="18" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1220.0" y="1400" font-size="10" text-anchor="middle">agitator</text>
+<text x="1220.0" y="1413" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="1142" y="1270" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<rect x="35" y="10" width="50" height="110" stroke="currentColor" stroke-width="3" fill="none"/><line x1="35" y1="30" x2="85" y2="30" stroke="currentColor" stroke-width="1" fill="none"/><line x1="35" y1="50" x2="85" y2="50" stroke="currentColor" stroke-width="1" fill="none"/><line x1="35" y1="70" x2="85" y2="70" stroke="currentColor" stroke-width="1" fill="none"/><line x1="35" y1="90" x2="85" y2="90" stroke="currentColor" stroke-width="1" fill="none"/>
+</g>
+<text x="100.0" y="1570" font-size="10" text-anchor="middle">column tower</text>
+<text x="100.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="22" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<path d="M20 30 L100 15 L100 105 L20 90 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="0" y1="45" x2="20" y2="47" stroke="currentColor" stroke-width="3" fill="none"/><line x1="100" y1="30" x2="120" y2="25" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="1570" font-size="10" text-anchor="middle">compressor</text>
+<text x="260.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="182" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<rect x="30" y="20" width="60" height="80" stroke="currentColor" stroke-width="3" fill="none"/><line x1="30" y1="40" x2="90" y2="40" stroke="currentColor" stroke-width="2" fill="none"/><line x1="40" y1="40" x2="40" y2="90" stroke="currentColor" stroke-width="1" stroke-dasharray="4,4" fill="none"/><line x1="60" y1="40" x2="60" y2="90" stroke="currentColor" stroke-width="1" stroke-dasharray="4,4" fill="none"/><line x1="80" y1="40" x2="80" y2="90" stroke="currentColor" stroke-width="1" stroke-dasharray="4,4" fill="none"/>
+</g>
+<text x="420.0" y="1570" font-size="10" text-anchor="middle">filter</text>
+<text x="420.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="342" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="35" width="100" height="50" stroke="currentColor" stroke-width="3" fill="none"/><line x1="15" y1="45" x2="115" y2="45" stroke="currentColor" stroke-width="1" fill="none"/><line x1="15" y1="60" x2="115" y2="60" stroke="currentColor" stroke-width="1" fill="none"/><line x1="15" y1="75" x2="115" y2="75" stroke="currentColor" stroke-width="1" fill="none"/><circle cx="15" cy="60" r="12" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="115" cy="60" r="12" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="1570" font-size="10" text-anchor="middle">heat exchanger shell tube</text>
+<text x="580.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="502" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="3" fill="none"/><polygon points="60,30 85,80 35,80" stroke="currentColor" stroke-width="2" fill="none"/><line x1="10" y1="60" x2="25" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="95" y1="60" x2="110" y2="60" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="1570" font-size="10" text-anchor="middle">pump centrifugal</text>
+<text x="740.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="662" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<path d="M20 40 L70 15 L120 40" stroke="currentColor" stroke-width="3" fill="none"/><rect x="20" y="40" width="100" height="70" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="1570" font-size="10" text-anchor="middle">tank cone roof</text>
+<text x="900.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="822" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="35" width="100" height="50" stroke="currentColor" stroke-width="3" fill="none"/><path d="M15 35 A12 25 0 0 0 15 85" stroke="currentColor" stroke-width="3" fill="none"/><path d="M115 35 A12 25 0 0 1 115 85" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1060.0" y="1570" font-size="10" text-anchor="middle">vessel horizontal</text>
+<text x="1060.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="982" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1444.2) scale(0.8462)" stroke="black" color="black">
+<rect x="30" y="20" width="60" height="90" rx="0" stroke="currentColor" stroke-width="3" fill="none"/><path d="M30 20 A30 12 0 0 1 90 20" stroke="currentColor" stroke-width="3" fill="none"/><path d="M30 110 A30 12 0 0 0 90 110" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1220.0" y="1570" font-size="10" text-anchor="middle">vessel vertical</text>
+<text x="1220.0" y="1583" font-size="8" fill="#888" text-anchor="middle">pip/equipment</text>
+<rect x="1142" y="1440" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<line x1="15" y1="40" x2="110" y2="40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="110" y1="22" x2="110" y2="58" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 22 A18 18 0 0 1 110 58" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="1740" font-size="10" text-anchor="middle">cap</text>
+<text x="100.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="22" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="3" fill="none"/><rect x="65" y="30" width="30" height="20" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="1740" font-size="10" text-anchor="middle">coupling</text>
+<text x="260.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="182" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<path d="M20 40 L90 40 L130 0" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="420.0" y="1740" font-size="10" text-anchor="middle">elbow 45</text>
+<text x="420.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="342" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<path d="M20 40 L100 40 A0 0 0 0 0 100 40" stroke="currentColor" stroke-width="3" fill="none"/><path d="M20 40 L100 40 L100 -20" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="1740" font-size="10" text-anchor="middle">elbow 90</text>
+<text x="580.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="502" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="75" y1="24" x2="75" y2="56" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="1740" font-size="10" text-anchor="middle">flange</text>
+<text x="740.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="662" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<path d="M20 24 L90 24 L130 34 L130 46 L90 56 L20 56 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="1740" font-size="10" text-anchor="middle">reducer concentric</text>
+<text x="900.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="822" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<path d="M20 24 L90 24 L130 24 L130 34 L90 56 L20 56 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="1740" font-size="10" text-anchor="middle">reducer eccentric</text>
+<text x="1060.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="982" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1637.5) scale(0.6875)" stroke="black" color="black">
+<line x1="15" y1="40" x2="145" y2="40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="40" x2="80" y2="0" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1220.0" y="1740" font-size="10" text-anchor="middle">tee fitting</text>
+<text x="1220.0" y="1753" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="1142" y="1610" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1807.5) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="72" y1="26" x2="72" y2="54" stroke="currentColor" stroke-width="2" fill="none"/><line x1="88" y1="26" x2="88" y2="54" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="1910" font-size="10" text-anchor="middle">union</text>
+<text x="100.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/fittings</text>
+<rect x="22" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1793.8) scale(0.9167)" stroke="black" color="black">
+<polygon points="60,10 95,45 60,80 25,45" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="50" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">1</text>
+</g>
+<text x="260.0" y="1910" font-size="10" text-anchor="middle">drawing note flag</text>
+<text x="260.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="182" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1793.8) scale(0.9167)" stroke="black" color="black">
+<rect x="10" y="10" width="100" height="40" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="30" font-size="16" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">P-101A</text>
+</g>
+<text x="420.0" y="1910" font-size="10" text-anchor="middle">equipment tag</text>
+<text x="420.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="342" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1804.1) scale(0.6875)" stroke="black" color="black">
+<rect x="5" y="15" width="150" height="30" stroke="currentColor" stroke-width="2" fill="none"/><text x="80" y="32" font-size="14" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">4"-P-1002-A1A-H</text>
+</g>
+<text x="580.0" y="1910" font-size="10" text-anchor="middle">line number tag</text>
+<text x="580.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="502" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1804.1) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" stroke-dasharray="18,6,2,6" fill="none"/><text x="80" y="15" font-size="14" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">MATCH LINE</text>
+</g>
+<text x="740.0" y="1910" font-size="10" text-anchor="middle">match line</text>
+<text x="740.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="662" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1804.1) scale(0.6875)" stroke="black" color="black">
+<polygon points="60,10 75,90 60,72 45,90" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="105" font-size="20" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">N</text>
+</g>
+<text x="900.0" y="1910" font-size="10" text-anchor="middle">north arrow</text>
+<text x="900.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="822" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1793.8) scale(0.9167)" stroke="black" color="black">
+<polygon points="10,40 25,20 45,15 60,25 80,15 100,25 115,45 100,60 80,55 60,65 40,55 20,60" stroke="currentColor" stroke-width="2" fill="none"/><text x="62" y="42" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">&#9651;</text>
+</g>
+<text x="1060.0" y="1910" font-size="10" text-anchor="middle">revision cloud</text>
+<text x="1060.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/layout</text>
+<rect x="982" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1814.4) scale(0.6875)" stroke="black" color="black">
+<path d="M20 30 H80 A0 0 0 0 1 80 30 V0" stroke="currentColor" stroke-width="3" fill="none"/><path d="M20 30 L80 30 L80 0" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1220.0" y="1910" font-size="10" text-anchor="middle">elbow</text>
+<text x="1220.0" y="1923" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="1142" y="1780" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="20" x2="150" y2="20" stroke="currentColor" stroke-width="1" stroke-dasharray="4,4" fill="none"/>
+</g>
+<text x="100.0" y="2080" font-size="10" text-anchor="middle">electric traced pipe</text>
+<text x="100.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="22" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="75" y1="16" x2="75" y2="44" stroke="currentColor" stroke-width="3" fill="none"/><line x1="85" y1="16" x2="85" y2="44" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="2080" font-size="10" text-anchor="middle">flanged connection</text>
+<text x="260.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="182" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><path d="M20 20 q8 -10 16 0 t16 0 t16 0 t16 0 t16 0 t16 0 t16 0" stroke="currentColor" stroke-width="1.5" fill="none"/>
+</g>
+<text x="420.0" y="2080" font-size="10" text-anchor="middle">insulated pipe</text>
+<text x="420.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="342" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="20" x2="150" y2="20" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="10" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="1.5" fill="none"/>
+</g>
+<text x="580.0" y="2080" font-size="10" text-anchor="middle">jacketed pipe</text>
+<text x="580.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="502" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="0" x2="80" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="80" cy="30" r="4" fill="currentColor" stroke="none"/>
+</g>
+<text x="740.0" y="2080" font-size="10" text-anchor="middle">pipe crossing connection</text>
+<text x="740.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="662" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="0" x2="80" y2="21" stroke="currentColor" stroke-width="3" fill="none"/><path d="M80 21 A9 9 0 0 1 80 39" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="39" x2="80" y2="60" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="2080" font-size="10" text-anchor="middle">pipe crossing no connection</text>
+<text x="900.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="822" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1060.0" y="2080" font-size="10" text-anchor="middle">process line primary</text>
+<text x="1060.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="982" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,1984.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1220.0" y="2080" font-size="10" text-anchor="middle">process line secondary</text>
+<text x="1220.0" y="2093" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="1142" y="1950" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,2154.4) scale(0.6875)" stroke="black" color="black">
+<path d="M10 26 L70 26 L100 16 L150 16" stroke="currentColor" stroke-width="3" fill="none"/><path d="M10 34 L70 34 L100 44 L150 44" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="2250" font-size="10" text-anchor="middle">reducer</text>
+<text x="100.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="22" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,2154.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="30" x2="80" y2="0" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="2250" font-size="10" text-anchor="middle">tee</text>
+<text x="260.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="182" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,2154.4) scale(0.6875)" stroke="black" color="black">
+<line x1="10" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="12,6"/>
+</g>
+<text x="420.0" y="2250" font-size="10" text-anchor="middle">underground pipe</text>
+<text x="420.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/piping</text>
+<rect x="342" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,2124.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="16" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="2250" font-size="10" text-anchor="middle">ball valve</text>
+<text x="580.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="502" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,2124.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><ellipse cx="60" cy="60" rx="6" ry="18" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="2250" font-size="10" text-anchor="middle">butterfly valve</text>
+<text x="740.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="662" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,2124.6) scale(0.9167)" stroke="black" color="black">
+<line x1="10" y1="60" x2="110" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><path d="M42 40 L42 80 L88 60 Z" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="2250" font-size="10" text-anchor="middle">check valve</text>
+<text x="900.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="822" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,2124.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 90 L60 60 L60 100 L10 70 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 90 L60 60 L60 100 L110 70 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="60" x2="60" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><path d="M40 8 A20 20 0 0 1 80 8 L80 28 L40 28 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="2250" font-size="10" text-anchor="middle">control valve globe</text>
+<text x="1060.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="982" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,2124.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M42 40 Q60 22 78 40" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1220.0" y="2250" font-size="10" text-anchor="middle">diaphragm valve</text>
+<text x="1220.0" y="2263" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="1142" y="2120" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,2294.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="32" x2="60" y2="15" stroke="currentColor" stroke-width="3" fill="none"/><line x1="45" y1="15" x2="75" y2="15" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="2420" font-size="10" text-anchor="middle">gate valve</text>
+<text x="100.0" y="2433" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="22" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,2294.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="9" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="32" x2="60" y2="15" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="2420" font-size="10" text-anchor="middle">globe valve</text>
+<text x="260.0" y="2433" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="182" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,2294.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M52 42 L68 60 L52 78" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="420.0" y="2420" font-size="10" text-anchor="middle">needle valve</text>
+<text x="420.0" y="2433" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="342" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,2294.6) scale(0.9167)" stroke="black" color="black">
+<path d="M10 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 60 L60 32 L60 88 Z" stroke="currentColor" stroke-width="3" fill="none"/><rect x="50" y="44" width="20" height="32" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="2420" font-size="10" text-anchor="middle">plug valve</text>
+<text x="580.0" y="2433" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="502" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,2294.6) scale(0.9167)" stroke="black" color="black">
+<path d="M35 100 L35 65 L60 30 L85 65 L85 100 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="42" y1="30" x2="78" y2="30" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="30" x2="60" y2="8" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="2420" font-size="10" text-anchor="middle">relief valve</text>
+<text x="740.0" y="2433" font-size="8" fill="#888" text-anchor="middle">pip/valves</text>
+<rect x="662" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,2294.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="60" x2="25" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="95" y1="60" x2="112" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="25" x2="60" y2="95" stroke="currentColor" stroke-width="1" fill="none"/>
+</g>
+<text x="900.0" y="2420" font-size="10" text-anchor="middle">centrifugal compressor</text>
+<text x="900.0" y="2433" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/compressors</text>
+<rect x="822" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,2294.2) scale(0.8462)" stroke="black" color="black">
+<rect x="10" y="45" width="70" height="30" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="100" cy="60" r="22" stroke="currentColor" stroke-width="3" fill="none"/><line x1="80" y1="60" x2="78" y2="60" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="1060.0" y="2420" font-size="10" text-anchor="middle">reciprocating compressor</text>
+<text x="1060.0" y="2433" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/compressors</text>
+<rect x="982" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,2294.2) scale(0.8462)" stroke="black" color="black">
+<path d="M15 20 L105 20 L105 100 L15 100 A45 40 0 0 1 15 20 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="6" fill="currentColor" stroke="none"/>
+</g>
+<text x="1220.0" y="2420" font-size="10" text-anchor="middle">rotary compressor</text>
+<text x="1220.0" y="2433" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/compressors</text>
+<rect x="1142" y="2290" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<rect x="10" y="15" width="110" height="90" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="35" x2="120" y2="35" stroke="currentColor" stroke-width="1" fill="none"/><path d="M100 15 L100 5 M108 15 L108 -3" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="2590" font-size="10" text-anchor="middle">box furnace</text>
+<text x="100.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/furnaces</text>
+<rect x="22" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<rect x="30" y="20" width="60" height="85" stroke="currentColor" stroke-width="3" fill="none"/><path d="M30 20 A30 10 0 0 1 90 20" stroke="currentColor" stroke-width="3" fill="none"/><line x1="70" y1="10" x2="70" y2="0" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="2590" font-size="10" text-anchor="middle">cylindrical furnace</text>
+<text x="260.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/furnaces</text>
+<rect x="182" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="55" width="100" height="25" stroke="currentColor" stroke-width="3" fill="none"/><polygon points="30,55 45,25 55,25 40,55" stroke="currentColor" stroke-width="2" fill="none"/><polygon points="60,55 75,25 85,25 70,55" stroke="currentColor" stroke-width="2" fill="none"/><polygon points="90,55 105,25 115,25 100,55" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="2590" font-size="10" text-anchor="middle">air cooled exchanger</text>
+<text x="420.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/heat-exchangers</text>
+<rect x="342" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<line x1="10" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="45" x2="120" y2="45" stroke="currentColor" stroke-width="2" fill="none"/><line x1="10" y1="75" x2="120" y2="75" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="2590" font-size="10" text-anchor="middle">double pipe exchanger</text>
+<text x="580.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/heat-exchangers</text>
+<rect x="502" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<line x1="20" y1="20" x2="20" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="32" y1="20" x2="32" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="44" y1="20" x2="44" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="56" y1="20" x2="56" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="68" y1="20" x2="68" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="80" y1="20" x2="80" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="92" y1="20" x2="92" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="104" y1="20" x2="104" y2="100" stroke="currentColor" stroke-width="2" fill="none"/><line x1="10" y1="10" x2="120" y2="10" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="110" x2="120" y2="110" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="2590" font-size="10" text-anchor="middle">plate frame exchanger</text>
+<text x="740.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/heat-exchangers</text>
+<rect x="662" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<rect x="10" y="40" width="110" height="40" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="50" x2="120" y2="50" stroke="currentColor" stroke-width="1" fill="none"/><line x1="10" y1="60" x2="120" y2="60" stroke="currentColor" stroke-width="1" fill="none"/><line x1="10" y1="70" x2="120" y2="70" stroke="currentColor" stroke-width="1" fill="none"/><circle cx="10" cy="60" r="14" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="120" cy="60" r="14" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="2590" font-size="10" text-anchor="middle">shell and tube exchanger</text>
+<text x="900.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/heat-exchangers</text>
+<rect x="822" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<line x1="10" y1="55" x2="35" y2="55" stroke="currentColor" stroke-width="3" fill="none"/><rect x="35" y="30" width="50" height="50" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="30" x2="85" y2="80" stroke="currentColor" stroke-width="1" fill="none"/><line x1="85" y1="30" x2="35" y2="80" stroke="currentColor" stroke-width="1" fill="none"/><line x1="85" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1060.0" y="2590" font-size="10" text-anchor="middle">flame arrestor</text>
+<text x="1060.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/miscellaneous</text>
+<rect x="982" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,2464.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="60" cy="60" r="40" stroke="currentColor" stroke-width="3" fill="none"/><text x="60" y="65" font-size="34" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">M</text>
+</g>
+<text x="1220.0" y="2590" font-size="10" text-anchor="middle">motor</text>
+<text x="1220.0" y="2603" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/miscellaneous</text>
+<rect x="1142" y="2460" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<line x1="10" y1="55" x2="45" y2="55" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="55" r="18" stroke="currentColor" stroke-width="2" fill="none"/><line x1="75" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="2760" font-size="10" text-anchor="middle">sight glass</text>
+<text x="100.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/miscellaneous</text>
+<rect x="22" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<line x1="10" y1="45" x2="40" y2="45" stroke="currentColor" stroke-width="3" fill="none"/><path d="M40 20 L90 20 A25 25 0 0 1 90 70 L40 70 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="90" y1="45" x2="115" y2="45" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="2760" font-size="10" text-anchor="middle">silencer</text>
+<text x="260.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/miscellaneous</text>
+<rect x="182" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<line x1="10" y1="55" x2="110" y2="55" stroke="currentColor" stroke-width="3" fill="none"/><polygon points="45,35 75,35 60,75" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="2760" font-size="10" text-anchor="middle">strainer</text>
+<text x="420.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/miscellaneous</text>
+<rect x="342" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="60" cy="60" r="35" stroke="currentColor" stroke-width="3" fill="none"/><line x1="10" y1="60" x2="25" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="95" y1="60" x2="112" y2="45" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="2760" font-size="10" text-anchor="middle">centrifugal pump</text>
+<text x="580.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/pumps</text>
+<rect x="502" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="45" cy="60" r="22" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="80" cy="60" r="22" stroke="currentColor" stroke-width="3" fill="none"/><line x1="0" y1="60" x2="23" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><line x1="102" y1="60" x2="125" y2="60" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="2760" font-size="10" text-anchor="middle">gear pump</text>
+<text x="740.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/pumps</text>
+<rect x="662" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="45" width="60" height="30" stroke="currentColor" stroke-width="3" fill="none"/><rect x="75" y="55" width="35" height="10" stroke="currentColor" stroke-width="3" fill="none"/><line x1="45" y1="45" x2="45" y2="20" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="2760" font-size="10" text-anchor="middle">reciprocating pump</text>
+<text x="900.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/pumps</text>
+<rect x="822" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<path d="M40 15 L90 15 L90 55 A40 40 0 0 1 60 110 L55 90 A25 25 0 0 0 65 55 L40 55 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="20" y1="25" x2="40" y2="25" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1060.0" y="2760" font-size="10" text-anchor="middle">cyclone separator</text>
+<text x="1060.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/separators</text>
+<rect x="982" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,2634.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="40" width="100" height="45" stroke="currentColor" stroke-width="3" fill="none"/><path d="M15 40 A11 22 0 0 0 15 85" stroke="currentColor" stroke-width="3" fill="none"/><path d="M115 40 A11 22 0 0 1 115 85" stroke="currentColor" stroke-width="3" fill="none"/><line x1="45" y1="40" x2="45" y2="85" stroke="currentColor" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+</g>
+<text x="1220.0" y="2760" font-size="10" text-anchor="middle">horizontal separator</text>
+<text x="1220.0" y="2773" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/separators</text>
+<rect x="1142" y="2630" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(45.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="35" y="15" width="60" height="90" stroke="currentColor" stroke-width="3" fill="none"/><path d="M35 15 A30 11 0 0 1 95 15" stroke="currentColor" stroke-width="3" fill="none"/><path d="M35 105 A30 11 0 0 0 95 105" stroke="currentColor" stroke-width="3" fill="none"/><line x1="35" y1="60" x2="95" y2="60" stroke="currentColor" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+</g>
+<text x="100.0" y="2930" font-size="10" text-anchor="middle">vertical separator</text>
+<text x="100.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/separators</text>
+<rect x="22" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(205.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="30" width="100" height="75" stroke="currentColor" stroke-width="3" fill="none"/><line x1="15" y1="30" x2="115" y2="30" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="2930" font-size="10" text-anchor="middle">atmospheric tank</text>
+<text x="260.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/tanks</text>
+<rect x="182" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(365.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<path d="M15 35 L65 12 L115 35" stroke="currentColor" stroke-width="3" fill="none"/><rect x="15" y="35" width="100" height="70" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="420.0" y="2930" font-size="10" text-anchor="middle">cone roof tank</text>
+<text x="420.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/tanks</text>
+<rect x="342" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(525.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="40" width="100" height="65" stroke="currentColor" stroke-width="3" fill="none"/><line x1="15" y1="40" x2="115" y2="40" stroke="currentColor" stroke-width="2" fill="none"/><path d="M25 30 A40 12 0 0 1 105 30" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="2930" font-size="10" text-anchor="middle">floating roof tank</text>
+<text x="580.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/tanks</text>
+<rect x="502" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(685.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<circle cx="65" cy="65" r="50" stroke="currentColor" stroke-width="3" fill="none"/><line x1="65" y1="115" x2="65" y2="130" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="130" x2="95" y2="130" stroke="currentColor" stroke-width="2" fill="none"/><line x1="30" y1="105" x2="50" y2="130" stroke="currentColor" stroke-width="2" fill="none"/><line x1="100" y1="105" x2="80" y2="130" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="740.0" y="2930" font-size="10" text-anchor="middle">spherical tank</text>
+<text x="740.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/tanks</text>
+<rect x="662" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(845.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="15" y="35" width="100" height="50" stroke="currentColor" stroke-width="3" fill="none"/><path d="M15 35 A12 25 0 0 0 15 85" stroke="currentColor" stroke-width="3" fill="none"/><path d="M115 35 A12 25 0 0 1 115 85" stroke="currentColor" stroke-width="3" fill="none"/><line x1="65" y1="10" x2="65" y2="35" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="2930" font-size="10" text-anchor="middle">horizontal vessel</text>
+<text x="900.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/vessels</text>
+<rect x="822" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1005.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="35" y="15" width="60" height="95" stroke="currentColor" stroke-width="3" fill="none"/><rect x="27" y="15" width="8" height="95" stroke="currentColor" stroke-width="2" fill="none"/><rect x="95" y="15" width="8" height="95" stroke="currentColor" stroke-width="2" fill="none"/><path d="M35 15 A30 12 0 0 1 95 15" stroke="currentColor" stroke-width="3" fill="none"/><path d="M35 110 A30 12 0 0 0 95 110" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1060.0" y="2930" font-size="10" text-anchor="middle">jacketed vessel</text>
+<text x="1060.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/vessels</text>
+<rect x="982" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+<g transform="translate(1165.0,2804.2) scale(0.8462)" stroke="black" color="black">
+<rect x="35" y="15" width="60" height="95" stroke="currentColor" stroke-width="3" fill="none"/><path d="M35 15 A30 12 0 0 1 95 15" stroke="currentColor" stroke-width="3" fill="none"/><path d="M35 110 A30 12 0 0 0 95 110" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="1220.0" y="2930" font-size="10" text-anchor="middle">vertical vessel</text>
+<text x="1220.0" y="2943" font-size="8" fill="#888" text-anchor="middle">y32.11-1961/vessels</text>
+<rect x="1142" y="2800" width="146" height="150" fill="none" stroke="#ddd" stroke-width="1"/>
+</svg>

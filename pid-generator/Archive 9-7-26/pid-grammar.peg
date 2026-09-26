@@ -1,0 +1,243 @@
+{
+  "name": "pid-dsl",
+  "version": "2.0.0",
+  "description": "Formal grammar for the P&ID DSL. PEG notation — each rule is `name = expression`.",
+  "notation": "PEG (Parsing Expression Grammar). `|` = choice, `?` = optional, `*` = zero or more, `+` = one or more, `()` = group, `\"...\"` = literal, `[...]` = character class.",
+  "notes": [
+    "Comments: lines starting with # or %% are ignored.",
+    "Blank lines are ignored.",
+    "The header `pid` or `pidDiagram` is optional and ignored.",
+    "Modifiers can appear in any order after the entity declaration.",
+    "Quoted strings use double quotes: \"hello world\".",
+    "IDs start with a letter and contain letters, digits, underscores, hyphens.",
+    "Types are lowercase with hyphens: pump, vessel-vertical, control-valve."
+  ]
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Top-level structure
+// ═══════════════════════════════════════════════════════════════════════════
+
+pid         = header? statement* EOF
+header      = ("pid" / "pidDiagram") newline
+statement   = view_directive / line_def / entity_stmt / pipe_stmt / signal_stmt
+              / tap_stmt / relationship_stmt / alarm_stmt / interlock_stmt
+              / loop_stmt / version_stmt / comment
+comment     = ("#" / "%%") rest_of_line
+newline     = "\n" / "\r\n" / "\r" / ";"
+EOF         = !.
+
+// ═══════════════════════════════════════════════════════════════════════════
+// View directives (drawing-level settings)
+// ═══════════════════════════════════════════════════════════════════════════
+
+view_directive
+  = show_directive / hide_show_labels / stub_directive / grid_directive
+  / scale_directive / chips_directive / route_directive / fit_page
+  / layout_directive / title_directive / project_directive / sheet_directive
+  / rev_directive / legend_directive / north_arrow_directive
+  / drawing_status_directive / units_directive / seed_directive
+
+show_directive      = "show" sp ("all" / "equipment" / "valves" / "instruments")
+hide_show_labels    = ("hide" / "show") sp "labels"
+stub_directive      = "stub" sp NUMBER
+grid_directive      = "grid" sp NUMBER
+scale_directive     = "scale" sp NUMBER
+chips_directive     = "chips" sp ("on" / "off")
+route_directive     = "route" sp ("avoid" / "direct")
+seed_directive      = "seed" sp NUMBER
+fit_page            = "fit" sp "page"
+layout_directive    = "layout" sp ("auto" / "manual")
+title_directive     = "title" sp QUOTED_STRING
+project_directive   = "project" sp QUOTED_STRING
+sheet_directive     = "sheet" sp NUMBER ("of" sp NUMBER)?
+rev_directive       = "rev" sp QUOTED_STRING sp QUOTED_STRING (sp QUOTED_STRING)?
+legend_directive    = "legend" sp ("on" / "off")
+north_arrow_directive = "north-arrow" sp ("on" / "off")
+drawing_status_directive = "status" sp ("preliminary" / "design" / "review" / "construction" / "as-built" / "superseded")
+units_directive     = "units" sp QUOTED_STRING
+version_stmt        = "version" sp NUMBER
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Line definitions (piping line specifications)
+// ═══════════════════════════════════════════════════════════════════════════
+
+line_def    = "line" sp ID line_field*
+line_field  = sp ("size" / "service" / "number" / "spec" / "ins" / "thick"
+              / "trace" / "fluid" / "phase" / "pressure" / "temperature"
+              / "material" / "insulation" / "tracing") sp NON_SPACE
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Entity declarations
+// ═══════════════════════════════════════════════════════════════════════════
+
+entity_stmt = equipment_stmt / valve_stmt / instrument_stmt
+              / nozzle_stmt / junction_stmt / stub_stmt / offpage_stmt
+
+equipment_stmt  = "equipment" sp ID sp TYPE modifier*
+valve_stmt      = "valve" sp ID sp TYPE modifier*
+instrument_stmt = "instrument" sp ID modifier*
+nozzle_stmt     = "nozzle" sp ID sp "on" sp ID sp "port" sp PORT nozzle_modifier*
+junction_stmt   = "junction" sp ID ("at" sp COORDS)?
+stub_stmt       = "stub" sp ID ("at" sp COORDS)?
+offpage_stmt    = "offpage" sp ID ("at" sp COORDS)? ("ref" sp QUOTED_STRING)?
+
+nozzle_modifier = sp (noz_size / noz_rating / noz_spec / noz_facing / noz_schedule / noz_type / noz_length / noz_edge)
+noz_size     = "size" sp NON_SPACE
+noz_rating   = "rating" sp NON_SPACE
+noz_spec     = "spec" sp NON_SPACE
+noz_facing   = "facing" sp ("RF" / "FF" / "RTJ" / "ring-type-joint")
+noz_schedule = "schedule" sp NON_SPACE
+noz_type     = "type" sp ("weld_neck" / "slip_on" / "socket_weld" / "threaded" / "lap_joint" / "blind")
+noz_length   = "length" sp NUMBER
+noz_edge     = "edge"
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Pipe / signal / tap statements
+// ═══════════════════════════════════════════════════════════════════════════
+
+pipe_stmt    = from_ref "->" to_ref modifier*
+signal_stmt  = "signal" sp from_ref "->" to_ref sp SIGNAL_TYPE
+tap_stmt     = "tap" sp from_ref "->" to_ref modifier*
+
+from_ref     = ID ("." PORT)?
+to_ref       = ID ("." PORT)?
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Relationships, alarms, interlocks, loops
+// ═══════════════════════════════════════════════════════════════════════════
+
+relationship_stmt = ("protects" / "discharges") sp ID sp "->" sp ID
+alarm_stmt        = "alarm" sp ID sp "from" sp ID sp "condition" sp CONDITION
+                    ("priority" sp PRIORITY)?
+interlock_stmt    = "interlock" sp ID sp "when" sp ID sp "action" sp ID
+loop_stmt         = "loop" sp ID sp "measure" sp ID sp "controller" sp ID
+                    sp "manipulate" sp ID
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Modifiers (applied to equipment, valve, instrument, pipe, tap)
+// ═══════════════════════════════════════════════════════════════════════════
+
+modifier = sp (mod_at / mod_rel / mod_rotated / mod_symbol / mod_scale
+         / mod_tag / mod_tag_above / mod_no_type_label / mod_normal
+         / mod_fail / mod_mode / mod_set_pressure / mod_size / mod_rating
+         / mod_spec / mod_stroke / mod_bubble / mod_via / mod_label
+         / mod_line / mod_description / mod_display_name / mod_service
+         / mod_system / mod_area / mod_unit / mod_plant / mod_discipline
+         / mod_status / mod_design / mod_loop / mod_notes / mod_attribute)
+
+// ── Positioning ─────────────────────────────────────────────────────────
+mod_at      = "at" sp COORDS
+mod_rel     = ("right" / "left" / "above" / "below") sp ("of" sp)? ID
+              ("offset" sp COORDS)?
+mod_rotated = "rotated" sp NUMBER
+
+// ── Graphics ────────────────────────────────────────────────────────────
+mod_symbol  = "symbol" sp QUOTED_STRING
+mod_scale   = "scale" sp NUMBER
+mod_stroke  = "stroke" sp QUOTED_STRING
+mod_via     = "via" sp COORDS
+
+// ── Labels ──────────────────────────────────────────────────────────────
+mod_tag          = "tag" sp QUOTED_STRING
+mod_tag_above    = "tag-above"
+mod_no_type_label = "no-type-label"
+mod_label        = QUOTED_STRING
+
+// ── Engineering state (existing) ────────────────────────────────────────
+mod_normal       = "normal" sp ("open" / "closed" / "flowing" / "blocked")
+mod_fail         = "fail" sp ("open" / "closed" / "last")
+mod_mode         = "mode" sp ("auto" / "manual" / "cascade" / "remote" / "local")
+mod_set_pressure = "set-pressure" sp NON_SPACE
+mod_size         = "size" sp NON_SPACE
+mod_rating       = "rating" sp NON_SPACE
+mod_spec         = "spec" sp NON_SPACE
+mod_bubble       = "bubble" sp ("field" / "panel" / "dcs" / "computer" / "plc")
+                  / ("field" / "panel" / "dcs" / "computer" / "plc") !ALNUM
+mod_line         = "line" sp ID
+
+// ── Engineering identity (new in v2) ────────────────────────────────────
+mod_description  = QUOTED_STRING                          // bare quoted string = description
+mod_display_name = "name" sp QUOTED_STRING
+mod_service      = "service" sp QUOTED_STRING
+mod_system       = "system" sp NON_SPACE
+mod_area         = "area" sp NON_SPACE
+mod_unit         = "unit" sp NON_SPACE
+mod_plant        = "plant" sp NON_SPACE
+mod_discipline   = "discipline" sp NON_SPACE
+
+// ── Lifecycle (new in v2) ───────────────────────────────────────────────
+mod_status = "status" sp ("new" / "existing" / "modified" / "relocated"
+              / "demolished" / "future" / "temporary" / "by-others")
+mod_design = "design" sp ("conceptual" / "preliminary" / "ifc" / "as-built")
+
+// ── Metadata (new in v2) ────────────────────────────────────────────────
+mod_notes     = "notes" sp QUOTED_STRING
+mod_loop      = "loop" sp NON_SPACE
+mod_attribute = "attribute" sp KEY sp VALUE
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Primitives
+// ═══════════════════════════════════════════════════════════════════════════
+
+ID     = [A-Za-z] [A-Za-z0-9_-]*
+TYPE   = [a-z] [a-z0-9_-]*
+PORT   = [A-Za-z] [A-Za-z0-9_-]*
+KEY    = [A-Za-z] [A-Za-z0-9_-]*
+VALUE  = NON_SPACE
+
+COORDS     = NUMBER "," NUMBER
+NUMBER     = "-"? [0-9]+ ("." [0-9]+)?
+QUOTED_STRING = '"' ([^"\\] / '\\' .)* '"'
+NON_SPACE  = [^\s]+
+
+SIGNAL_TYPE = "pneumatic" / "hydraulic" / "electrical" / "capillary"
+            / "digital" / "mechanical" / "sonic" / "magnetic"
+CONDITION   = "high" / "low" / "high-high" / "low-low"
+PRIORITY    = "low" / "medium" / "high" / "critical"
+
+ALNUM = [A-Za-z0-9]
+sp    = [ \t]+
+rest_of_line = [^\n]*
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Examples
+// ═══════════════════════════════════════════════════════════════════════════
+
+// pid
+// layout auto
+// fit page
+// title "Reactor Unit"
+// project "Demo Plant"
+// sheet 1 of 2
+// status preliminary
+//
+// line L-1001 size 4" service "Process Water" spec CS150
+//
+// equipment P-101 pump "CIP Return Pump" service "PW" system "utilities"
+//   area "Unit 100" status existing at 200,300
+// nozzle NZ-P101-S on P-101 port suction size 4" rating 150
+// nozzle NZ-P101-D on P-101 port discharge size 3" rating 150 spec A105
+//
+// valve XV-101 gate normal open fail closed
+// valve PSV-101 relief "Pressure relief" set-pressure 150psi
+//
+// instrument FT-101 bubble field
+// instrument LIC-101 bubble panel "Level controller"
+//
+// P-101 -> XV-101
+// XV-101.discharge -> V-101.inlet via 400,300
+// signal FT-101 -> FIC-101 pneumatic
+// tap FT-101 -> P-101.discharge   (tap port required on equipment/valves;
+//                                bare taps are refused: TAP_PORT)
+// tap FT-101 -> P-101.discharge.line (line-tap: flow element on the line,
+//                                consumes no nozzle slot, needs a process
+//                                line at that port: TAP_LINE)
+//
+// protects PSV-101 -> V-101
+// discharges P-101 -> DR-101
+//
+// alarm PAH-101 from PT-101 condition high priority high
+// interlock IL-101 when PAH-101 action XV-101
+//
+// loop 101 measure FT-101 controller FIC-101 manipulate FV-101

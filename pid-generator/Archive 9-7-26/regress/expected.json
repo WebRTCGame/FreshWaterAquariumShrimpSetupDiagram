@@ -1,0 +1,364 @@
+{
+ "spike": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
+    "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
+    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (592mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-GEO-002] geometry \"J-4 -> V-105\": port lead-in only 6.0mm (< 14mm) — bend too close to the V-105 port",
+    "[PID-GEO-002] geometry \"FT-101 -> FIC-101\": port lead-in only 10.0mm (< 14mm) — bend too close to the FT-101 port",
+    "[PID-SHT-001] line \"J-4 -> E-103\" leaves the sheet"
+   ],
+   "warningsTotal": 6,
+   "score": {
+    "total": 1127,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 32,
+     "pp": 16,
+     "ps": 16,
+     "ss": 0,
+     "bends": 70,
+     "length": 7406,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 1
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0
+    },
+    "instruments": {
+     "tapReachTotal": 51,
+     "maxSignalLen": 385
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 6
+    }
+   }
+  },
+  "audit": {
+   "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 138",
+   "counts": {
+    "0": 0,
+    "3": 21,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 2,
+    "9": 1,
+    "10": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [
+     "V-101->P-101 X V-105->C-101 @(235,200)",
+     "FV-101->R-101 X P-103->J-3 @(580,180)",
+     "V-102->C-101 X TT-101->TIC-101 @(675,40)",
+     "V-102->C-101 X TT-101->TIC-101 @(650,40)",
+     "V-102->C-101 X TT-101->TIC-101 @(650,40)",
+     "V-102->C-101 X PT-101->PIC-101 @(162,55)",
+     "D-101->P-102 X J-4->E-103 @(530,245)",
+     "D-101->P-102 X P-103->J-3 @(530,180)",
+     "J-4->V-105 X J-4->E-103 @(660,266)",
+     "J-4->V-105 X PT-101->PIC-101 @(130,55)",
+     "J-4->V-105 X PIC-101->V-105 @(65,190)",
+     "J-4->V-105 X PIC-101->V-105 @(65,190)",
+     "V-105->C-101 X P-103->J-3 @(235,180)",
+     "J-4->E-103 X V-103->P-103 @(425,245)",
+     "J-4->E-103 X LIC-101->V-103 @(405,245)"
+    ],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [
+     "V-105->C-101 2mm (235,218)->(235,220)",
+     "C-101->E-101 2mm (280,170)->(282,170)"
+    ],
+    "9": [
+     "J-4->E-103 (5,271)"
+    ],
+    "10": []
+   }
+  },
+  "budget": 1014
+ },
+ "min": {
+  "harness": {
+   "errors": [],
+   "warnings": [],
+   "warningsTotal": 0,
+   "score": {
+    "total": 49,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 0,
+     "pp": 0,
+     "ps": 0,
+     "ss": 0,
+     "bends": 5,
+     "length": 494,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0
+    },
+    "instruments": {
+     "tapReachTotal": 0,
+     "maxSignalLen": 70
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 0
+    }
+   }
+  },
+  "audit": {
+   "paths": "3 process, 2 signal, 1 taps | entities: 6 | texts: 24",
+   "counts": {
+    "0": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [],
+    "9": [],
+    "10": []
+   }
+  },
+  "budget": 44
+ },
+ "dense": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-VAL-004] control valve \"V-2\" has no defined fail action",
+    "[PID-GEO-002] geometry \"LT-1 -> LIC-1\": port lead-in only 9.5mm (< 14mm) — bend too close to the LT-1 port"
+   ],
+   "warningsTotal": 2,
+   "score": {
+    "total": 287,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 4,
+     "pp": 3,
+     "ps": 1,
+     "ss": 0,
+     "bends": 37,
+     "length": 2673,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0
+    },
+    "instruments": {
+     "tapReachTotal": 0,
+     "maxSignalLen": 70
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 2
+    }
+   }
+  },
+  "audit": {
+   "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 55",
+   "counts": {
+    "0": 0,
+    "3": 5,
+    "4": 0,
+    "5": 1,
+    "6": 0,
+    "7": 0,
+    "8": 2,
+    "9": 0,
+    "10": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [
+     "V-1->P-1 X FV-1->C-1 @(301,100)",
+     "FV-1->C-1 X FIC-1->FV-1 @(385,100)",
+     "FV-1->C-1 X FIC-1->FV-1 @(385,100)",
+     "C-1->E-1 X J-1->V-2 @(282,155)",
+     "J-1->V-2 X V-2->C-1 @(245,155)"
+    ],
+    "4": [],
+    "5": [
+     "LT-1~tap-> through D-1"
+    ],
+    "6": [],
+    "7": [],
+    "8": [
+     "V-2->C-1 2mm (245,298)->(245,300)",
+     "LIC-1->V-2 1.5mm (65,259)->(65,260)"
+    ],
+    "9": [],
+    "10": []
+   }
+  },
+  "budget": 258
+ },
+ "split": {
+  "harness": {
+   "errors": [],
+   "warnings": [],
+   "warningsTotal": 0,
+   "score": {
+    "total": 38,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 0,
+     "pp": 0,
+     "ps": 0,
+     "ss": 0,
+     "bends": 4,
+     "length": 601,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0
+    },
+    "instruments": {
+     "tapReachTotal": 0,
+     "maxSignalLen": 0
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 0
+    }
+   }
+  },
+  "audit": {
+   "paths": "4 process, 0 signal, 0 taps | entities: 6 | texts: 23",
+   "counts": {
+    "0": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [],
+    "9": [],
+    "10": []
+   }
+  },
+  "budget": 34
+ }
+}

@@ -1,0 +1,6 @@
+# generated / reproducible — do not track
+pid-spike-export*.svg
+render-*.svg
+regress/*.svg
+regress/_*.dsl
+*.bmp

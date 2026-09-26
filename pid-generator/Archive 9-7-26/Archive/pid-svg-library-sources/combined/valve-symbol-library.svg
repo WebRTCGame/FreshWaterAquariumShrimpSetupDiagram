@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" font-family="Arial, Helvetica, sans-serif">
+<rect width="1000" height="1000" fill="white"/>
+<text x="500.0" y="35" font-size="24" text-anchor="middle" font-weight="bold">P&amp;ID Valve Symbol Library (ISA-5.1 + PIP)</text>
+<g transform="translate(40.0,90.0) scale(1.0000)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><path d="M25 15 A35 25 0 0 1 95 15 L95 50 L25 50 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="25" y1="32" x2="95" y2="32" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="220" font-size="11" text-anchor="middle">actuator</text>
+<text x="100.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="22" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(200.0,90.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="15" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="220" font-size="11" text-anchor="middle">ball</text>
+<text x="260.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="182" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(360.0,90.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="14" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="46" x2="60" y2="74" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="220" font-size="11" text-anchor="middle">butterfly</text>
+<text x="420.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="342" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(520.0,90.0) scale(1.0000)" stroke="black" color="black">
+<line x1="10" y1="60" x2="110" y2="60" stroke="currentColor" stroke-width="2" fill="none"/><path d="M35 40 L35 80 L75 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="75" y1="40" x2="75" y2="80" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="220" font-size="11" text-anchor="middle">check valve</text>
+<text x="580.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="502" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(680.0,90.0) scale(1.0000)" stroke="black" color="black">
+<path d="M20 60 L20 100 L60 80 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M100 60 L100 100 L60 80 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="80" x2="60" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><path d="M40 10 A20 20 0 0 1 80 10 L80 30 L40 30 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="740.0" y="220" font-size="11" text-anchor="middle">control valve</text>
+<text x="740.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="662" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(840.0,90.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M40 30 Q60 12 80 30" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="220" font-size="11" text-anchor="middle">diaphragm valve</text>
+<text x="900.0" y="233" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="822" y="80" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(40.0,270.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="60" x2="60" y2="15" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="400" font-size="11" text-anchor="middle">gate</text>
+<text x="100.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="22" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(200.0,270.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="60" r="9" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="60" x2="60" y2="15" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="400" font-size="11" text-anchor="middle">globe</text>
+<text x="260.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="182" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(360.0,270.0) scale(1.0000)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="55" x2="85" y2="55" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="55" x2="60" y2="20" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="14" r="6" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="400" font-size="11" text-anchor="middle">hand actuator</text>
+<text x="420.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="342" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(520.0,270.0) scale(1.0000)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="60" cy="30" r="20" stroke="currentColor" stroke-width="2" fill="none"/><text x="60" y="34" font-size="18" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" dominant-baseline="middle">M</text>
+</g>
+<text x="580.0" y="400" font-size="11" text-anchor="middle">motor actuator</text>
+<text x="580.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="502" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(680.0,270.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M50 44 L70 60 L50 76" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="740.0" y="400" font-size="11" text-anchor="middle">needle valve</text>
+<text x="740.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="662" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(840.0,270.0) scale(1.0000)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><rect x="30" y="20" width="60" height="30" stroke="currentColor" stroke-width="2" fill="none"/><rect x="45" y="26" width="14" height="18" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="900.0" y="400" font-size="11" text-anchor="middle">piston actuator</text>
+<text x="900.0" y="413" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="822" y="260" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(40.0,450.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><rect x="52" y="46" width="16" height="28" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="100.0" y="580" font-size="11" text-anchor="middle">plug valve</text>
+<text x="100.0" y="593" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="22" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(208.6,440.0) scale(0.8571)" stroke="black" color="black">
+<path d="M30 115 L90 115 L60 75 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M30 35 L90 35 L60 75 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="35" x2="60" y2="15" stroke="currentColor" stroke-width="2" fill="none"/><rect x="44" y="-5" width="32" height="20" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="-5" x2="60" y2="-20" stroke="currentColor" stroke-width="2" fill="none"/><path d="M52 -28 L60 -20 L68 -28" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="580" font-size="11" text-anchor="middle">relief safety</text>
+<text x="260.0" y="593" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="182" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(360.0,450.0) scale(1.0000)" stroke="black" color="black">
+<line x1="60" y1="90" x2="60" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><rect x="35" y="15" width="50" height="35" stroke="currentColor" stroke-width="2" fill="none"/><line x1="35" y1="15" x2="85" y2="50" stroke="currentColor" stroke-width="2" fill="none"/><line x1="85" y1="15" x2="35" y2="50" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="420.0" y="580" font-size="11" text-anchor="middle">solenoid actuator</text>
+<text x="420.0" y="593" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="342" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(520.0,450.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 30 L10 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M110 30 L110 90 L60 60 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="60" x2="60" y2="10" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="580.0" y="580" font-size="11" text-anchor="middle">three way</text>
+<text x="580.0" y="593" font-size="9" fill="#888" text-anchor="middle">isa-5.1-valves</text>
+<rect x="502" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(680.0,445.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="16" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="580" font-size="11" text-anchor="middle">ball valve</text>
+<text x="740.0" y="593" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="662" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(840.0,445.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="15" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="45" x2="60" y2="75" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="580" font-size="11" text-anchor="middle">butterfly valve</text>
+<text x="900.0" y="593" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="822" y="440" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(40.0,625.0) scale(1.0000)" stroke="black" color="black">
+<line x1="10" y1="60" x2="110" y2="60" stroke="currentColor" stroke-width="3" fill="none"/><path d="M32 40 L32 80 L78 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="78" y1="40" x2="78" y2="80" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="760" font-size="11" text-anchor="middle">check valve</text>
+<text x="100.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="22" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(200.0,625.0) scale(1.0000)" stroke="black" color="black">
+<path d="M20 60 L20 100 L60 80 Z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M100 60 L100 100 L60 80 Z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="60" y1="80" x2="60" y2="30" stroke="currentColor" stroke-width="2" fill="none"/><path d="M40 8 A20 20 0 0 1 80 8 L80 28 L40 28 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+</g>
+<text x="260.0" y="760" font-size="11" text-anchor="middle">control valve globe</text>
+<text x="260.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="182" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(360.0,625.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M38 32 Q60 12 82 32" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="420.0" y="760" font-size="11" text-anchor="middle">diaphragm valve</text>
+<text x="420.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="342" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(520.0,625.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="60" x2="60" y2="15" stroke="currentColor" stroke-width="3" fill="none"/><line x1="45" y1="15" x2="75" y2="15" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="580.0" y="760" font-size="11" text-anchor="middle">gate valve</text>
+<text x="580.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="502" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(680.0,625.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="60" cy="60" r="9" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="60" x2="60" y2="15" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="740.0" y="760" font-size="11" text-anchor="middle">globe valve</text>
+<text x="740.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="662" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(840.0,625.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M48 42 L72 60 L48 78" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="900.0" y="760" font-size="11" text-anchor="middle">needle valve</text>
+<text x="900.0" y="773" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="822" y="620" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(40.0,805.0) scale(1.0000)" stroke="black" color="black">
+<path d="M10 32 L10 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M110 32 L110 88 L60 60 Z" stroke="currentColor" stroke-width="3" fill="none"/><rect x="50" y="44" width="20" height="32" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="100.0" y="940" font-size="11" text-anchor="middle">plug valve</text>
+<text x="100.0" y="953" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="22" y="800" width="146" height="165" fill="none" stroke="#ddd"/>
+<g transform="translate(212.0,800.0) scale(0.8000)" stroke="black" color="black">
+<path d="M30 115 L90 115 L60 75 Z" stroke="currentColor" stroke-width="3" fill="none"/><path d="M30 35 L90 35 L60 75 Z" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="35" x2="60" y2="15" stroke="currentColor" stroke-width="3" fill="none"/><rect x="44" y="-5" width="32" height="20" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="-5" x2="60" y2="-20" stroke="currentColor" stroke-width="3" fill="none"/><path d="M52 -28 L60 -20 L68 -28" stroke="currentColor" stroke-width="3" fill="none"/>
+</g>
+<text x="260.0" y="940" font-size="11" text-anchor="middle">relief valve</text>
+<text x="260.0" y="953" font-size="9" fill="#888" text-anchor="middle">pip-valves</text>
+<rect x="182" y="800" width="146" height="165" fill="none" stroke="#ddd"/>
+</svg>

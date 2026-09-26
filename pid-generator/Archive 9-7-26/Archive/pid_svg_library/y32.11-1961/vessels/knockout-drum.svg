@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" version="1.1">
+  <metadata>
+    <symbol>
+      <id>knockout_drum</id>
+      <category>vessel</category>
+      <description>Knockout drum with mist extractor</description>
+      <standard>original-standards-inspired</standard>
+      <version>1.0.0</version>
+      <connections>
+        <connection id="inlet" x="10" y="40" type="nozzle"/>
+        <connection id="gas_out" x="90" y="30" type="nozzle"/>
+        <connection id="liquid_out" x="50" y="90" type="nozzle"/>
+      </connections>
+    </symbol>
+  </metadata>
+  <defs>
+    <style type="text/css">
+    .sym-stroke { stroke: #1a1a1a; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .sym-fill { fill: #ffffff; stroke: #1a1a1a; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <g id="knockout-drum">
+    <rect x="15" y="25" width="70" height="50" rx="6" class="sym-fill"/>
+    <line x1="15" y1="40" x2="85" y2="40" class="sym-stroke sym-thin"/>
+    <line x1="20" y1="40" x2="20" y2="25" class="sym-stroke"/>
+    <line x1="80" y1="40" x2="80" y2="25" class="sym-stroke"/>
+    <line x1="50" y1="75" x2="50" y2="90" class="sym-stroke"/>
+  </g>
+</svg>

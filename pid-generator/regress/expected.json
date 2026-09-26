@@ -1,0 +1,406 @@
+{
+ "spike": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
+    "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
+    "[PID-VAL-002] control valve \"V-102\": controller \"TIC-101\" should sit directly above the valve (actuator up)",
+    "[PID-VAL-002] control valve \"V-105\": controller \"PIC-101\" should sit directly above the valve (actuator up)",
+    "[PID-SIG-002] signal \"PT-101 -> PIC-101\": very long run (660mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-SIG-002] signal \"LT-102 -> LIC-102\": very long run (514mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-SIG-002] signal \"PIC-101 -> V-105\": very long run (1227mm) — instrument pair far apart; consider moving the receiver",
+    "[PID-GEO-002] geometry \"D-101 -> P-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the D-101 port",
+    "[PID-GEO-002] geometry \"LIC-102 -> P-102\": port lead-in only 10.0mm (< 14mm) — bend too close to the LIC-102 port",
+    "[PID-GEO-002] geometry \"PIC-101 -> V-105\": port lead-in only 8.0mm (< 14mm) — bend too close to the PIC-101 port",
+    "[PID-GEO-002] geometry \"TIC-101 -> V-102\": port lead-in only 6.5mm (< 14mm) — bend too close to the V-102 port",
+    "[PID-INS-006] tap \"FT-101 -> P-101\": 56.0mm of sideways travel for a 70mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"TT-101 -> R-101\": 35.0mm of sideways travel for a 129mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 162mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-GEO-005] line \"TT-101 -> TIC-101\" passes through PSV-101"
+   ],
+   "warningsTotal": 16,
+   "score": {
+    "total": 1185,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 30,
+     "pp": 13,
+     "ps": 14,
+     "ss": 3,
+     "bends": 84,
+     "length": 9091,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0,
+     "astarGiveups": 0
+    },
+    "instruments": {
+     "tapReachTotal": 197,
+     "maxSignalLen": 465
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 16
+    }
+   }
+  },
+  "audit": {
+   "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 138",
+   "counts": {
+    "0": 0,
+    "3": 26,
+    "4": 1,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 88,
+    "13": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [
+     "TT-101~tap-> X R-101->V-102 @(660,168)",
+     "TT-101~tap-> X V-102->C-101 @(660,168)",
+     "FV-101->R-101 X P-103->J-3 @(658,255)",
+     "V-102->C-101 X V-105->C-101 @(585,105)",
+     "V-102->C-101 X V-105->C-101 @(213,105)",
+     "V-102->C-101 X P-103->J-3 @(605,168)",
+     "V-102->C-101 X P-103->J-3 @(585,115)",
+     "V-102->C-101 X P-103->J-3 @(213,115)",
+     "V-102->C-101 X PT-101->PIC-101 @(213,125)",
+     "V-102->C-101 X PIC-101->V-105 @(355,90)",
+     "C-101->E-102 X PIC-101->V-105 @(355,180)",
+     "J-4->V-105 X PIC-101->V-105 @(714,320)",
+     "J-4->V-105 X PIC-101->V-105 @(714,320)",
+     "V-105->C-101 X P-103->J-3 @(201,115)",
+     "V-105->C-101 X TT-101->TIC-101 @(665,105)"
+    ],
+    "4": [
+     "LT-101~tap-> & C-101->E-101 overlap 26mm at y=250"
+    ],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [],
+    "9": [],
+    "10": [],
+    "11": [
+     "content 760x392mm bbox (50,75)->(810,467) | 99% W x 89% H | drawable 768x439mm | sheet 864x559mm"
+    ],
+    "13": []
+   }
+  },
+  "budget": 1067
+ },
+ "min": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 5.5mm (< 14mm) — bend too close to the FIC-1 port"
+   ],
+   "warningsTotal": 1,
+   "score": {
+    "total": 63,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 0,
+     "pp": 0,
+     "ps": 0,
+     "ss": 0,
+     "bends": 8,
+     "length": 507,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0,
+     "astarGiveups": 0
+    },
+    "instruments": {
+     "tapReachTotal": 31,
+     "maxSignalLen": 51
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 1
+    }
+   }
+  },
+  "audit": {
+   "paths": "3 process, 2 signal, 1 taps | entities: 6 | texts: 24",
+   "counts": {
+    "0": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 2,
+    "9": 0,
+    "10": 0,
+    "11": 11,
+    "13": 1
+   },
+   "lists": {
+    "0": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [
+     "FV-1->T-1 2mm (415,283)->(415,285)",
+     "FV-1->T-1 2.5mm (415,285)->(413,285)"
+    ],
+    "9": [],
+    "10": [],
+    "11": [
+     "content 442x82mm bbox (54,240)->(496,322) | 58% W x 19% H | drawable 768x439mm | sheet 864x559mm"
+    ],
+    "13": [
+     "fills only 19% of drawable height (< 45%) — content is 58% W x 19% H; consider splitting the sheet or adding scope"
+    ]
+   }
+  },
+  "budget": 57
+ },
+ "dense": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-VAL-004] control valve \"V-2\" has no defined fail action"
+   ],
+   "warningsTotal": 1,
+   "score": {
+    "total": 293,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 7,
+     "pp": 3,
+     "ps": 3,
+     "ss": 1,
+     "bends": 29,
+     "length": 2635,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0,
+     "astarGiveups": 0
+    },
+    "instruments": {
+     "tapReachTotal": 24,
+     "maxSignalLen": 70
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 1
+    }
+   }
+  },
+  "audit": {
+   "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 55",
+   "counts": {
+    "0": 0,
+    "3": 5,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 3,
+    "9": 0,
+    "10": 0,
+    "11": 27,
+    "13": 1
+   },
+   "lists": {
+    "0": [],
+    "3": [
+     "V-1->P-1 X FV-1->C-1 @(515,223)",
+     "V-1->P-1 X LT-1->LIC-1 @(300,200)",
+     "V-2->C-1 X LT-1->LIC-1 @(300,234)",
+     "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)",
+     "FT-1->FIC-1 X FIC-1->FV-1 @(570,195)"
+    ],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [
+     "FV-1->C-1 2mm (370,223)->(370,225)",
+     "FV-1->C-1 2mm (370,225)->(368,225)",
+     "V-2->C-1 1mm (450,234)->(450,235)"
+    ],
+    "9": [],
+    "10": [],
+    "11": [
+     "content 469x197mm bbox (186,165)->(655,362) | 61% W x 45% H | drawable 768x439mm | sheet 864x559mm"
+    ],
+    "13": [
+     "fills only 45% of drawable height (< 45%) — content is 61% W x 45% H; consider splitting the sheet or adding scope"
+    ]
+   }
+  },
+  "budget": 264
+ },
+ "split": {
+  "harness": {
+   "errors": [],
+   "warnings": [],
+   "warningsTotal": 0,
+   "score": {
+    "total": 40,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 0,
+     "pp": 0,
+     "ps": 0,
+     "ss": 0,
+     "bends": 5,
+     "length": 609,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 0
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0,
+     "astarGiveups": 0
+    },
+    "instruments": {
+     "tapReachTotal": 0,
+     "maxSignalLen": 0
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 0
+    }
+   }
+  },
+  "audit": {
+   "paths": "4 process, 0 signal, 0 taps | entities: 6 | texts: 23",
+   "counts": {
+    "0": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 0,
+    "8": 0,
+    "9": 0,
+    "10": 0,
+    "11": 27,
+    "13": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [],
+    "8": [],
+    "9": [],
+    "10": [],
+    "11": [
+     "content 425x214mm bbox (128,248)->(553,462) | 55% W x 49% H | drawable 768x439mm | sheet 864x559mm"
+    ],
+    "13": []
+   }
+  },
+  "budget": 36
+ }
+}

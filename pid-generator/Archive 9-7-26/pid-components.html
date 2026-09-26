@@ -1,0 +1,884 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>P&ID Component Editor</title>
+    <style>
+      body { font-family: sans-serif; margin: 0; display: grid; grid-template-columns: 290px 1fr 400px; height: 100vh; }
+      #sidebar { border-right: 1px solid #ddd; padding: 10px; box-sizing: border-box; overflow-y: auto; }
+      #search { width: 100%; box-sizing: border-box; padding: 6px 8px; font-size: 13px; margin-bottom: 4px; }
+      #count { font-size: 11px; color: #888; margin-bottom: 6px; }
+      .group { font-weight: bold; font-size: 11px; color: #999; margin: 12px 0 4px 2px; text-transform: uppercase; letter-spacing: .5px; }
+      .item { padding: 3px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .item:hover { background: #eef4ff; }
+      .item.sel { background: #1E90FF; color: white; }
+      .item.dirty::after { content: " •"; color: #ff8c00; font-weight: bold; }
+      .item.sel.dirty::after { color: white; }
+      #center { display: flex; flex-direction: column; overflow: hidden; }
+      #canvasToolbar { padding: 8px 14px; border-bottom: 1px solid #eee; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: #444; }
+      #canvasToolbar .spacer { flex: 1; }
+      #canvas { position: relative; flex: 1; overflow: hidden; cursor: grab;
+        background: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px);
+        background-size: 24px 24px; }
+      #canvas.panning { cursor: grabbing; }
+      #previewWrap { position: absolute; background: white; box-shadow: 0 2px 12px rgba(0,0,0,.1); transform-origin: 0 0; }
+      #previewWrap svg { display: block; touch-action: none; }
+      #previewWrap [data-eid] { cursor: move; }
+      #previewWrap [data-eid]:hover { opacity: .8; }
+      #legendBar { padding: 8px 14px; border-top: 1px solid #eee; font-size: 12px; color: #444; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid white; box-shadow: 0 0 0 1px #bbb; vertical-align: middle; }
+      #props { border-left: 1px solid #ddd; overflow-y: auto; padding: 14px; box-sizing: border-box; }
+      h2 { margin: 0 0 8px; font-family: monospace; font-size: 15px; word-break: break-all; }
+      .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+      .toolbar button { font-size: 13px; padding: 5px 12px; cursor: pointer; }
+      button.mini { font-size: 11px; padding: 2px 8px; cursor: pointer; }
+      #status { font-size: 12px; color: #555; min-height: 15px; }
+      details { margin: 10px 0; border: 1px solid #eee; border-radius: 6px; }
+      details summary { padding: 7px 10px; font-size: 12px; font-weight: bold; color: #555; cursor: pointer; text-transform: uppercase; letter-spacing: .5px; user-select: none; }
+      details[open] summary { border-bottom: 1px solid #eee; }
+      details > div, details > table { padding: 6px 10px; }
+      table { border-collapse: collapse; margin: 6px 0; font-size: 13px; width: 100%; }
+      th, td { border: 1px solid #e5e5e5; padding: 3px 7px; text-align: left; }
+      th { background: #f7f7f7; font-weight: 600; white-space: nowrap; }
+      td input[type="text"], td input[type="number"], td select, td textarea {
+        width: 100%; min-width: 46px; box-sizing: border-box; font-size: 12px; padding: 2px 4px;
+        border: 1px solid transparent; background: transparent; font-family: inherit;
+      }
+      td textarea { font-family: monospace; min-height: 56px; white-space: pre; }
+      td input:hover, td select:hover, td textarea:hover { border-color: #ccc; background: white; }
+      td input:focus, td select:focus, td textarea:focus { border-color: #1E90FF; background: white; outline: none; }
+      td.num input { text-align: right; }
+      .kv td:first-child { color: #666; min-width: 118px; vertical-align: top; }
+      .badge { display: inline-block; padding: 1px 8px; border-radius: 9px; font-size: 11px; background: #eee; margin: 1px 2px 1px 0; }
+      .b-process { background: #dcefff; } .b-signal { background: #ffe9d6; } .b-other { background: #e2f5e2; }
+      .toggles { display: flex; gap: 12px; flex-wrap: wrap; }
+      .hint { font-size: 11px; color: #888; margin-top: 4px; }
+      .selinfo { font-size: 12px; color: #1E90FF; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <aside id="sidebar">
+      <input id="search" placeholder="filter by id…" autofocus>
+      <div id="count"></div>
+      <div id="list"></div>
+    </aside>
+
+    <section id="center">
+      <div id="canvasToolbar">
+        <span class="toggles">
+          <label><input type="checkbox" id="tPorts" checked> ports</label>
+          <label><input type="checkbox" id="tExtents"> extents</label>
+          <label><input type="checkbox" id="tAnchor"> anchor</label>
+          <label><input type="checkbox" id="tLabel"> label pt</label>
+        </span>
+        <span class="selinfo" id="selInfo"></span>
+        <span class="spacer"></span>
+        <button class="mini" id="prev">&larr;</button>
+        <button class="mini" id="next">&rarr;</button>
+        <button class="mini" id="zoomOut">&minus;</button>
+        <span id="zoomVal">100%</span>
+        <button class="mini" id="zoomIn">+</button>
+        <button class="mini" id="zoomFit">fit</button>
+      </div>
+      <div id="canvas"><div id="previewWrap"></div></div>
+      <div id="legendBar">
+        <span><span class="dot" style="background:#1E90FF"></span> process</span>
+        <span><span class="dot" style="background:#ff8c00"></span> signal</span>
+        <span><span class="dot" style="background:#7a9a7a"></span> other</span>
+        <span>&nbsp;&middot;&nbsp;drag empty space = pan &middot; wheel = zoom &middot; click linework = select &middot; drag selected = move &middot; Del = delete &middot; Esc = deselect &middot; Ctrl+Z / Ctrl+Y</span>
+      </div>
+    </section>
+
+    <aside id="props">
+      <h2 id="compTitle"></h2>
+      <div class="toolbar">
+        <button id="revert" title="restore this component from session start">revert</button>
+        <button id="exportBtn">export json</button>
+        <button id="linkBtn">link gen file&hellip;</button>
+        <button id="saveBtn" disabled>save</button>
+      </div>
+      <div id="status"></div>
+
+      <details open><summary>component</summary><div id="compRows"></div></details>
+      <details open><summary>behavior</summary><div id="behRows"></div></details>
+      <details open><summary>ports <span id="portCount"></span></summary>
+        <div><button class="mini" id="addPort">+ add port</button></div>
+        <table id="portTable"></table>
+      </details>
+      <details><summary>svg defaults</summary>
+        <div>
+          <table class="kv">
+            <tr><td>stroke-width (all)</td><td class="num"><input type="number" step="0.1" id="swAll" placeholder="e.g. 2"></td></tr>
+            <tr><td>stroke (all)</td><td><input type="text" id="strokeAll" placeholder="#000 / currentColor"></td></tr>
+          </table>
+          <button class="mini" id="applyAllBtn">apply to every shape</button>
+          <div class="hint">Empty fields leave elements untouched.</div>
+        </div>
+      </details>
+      <details open id="secElem"><summary>selected element</summary><div id="elemRows"><p class="hint">Click any linework in the preview.</p></div></details>
+    </aside>
+
+    <script src="pid-rules.js?v=1788022128"></script>
+    <script src="pid-collide.js?v=1788022128"></script>
+    <script src="geometric_objects.js?v=1788022128"></script>
+    <script src="pid-symbols-bundle.js?v=1788022128"></script>
+    <script src="pid-parser.js?v=1788022128"></script>
+    <script src="pid-router.js?v=1788022128"></script>
+    <script src="pid-validator.js?v=1788022128"></script>
+    <script src="pid-renderer.js?v=1788025639"></script>
+    <script>
+    (() => {
+      const G = window.PIDGenerator;
+      const ALL = G.componentIds().sort();
+      const PRISTINE = JSON.parse(JSON.stringify(window.PID_SYMBOLS));
+      let visible = ALL.slice(), current = null, selPort = null, selEl = -1;
+
+      const CLASS_COLOR = { process: '#1E90FF', signal: '#ff8c00' };
+      const colorOf = (p) => CLASS_COLOR[p.connectionClass] || '#7a9a7a';
+      const escHtml = (s) => String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+      const el = (id) => document.getElementById(id);
+      const isDirty = (id) => JSON.stringify(PRISTINE[id]) !== JSON.stringify(window.PID_SYMBOLS[id]);
+      const status = (msg) => { el('status').textContent = msg; };
+      const rnd = (v) => Math.round(v * 100) / 100;
+
+      // ================= undo / redo =================
+      const undoStack = [], redoStack = [];
+      const canUndo = () => undoStack.length > 0, canRedo = () => redoStack.length > 0;
+      function pushUndo() {
+        undoStack.push({ id: current, data: JSON.stringify(window.PID_SYMBOLS[current]) });
+        if (undoStack.length > 60) undoStack.shift();
+        redoStack.length = 0;
+      }
+      function undo() {
+        const e = undoStack.pop();
+        if (!e) return status('nothing to undo');
+        if (e.id === current) redoStack.push({ id: e.id, data: JSON.stringify(window.PID_SYMBOLS[e.id]) });
+        window.PID_SYMBOLS[e.id] = JSON.parse(e.data);
+        if (e.id === current) { selPort = null; selEl = -1; }
+        refreshAll(); status('undo');
+      }
+      function redo() {
+        const e = redoStack.pop();
+        if (!e) return status('nothing to redo');
+        if (e.id === current) undoStack.push({ id: e.id, data: JSON.stringify(window.PID_SYMBOLS[e.id]) });
+        window.PID_SYMBOLS[e.id] = JSON.parse(e.data);
+        if (e.id === current) { selPort = null; selEl = -1; }
+        refreshAll(); status('redo');
+      }
+
+      // ================= svg analysis =================
+      const SHAPE_TAGS = ['path', 'line', 'rect', 'circle', 'ellipse', 'polyline', 'polygon', 'text'];
+      function analyze(svg) {
+        const nodes = [];
+        const re = /<(\/?)([\w-]+)((?:"[^"]*"|'[^']*'|[^>"'])*?)(\/?)>/g;
+        let m, last = 0;
+        const stack = [];
+        while ((m = re.exec(svg)) !== null) {
+          if (m.index > last) nodes.push({ kind: 'raw', start: last, end: m.index });
+          const close = m[1] === '/', name = m[2].toLowerCase();
+          let attrsRaw = m[3] || '';
+          const selfClose = m[4] === '/' || /\/\s*$/.test(attrsRaw);
+          attrsRaw = attrsRaw.replace(/\/\s*$/, '');
+          const start = m.index, end = re.lastIndex;
+          if (!close && name === 'g') {
+            const tr = attrsRaw.match(/translate\(\s*(-?[\d.eE+-]+)[ ,]+(-?[\d.eE+-]+)/);
+            const sc = attrsRaw.match(/scale\(\s*(-?[\d.eE+-]+)(?:[ ,]+(-?[\d.eE+-]+))?\)/);
+            nodes.push({ kind: 'g', name, start, end, attrsRaw, selfClose,
+              tr: tr ? [+tr[1], +tr[2]] : null,
+              sc: sc ? [+sc[1], sc[2] !== undefined ? +sc[2] : +sc[1]] : null,
+              parent: stack.length ? stack[stack.length - 1] : -1 });
+            if (!selfClose) stack.push(nodes.length - 1);
+          } else if (close) {
+            if (name === 'g' && stack.length) stack.pop();
+            nodes.push({ kind: 'closer', name, start, end });
+          } else if (SHAPE_TAGS.includes(name)) {
+            nodes.push({ kind: 'shape', name, start, end, attrsRaw, selfClose,
+              parent: stack.length ? stack[stack.length - 1] : -1 });
+          } else nodes.push({ kind: 'other', name, start, end });
+          last = end;
+        }
+        if (last < svg.length) nodes.push({ kind: 'raw', start: last, end: svg.length });
+        return nodes;
+      }
+      function chainOf(nodes, i) {
+        const t = [0, 0], s = [1, 1];
+        const walk = (idx) => {
+          if (idx === undefined || idx < 0 || !nodes[idx]) return;
+          const n = nodes[idx];
+          walk(n.parent);
+          if (n.tr) { t[0] += s[0] * n.tr[0]; t[1] += s[1] * n.tr[1]; }
+          if (n.sc) { s[0] *= n.sc[0]; s[1] *= n.sc[1]; }
+        };
+        if (nodes[i]) walk(nodes[i].parent);
+        return { tx: t[0], ty: t[1], sx: s[0], sy: s[1] };
+      }
+      function setAttrInRaw(raw, name, value) {
+        const rx = new RegExp('\\s' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*=\\s*"[^"]*"');
+        const nv = ' ' + name + '="' + value + '"';
+        return value === '' || value == null ? raw.replace(rx, '') : rx.test(raw) ? raw.replace(rx, nv) : raw + nv;
+      }
+
+      // ================= path parsing (absolute-normalized) =================
+      function parsePathD(d) {
+        const tk = d.match(/[MLHVCSQTAZmlhvcstaz]|-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+        const raw = []; let cur = null;
+        for (const t of tk) {
+          if (/^[a-zA-Z]$/.test(t)) { cur = { cmd: t, args: [] }; raw.push(cur); }
+          else if (cur) cur.args.push(parseFloat(t));
+        }
+        const out = []; let cx = 0, cy = 0, sx = 0, sy = 0;
+        for (const { cmd, args } of raw) {
+          const rel = cmd !== cmd.toUpperCase(), C = cmd.toUpperCase();
+          if (C === 'Z') { out.push({ cmd: 'Z', args: [] }); cx = sx; cy = sy; continue; }
+          let k = 0;
+          const A = (v, base) => Math.round((rel ? base + v : v) * 10000) / 10000;
+          if (C === 'M' || C === 'L' || C === 'T') {
+            let first = true;
+            do {
+              const x = A(args[k], cx), y = A(args[k + 1], cy);
+              out.push({ cmd: first ? (C === 'M' ? 'M' : C) : (C === 'T' ? 'T' : 'L'), args: [x, y] });
+              cx = x; cy = y;
+              if (C === 'M' && first) { sx = cx; sy = cy; }
+              first = false; k += 2;
+            } while (k < args.length);
+          } else if (C === 'H') { out.push({ cmd: 'H', args: [A(args[k], cx)] }); cx = A(args[k], cx); k += 1; }
+          else if (C === 'V') { out.push({ cmd: 'V', args: [A(args[k], cy)] }); cy = A(args[k], cy); k += 1; }
+          else if (C === 'A') {
+            out.push({ cmd: 'A', args: [args[k], args[k + 1], args[k + 2], args[k + 3], args[k + 4], A(args[k + 5], cx), A(args[k + 6], cy)] });
+            cx = A(args[k + 5], cx); cy = A(args[k + 6], cy); k += 7;
+          } else {
+            const arity = C === 'C' ? 6 : 4, pair = [];
+            for (let j = 0; j < arity; j += 2) pair.push(A(args[k + j], cx), A(args[k + j + 1], cy));
+            out.push({ cmd: C, args: pair });
+            cx = pair[pair.length - 2]; cy = pair[pair.length - 1]; k += arity;
+          }
+        }
+        return out;
+      }
+      function toD(cmds) {
+        return cmds.map(c => c.cmd + ' ' + c.args.map(n => Math.round(n * 100) / 100).join(' ')).join(' ');
+      }
+      function pathPoints(cmds) {
+        const CTRL = { C: [0, 2, 4], S: [0, 2], Q: [0, 2], A: [5] };
+        const pts = [];
+        for (let ci = 0; ci < cmds.length; ci++) {
+          const { cmd, args } = cmds[ci];
+          if (cmd === 'Z') continue;
+          const ctrlIdx = CTRL[cmd];
+          for (let k = 0; k < args.length; k += (cmd === 'H' || cmd === 'V') ? 1 : 2) {
+            const isCtrl = ctrlIdx ? ctrlIdx.includes(k) : false;
+            if (cmd === 'H') pts.push({ ci, ai: k, x: args[k], y: null, axis: 'x', ctrl: false });
+            else if (cmd === 'V') pts.push({ ci, ai: k, x: null, y: args[k], axis: 'y', ctrl: false });
+            else pts.push({ ci, ai: k, x: args[k], y: args[k + 1], axis: 'xy', ctrl: !!isCtrl && !(cmd === 'A' && k === 5) });
+          }
+        }
+        return pts;
+      }
+      function translatePathD(d, ddx, ddy) {
+        const cmds = parsePathD(d);
+        for (const cm of cmds) {
+          if (cm.cmd === 'Z') continue;
+          for (let k = 0; k < cm.args.length; k++) {
+            if (cm.cmd === 'H') cm.args[k] = rnd(cm.args[k] + ddx);
+            else if (cm.cmd === 'V') cm.args[k] = rnd(cm.args[k] + ddy);
+            else cm.args[k] = rnd(cm.args[k] + (k % 2 === 0 ? ddx : ddy));
+          }
+        }
+        return toD(cmds);
+      }
+
+      window.__PID_EDITOR_TEST__ = { parsePathD, toD, pathPoints, translatePathD, analyze, chainOf,
+        pushUndo, undo, redo, canUndo, canRedo };
+
+      // ---- element geometry in logical 0-100 space ----
+      function elemGeom(c, idx) {
+        const nodes = analyze(c.svg);
+        const n = nodes[idx];
+        const ch = chainOf(nodes, idx);
+        const attrs = {};
+        for (const am of n.attrsRaw.matchAll(/([\w-]+)\s*=\s*"([^"]*)"/g)) attrs[am[1]] = am[2];
+        const tv = (lx, ly) => ({ vx: ch.tx + ch.sx * lx, vy: ch.ty + ch.sy * ly });
+        let pts = [];
+        if (n.name === 'line') pts = [{ kind: 'pt', lx: +attrs.x1 || 0, ly: +attrs.y1 || 0 }, { kind: 'pt', lx: +attrs.x2 || 0, ly: +attrs.y2 || 0 }];
+        else if (n.name === 'rect') {
+          const x = +attrs.x || 0, y = +attrs.y || 0, w = +attrs.width || 0, h = +attrs.height || 0;
+          pts = [
+            { kind: 'corner', cn: 'tl', lx: x, ly: y }, { kind: 'corner', cn: 'tr', lx: x + w, ly: y },
+            { kind: 'corner', cn: 'bl', lx: x, ly: y + h }, { kind: 'corner', cn: 'br', lx: x + w, ly: y + h }];
+        } else if (n.name === 'circle') {
+          pts = [{ kind: 'center', lx: +attrs.cx || 0, ly: +attrs.cy || 0 },
+                 { kind: 'radius', dir: 'x', lx: (+attrs.cx || 0) + (+attrs.r || 0), ly: +attrs.cy || 0 },
+                 { kind: 'radius', dir: 'y', lx: +attrs.cx || 0, ly: (+attrs.cy || 0) + (+attrs.r || 0) }];
+        } else if (n.name === 'ellipse') {
+          pts = [{ kind: 'center', lx: +attrs.cx || 0, ly: +attrs.cy || 0 },
+                 { kind: 'radius', dir: 'x', rx: true, lx: (+attrs.cx || 0) + (+attrs.rx || 0), ly: +attrs.cy || 0 },
+                 { kind: 'radius', dir: 'y', ry: true, lx: +attrs.cx || 0, ly: (+attrs.cy || 0) + (+attrs.ry || 0) }];
+        } else if (n.name === 'polyline' || n.name === 'polygon') {
+          const v = (attrs.points || '').match(/-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+          for (let i = 0; i + 1 < v.length; i += 2) pts.push({ kind: 'pt', pi: i, lx: +v[i], ly: +v[i + 1] });
+        } else if (n.name === 'text') pts = [{ kind: 'pt', lx: +attrs.x || 0, ly: +attrs.y || 0 }];
+        else if (n.name === 'path' && attrs.d) {
+          pts = pathPoints(parsePathD(attrs.d)).map(p => ({
+            kind: p.ctrl ? 'ctrl' : 'pt',
+            lx: p.axis === 'y' ? 0 : p.x, ly: p.axis === 'x' ? 0 : p.y,
+            axis: p.axis, pi: p,
+          }));
+        }
+        for (const pt of pts) Object.assign(pt, tv(pt.lx ?? 0, pt.ly ?? 0));
+        return { nodes, n, ch, attrs, pts };
+      }
+      // ---- preview ----
+      function viewDims(c) {
+        const vbm = c.svg.match(/viewBox="\s*([\d.\-+eE]+)[ ,]+([\d.\-+eE]+)[ ,]+([\d.\-+eE]+)[ ,]+([\d.\-+eE]+)\s*"/);
+        return { w: vbm ? +vbm[3] : 100, h: vbm ? +vbm[4] : 100 };
+      }
+      let eidMap = [];
+      let view = { k: 1, x: 0, y: 0, centered: true };
+      function buildInner(c) {
+        const nodes = analyze(c.svg);
+        eidMap = []; let count = 0, out = '';
+        for (const n of nodes) {
+          if (n.kind === 'shape') { eidMap.push(nodes.indexOf(n)); out += '<' + n.name + ' data-eid="' + count++ + '"' + n.attrsRaw + (n.selfClose ? ' />' : '>'); }
+          else out += c.svg.slice(n.start, n.end);
+        }
+        return out;
+      }
+      function overlay(c, w, h) {
+        const px = (x) => x / 100 * w, py = (y) => y / 100 * h;
+        let ov = '';
+        if (el('tExtents').checked) {
+          const e0 = c.extents || { x0: 0, y0: 0, x1: 100, y1: 100 };
+          ov += '<rect x="' + px(e0.x0) + '" y="' + py(e0.y0) + '" width="' + (px(e0.x1) - px(e0.x0)) + '" height="' + (py(e0.y1) - py(e0.y0)) + '" fill="none" stroke="#b58900" stroke-dasharray="4 3" stroke-width="' + w * 0.004 + '" pointer-events="none"/>';
+        }
+        if (el('tAnchor').checked && c.anchor) {
+          ov += '<path d="M ' + px(c.anchor.x - 4) + ' ' + py(c.anchor.y) + ' H ' + px(c.anchor.x + 4) + ' M ' + px(c.anchor.x) + ' ' + py(c.anchor.y - 4) + ' V ' + py(c.anchor.y + 4) + '" stroke="#c62828" stroke-width="' + w * 0.006 + '" pointer-events="none"/>';
+        }
+        if (el('tLabel').checked && c.labelAnchor) {
+          ov += '<circle cx="' + px(c.labelAnchor.x) + '" cy="' + py(c.labelAnchor.y) + '" r="' + w * 0.02 + '" fill="none" stroke="#6a1b9a" stroke-width="' + w * 0.005 + '" pointer-events="none"/>';
+        }
+        return ov;
+      }
+      function elemBounds(idx) {
+        const c = window.PID_SYMBOLS[current];
+        const nodes = analyze(c.svg), n = nodes[idx], ch = chainOf(nodes, idx);
+        const attrs = {}; for (const am of n.attrsRaw.matchAll(/([\w-]+)\s*=\s*"([^"]*)"/g)) attrs[am[1]] = am[2];
+        let b = null;
+        const push = (x, y) => { b = b ? { x0: Math.min(b.x0, x), y0: Math.min(b.y0, y), x1: Math.max(b.x1, x), y1: Math.max(b.y1, y) } : { x0: x, y0: y, x1: x, y1: y }; };
+        if (n.name === 'line') { push(+attrs.x1 || 0, +attrs.y1 || 0); push(+attrs.x2 || 0, +attrs.y2 || 0); }
+        else if (n.name === 'rect') { push(+attrs.x || 0, +attrs.y || 0); push((+attrs.x || 0) + (+attrs.width || 0), (+attrs.y || 0) + (+attrs.height || 0)); }
+        else if (n.name === 'circle') { const r = +attrs.r || 0; push(+attrs.cx - r, +attrs.cy - r); push(+attrs.cx + r, +attrs.cy + r); }
+        else if (n.name === 'ellipse') { const rx2 = +attrs.rx || 0, ry2 = +attrs.ry || 0; push(+attrs.cx - rx2, +attrs.cy - ry2); push(+attrs.cx + rx2, +attrs.cy + ry2); }
+        else if ((n.name === 'polyline' || n.name === 'polygon') && attrs.points) { const v = attrs.points.match(/-?\d*\.?\d+/g) || []; for (let i = 0; i + 1 < v.length; i += 2) push(+v[i], +v[i + 1]); }
+        else if (n.name === 'text') { push(+attrs.x || 0, +attrs.y || 0); }
+        else if (n.name === 'path' && attrs.d) for (const p of pathPoints(parsePathD(attrs.d))) { if (p.axis === 'x') push(p.x, 0); else if (p.axis === 'y') push(0, p.y); else push(p.x, p.y); }
+        return b ? { x0: ch.tx + ch.sx * b.x0, y0: ch.ty + ch.sy * b.y0, x1: ch.tx + ch.sx * b.x1, y1: ch.ty + ch.sy * b.y1 } : b;
+      }
+      function drawPreview() {
+        const c = window.PID_SYMBOLS[current];
+        const { w, h } = viewDims(c);
+        let inner = overlay(c, w, h) + buildInner(c);
+        if (el('tPorts').checked) {
+          for (const p of G.symbolConnections(current)) {
+            const sel = selPort === p.id;
+            inner += '<circle class="port-dot" data-port="' + escHtml(p.id) + '" cx="' + p.x / 100 * w + '" cy="' + p.y / 100 * h + '" r="' + w * (sel ? 0.032 : 0.025) + '" fill="' + colorOf(p) + '" stroke="' + (sel ? '#c62828' : 'white') + '" stroke-width="' + w * 0.007 + '" style="cursor:move"><title>' + escHtml(p.id) + '</title></circle>';
+          }
+        }
+        let handles = '';
+        if (selEl >= 0 && eidMap.includes(selEl)) {
+          const nodes = analyze(c.svg), n = nodes[selEl];
+          if (n.name !== 'text') {
+            const b = elemBounds(selEl);
+            if (b) inner += '<rect x="' + b.x0 + '" y="' + b.y0 + '" width="' + (b.x1 - b.x0) + '" height="' + (b.y1 - b.y0) + '" fill="none" stroke="#1E90FF" stroke-width="' + w * 0.006 + '" stroke-dasharray="5 3" pointer-events="none"/>';
+            const R = w * 0.02;
+            elemGeom(c, selEl).pts.forEach((pt, i) => {
+              if (pt.kind === 'ctrl') handles += '<circle class="vh" data-vi="' + i + '" cx="' + pt.vx / 100 * w + '" cy="' + pt.vy / 100 * h + '" r="' + R * 0.55 + '" fill="#ff8c00" stroke="#fff" stroke-width="' + R * 0.2 + '" style="cursor:move"/>';
+              else if (pt.kind === 'radius') handles += '<circle class="vh" data-vi="' + i + '" cx="' + pt.vx / 100 * w + '" cy="' + pt.vy / 100 * h + '" r="' + R * 0.8 + '" fill="#7a9a7a" stroke="#fff" stroke-width="' + R * 0.25 + '" style="cursor:ew-resize"/>';
+              else if (pt.kind === 'corner') handles += '<rect class="vh" data-vi="' + i + '" x="' + (pt.vx / 100 * w - R * 0.7) + '" y="' + (pt.vy / 100 * h - R * 0.7) + '" width="' + R * 1.4 + '" height="' + R * 1.4 + '" fill="#fff" stroke="#1E90FF" stroke-width="' + R * 0.3 + '" style="cursor:nwse-resize"/>';
+              else handles += '<rect class="vh" data-vi="' + i + '" x="' + (pt.vx / 100 * w - R * 0.6) + '" y="' + (pt.vy / 100 * h - R * 0.6) + '" width="' + R * 1.2 + '" height="' + R * 1.2 + '" fill="#fff" stroke="#1E90FF" stroke-width="' + R * 0.3 + '" style="cursor:move"/>';
+            });
+          }
+        }
+        const side = Math.round(fitBase() * view.k);
+        const wrap = el('previewWrap');
+        wrap.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + side + '" height="' + Math.round(side * h / w) + '" preserveAspectRatio="xMidYMid meet">' + inner + handles + '</svg>';
+        applyPan(side, side * h / w);
+        el('zoomVal').textContent = Math.round(view.k * 100) + '%';
+        if (drag && drag.pointerId != null) { const s = wrap.querySelector('svg'); try { s.setPointerCapture(drag.pointerId); } catch (_) {} }
+      }
+      function fitBase() {
+        const cnv = el('canvas');
+        return Math.max(240, Math.min(cnv.clientWidth - 48, cnv.clientHeight - 48, 1400));
+      }
+      function applyPan(sideW, sideH) {
+        const cnv = el('canvas'), wrap = el('previewWrap');
+        if (view.centered) { view.x = Math.round((cnv.clientWidth - sideW) / 2); view.y = Math.round((cnv.clientHeight - sideH) / 2); }
+        wrap.style.left = view.x + 'px';
+        wrap.style.top = view.y + 'px';
+      }
+
+      // ---- right panel ----
+      function numF(value, path, step) { return '<input type="number" step="' + (step ?? 0.1) + '" value="' + value + '" data-path="' + path + '">'; }
+      function renderProps() {
+        const c = window.PID_SYMBOLS[current];
+        el('compTitle').textContent = current;
+        el('compRows').innerHTML =
+          '<table class="kv">' +
+          '<tr><td>nominal size (mm)</td><td class="num">' + numF(c.size, 'size', 1) + '</td></tr>' +
+          '<tr><td>flowAxis</td><td><select data-scalar="flowAxis"><option value=""' + (!c.flowAxis ? ' selected' : '') + '>(none)</option><option value="h"' + (c.flowAxis === 'h' ? ' selected' : '') + '>h</option><option value="v"' + (c.flowAxis === 'v' ? ' selected' : '') + '>v</option></select>' +
+          '<label style="font-size:12px;margin-left:8px"><input type="checkbox" data-flag="autoRotate"' + (c.autoRotate ? ' checked' : '') + '> autoRotate</label></td></tr>' +
+          '<tr><td>rotatable</td><td><input type="checkbox" data-flag="rotatable"' + (c.rotatable !== false ? ' checked' : '') + '></td></tr>' +
+          '<tr><td>standard</td><td><input type="text" value="' + escHtml(c.standard || '') + '" data-scalar="standard"></td></tr>' +
+          '<tr><td>version</td><td class="num">' + numF(c.version ?? 1, 'version', 1) + '</td></tr>' +
+          '<tr><td>anchor x, y</td><td class="num">' + numF(c.anchor?.x ?? 50, 'anchor.x') + ' , ' + numF(c.anchor?.y ?? 50, 'anchor.y') + '</td></tr>' +
+          '<tr><td>labelAnchor x, y</td><td class="num">' + numF(c.labelAnchor?.x ?? 50, 'labelAnchor.x') + ' , ' + numF(c.labelAnchor?.y ?? 86, 'labelAnchor.y') + '</td></tr>' +
+          '<tr><td>extents</td><td class="num">' + numF(c.extents?.x0 ?? 0, 'extents.x0') + ' , ' + numF(c.extents?.y0 ?? 0, 'extents.y0') + ' , ' + numF(c.extents?.x1 ?? 100, 'extents.x1') + ' , ' + numF(c.extents?.y1 ?? 100, 'extents.y1') + '</td></tr>' +
+          '</table>';
+        const b = c.behavior || {};
+        const behKeys = ['isolation', 'throttling', 'directional', 'actuated', 'requiresControl', 'safety'];
+        el('behRows').innerHTML = '<table class="kv">' +
+          behKeys.map(k => '<tr><td>' + k + '</td><td><input type="checkbox" data-beh="' + k + '"' + (b[k] ? ' checked' : '') + '></td></tr>').join('') +
+          '<tr><td>minProcessPorts</td><td class="num">' + numF(b.minProcessPorts ?? 2, 'behavior.minProcessPorts', 1) + '</td></tr></table>';
+        const ports = G.symbolConnections(current);
+        el('portCount').textContent = '(' + ports.length + ')';
+        el('portTable').innerHTML = '<tr><th>#</th><th>id</th><th>type</th><th>role</th><th>x</th><th>y</th><th>dir</th><th>flow</th><th>connType</th><th>card</th><th></th></tr>' +
+          ports.map((p, i) => '<tr><td>' + (i + 1) + '</td>' +
+            '<td><input type="text" value="' + escHtml(p.id) + '" data-port-edit="' + escHtml(p.id) + '" data-pf="id"></td>' +
+            '<td><select data-port-edit="' + escHtml(p.id) + '" data-pf="type"><option' + (p.type === 'pipe' ? ' selected' : '') + '>pipe</option><option' + (p.type === 'nozzle' ? ' selected' : '') + '>nozzle</option><option' + (p.type === 'signal' ? ' selected' : '') + '>signal</option></select></td>' +
+            '<td><input type="text" value="' + escHtml(p.role || '') + '" data-port-edit="' + escHtml(p.id) + '" data-pf="role" style="width:60px"></td>' +
+            '<td class="num">' + numF(p.x, 'port.' + p.id + '.x') + '</td>' +
+            '<td class="num">' + numF(p.y, 'port.' + p.id + '.y') + '</td>' +
+            '<td><select data-port-edit="' + escHtml(p.id) + '" data-pf="direction"><option value=""' + (!p.direction ? ' selected' : '') + '>-</option><option value="in"' + (p.direction === 'in' ? ' selected' : '') + '>in</option><option value="out"' + (p.direction === 'out' ? ' selected' : '') + '>out</option></select></td>' +
+            '<td><select data-port-edit="' + escHtml(p.id) + '" data-pf="flowDirection"><option value=""' + (!p.flowDirection ? ' selected' : '') + '>-</option><option value="in"' + (p.flowDirection === 'in' ? ' selected' : '') + '>in</option><option value="out"' + (p.flowDirection === 'out' ? ' selected' : '') + '>out</option><option value="bidirectional"' + (p.flowDirection === 'bidirectional' ? ' selected' : '') + '>both</option></select></td>' +
+            '<td><select data-port-edit="' + escHtml(p.id) + '" data-pf="connectionType"><option value=""' + (!p.connectionType ? ' selected' : '') + '>-</option><option value="process"' + (p.connectionType === 'process' ? ' selected' : '') + '>process</option><option value="utility"' + (p.connectionType === 'utility' ? ' selected' : '') + '>utility</option><option value="pneumatic"' + (p.connectionType === 'pneumatic' ? ' selected' : '') + '>pneumatic</option><option value="electrical"' + (p.connectionType === 'electrical' ? ' selected' : '') + '>electrical</option><option value="digital"' + (p.connectionType === 'digital' ? ' selected' : '') + '>digital</option></select></td>' +
+            '<td class="num"><input type="number" value="' + (p.cardinality || 1) + '" data-port-edit="' + escHtml(p.id) + '" data-pf="cardinality" min="1" max="10" style="width:40px"></td>' +
+            '<td><button class="mini" data-del-port="' + escHtml(p.id) + '">x</button></td></tr>').join('');
+        renderElemSection();
+      }
+      function renderElemSection() {
+        const box = el('elemRows');
+        if (selEl < 0) { box.innerHTML = '<p class="hint">Click any linework in the preview.</p>'; el('selInfo').textContent = ''; return; }
+        const c = window.PID_SYMBOLS[current];
+        const nodes = analyze(c.svg), n = nodes[selEl];
+        if (!n) { selEl = -1; return; }
+        const attrs = {}; for (const am of n.attrsRaw.matchAll(/([\w-]+)\s*=\s*"([^"]*)"/g)) attrs[am[1]] = am[2];
+        el('selInfo').textContent = n.name + '[' + eidMap.indexOf(selEl) + ']';
+        const common = ['stroke-width', 'stroke', 'fill', 'stroke-dasharray', 'stroke-linecap', 'opacity'];
+        const missing = common.filter(k => !(k in attrs));
+        box.innerHTML = '<table class="kv"><tr><td>tag</td><td class="mono">' + n.name + '</td></tr>' +
+          Object.entries(attrs).map(([k, v]) => '<tr><td>' + k + '</td><td>' +
+            (k === 'd' || k === 'points' ? '<textarea data-elattr="' + k + '" spellcheck="false">' + escHtml(v) + '</textarea>'
+              : '<input type="text" value="' + escHtml(v) + '" data-elattr="' + k + '">') + '</td></tr>').join('') +
+          missing.map(k => '<tr><td>+ ' + k + '</td><td><input type="text" placeholder="(unset)" data-elattr-new="' + k + '"></td></tr>').join('') +
+          '</table><div class="toolbar"><button class="mini" id="dupElem">duplicate</button><button class="mini" id="delElem" style="color:#c62828">delete element</button></div>';
+      }
+
+      // ---- mutations ----
+      function commitNodeAttrs(idx, newAttrsRaw) {
+        const c = window.PID_SYMBOLS[current];
+        const nodes = analyze(c.svg), n = nodes[idx];
+        c.svg = c.svg.slice(0, n.start) + '<' + n.name + newAttrsRaw + (n.selfClose ? ' />' : '>') + c.svg.slice(n.end);
+      }
+      function setNodeAttr(idx, name, value) {
+        const c = window.PID_SYMBOLS[current];
+        const n = analyze(c.svg)[idx];
+        commitNodeAttrs(idx, setAttrInRaw(n.attrsRaw, name, value));
+        renderList();
+      }
+      // translate an entire element by local-unit deltas
+      function translateElem(idx, ddx, ddy) {
+        const c = window.PID_SYMBOLS[current];
+        const nodes = analyze(c.svg), n = nodes[idx];
+        const attrs = {}; for (const am of n.attrsRaw.matchAll(/([\w-]+)\s*=\s*"([^"]*)"/g)) attrs[am[1]] = am[2];
+        let raw = n.attrsRaw;
+        if (n.name === 'line') {
+          raw = setAttrInRaw(setAttrInRaw(setAttrInRaw(setAttrInRaw(raw, 'x1', rnd((+attrs.x1 || 0) + ddx)), 'y1', rnd((+attrs.y1 || 0) + ddy)), 'x2', rnd((+attrs.x2 || 0) + ddx)), 'y2', rnd((+attrs.y2 || 0) + ddy));
+        } else if (n.name === 'rect') {
+          raw = setAttrInRaw(setAttrInRaw(raw, 'x', rnd((+attrs.x || 0) + ddx)), 'y', rnd((+attrs.y || 0) + ddy));
+        } else if (n.name === 'circle' || n.name === 'ellipse') {
+          raw = setAttrInRaw(setAttrInRaw(raw, 'cx', rnd((+attrs.cx || 0) + ddx)), 'cy', rnd((+attrs.cy || 0) + ddy));
+        } else if (n.name === 'text') {
+          raw = setAttrInRaw(setAttrInRaw(raw, 'x', rnd((+attrs.x || 0) + ddx)), 'y', rnd((+attrs.y || 0) + ddy));
+        } else if ((n.name === 'polyline' || n.name === 'polygon') && attrs.points) {
+          const v = attrs.points.match(/-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+          for (let i = 0; i + 1 < v.length; i += 2) { v[i] = rnd(+v[i] + ddx); v[i + 1] = rnd(+v[i + 1] + ddy); }
+          raw = setAttrInRaw(raw, 'points', v.join(' '));
+        } else if (n.name === 'path' && attrs.d) {
+          raw = setAttrInRaw(raw, 'd', translatePathD(attrs.d, ddx, ddy));
+        }
+        commitNodeAttrs(idx, raw);
+      }
+
+      // ---- canvas interaction: pan / zoom / select / move / grips ----
+      let drag = null;
+      function screenToView(e) {
+        const svgEl = el('previewWrap').querySelector('svg');
+        if (!svgEl) return null;
+        if (svgEl.getScreenCTM) {
+          const inv = svgEl.getScreenCTM().inverse();
+          const pt = svgEl.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+          const p = pt.matrixTransform(inv);
+          return { x: p.x, y: p.y };
+        }
+        const r = svgEl.getBoundingClientRect();
+        const { w, h } = viewDims(window.PID_SYMBOLS[current]);
+        return { x: (e.clientX - r.left) / r.width * w, y: (e.clientY - r.top) / r.height * h };
+      }
+      el('canvas').addEventListener('pointerdown', (e) => {
+        const onSvg = e.target.tagName && e.target.tagName.toLowerCase() === 'svg';
+        if (e.button === 1 || (e.button === 0 && onSvg)) {
+          drag = { kind: 'pan', sx: e.clientX, sy: e.clientY, ox: view.x, oy: view.y, pointerId: e.pointerId };
+          el('canvas').classList.add('panning');
+          el('canvas').setPointerCapture(e.pointerId);
+          e.preventDefault(); return;
+        }
+        const vh = e.target.closest('.vh');
+        if (vh && selEl >= 0) {
+          drag = { kind: 'vertex', vi: +vh.dataset.vi, g: elemGeom(window.PID_SYMBOLS[current], selEl), startSnap: JSON.stringify(window.PID_SYMBOLS[current]), pointerId: e.pointerId };
+          el('previewWrap').querySelector('svg').setPointerCapture(e.pointerId);
+          e.preventDefault(); return;
+        }
+        const dot = e.target.closest('.port-dot');
+        if (dot) {
+          const p = G.symbolConnections(current).find(q => q.id === dot.dataset.port);
+          if (p) {
+            drag = { kind: 'port', p, pointerId: e.pointerId };
+            el('previewWrap').querySelector('svg').setPointerCapture(e.pointerId);
+            e.preventDefault();
+          }
+          return;
+        }
+        const shape = e.target.closest('[data-eid]');
+        if (shape) {
+          const idx = eidMap[+shape.dataset.eid] ?? -1;
+          if (idx !== selEl) { selEl = idx; drawPreview(); renderElemSection(); document.getElementById('secElem').open = true; }
+          drag = { kind: 'move', moved: false, last: screenToView(e), startSnap: JSON.stringify(window.PID_SYMBOLS[current]), pointerId: e.pointerId };
+          el('previewWrap').querySelector('svg').setPointerCapture(e.pointerId);
+          e.preventDefault();
+        }
+      });
+      el('canvas').addEventListener('pointermove', (e) => {
+        if (!drag) return;
+        const c = window.PID_SYMBOLS[current];
+        const { w, h } = viewDims(c);
+        if (drag.kind === 'pan') {
+          view.x = drag.ox + (e.clientX - drag.sx);
+          view.y = drag.oy + (e.clientY - drag.sy);
+          view.centered = false;
+          const sideW = Math.round(fitBase() * view.k);
+          applyPan(sideW, sideW * h / w);
+          return;
+        }
+        const now = screenToView(e);
+        if (!now || !drag.last) return;
+        let ddx = now.x - drag.last.x, ddy = now.y - drag.last.y;
+        drag.last = now;
+        const fine = e.shiftKey ? 0.2 : 1;
+        ddx *= fine; ddy *= fine;
+        if (drag.kind === 'port') {
+          drag.p.x = rnd(drag.p.x + ddx);
+          drag.p.y = rnd(drag.p.y + ddy);
+          const d2 = el('previewWrap').querySelector('.port-dot[data-port="' + drag.p.id.replace(/"/g, '') + '"]');
+          if (d2) { d2.setAttribute('cx', drag.p.x / 100 * w); d2.setAttribute('cy', drag.p.y / 100 * h); }
+          return;
+        }
+        if (drag.kind === 'vertex') {
+          if (!drag.pushed) { undoStack.push({ id: current, data: drag.startSnap }); redoStack.length = 0; drag.pushed = true; }
+          const g = drag.g;
+          const lddx = ddx / (g.ch.sx || 1), lddy = ddy / (g.ch.sy || 1);
+          const pt = g.pts[drag.vi];
+          if (!pt) return;
+          if (pt.kind === 'radius') {
+            const a = g.attrs;
+            if (g.n.name === 'circle') {
+              const nr = Math.max(0.2, (+a.r || 0) + (Math.abs(ddx) > Math.abs(ddy) ? lddx : lddy));
+              commitNodeAttrs(selEl, setAttrInRaw(g.n.attrsRaw, 'r', rnd(nr)));
+            } else {
+              let raw = g.n.attrsRaw;
+              if (pt.dir === 'x') raw = setAttrInRaw(raw, 'rx', rnd(Math.max(0.2, (+a.rx || 0) + lddx)));
+              else raw = setAttrInRaw(raw, 'ry', rnd(Math.max(0.2, (+a.ry || 0) + lddy)));
+              commitNodeAttrs(selEl, raw);
+            }
+          } else if (pt.kind === 'corner') {
+            const a = g.attrs;
+            let x = +a.x || 0, y = +a.y || 0, ww = +a.width || 0, hh = +a.height || 0;
+            if (pt.cn === 'tl') { x += lddx; y += lddy; ww -= lddx; hh -= lddy; }
+            else if (pt.cn === 'tr') { ww += lddx; hh -= lddy; }
+            else if (pt.cn === 'bl') { x += lddx; ww -= lddx; hh += lddy; }
+            else { ww += lddx; hh += lddy; }
+            let raw = setAttrInRaw(setAttrInRaw(g.n.attrsRaw, 'x', rnd(x)), 'y', rnd(y));
+            raw = setAttrInRaw(setAttrInRaw(raw, 'width', rnd(Math.max(0.2, ww))), 'height', rnd(Math.max(0.2, hh)));
+            commitNodeAttrs(selEl, raw);
+          } else if (g.n.name === 'path') {
+            vertexDragPath(g, drag.vi, ddx, ddy);
+          } else if (g.n.name === 'polyline' || g.n.name === 'polygon') {
+            vertexDragPoints(g, drag.vi, ddx, ddy);
+          }
+          drawPreview();
+          return;
+        }
+        if (drag.kind === 'move') {
+          if (!ddx && !ddy) return;
+          if (!drag.moved) { pushUndoAt(current, drag.startSnap); drag.moved = true; }
+          translateElem(selEl, ddx, ddy);
+          drawPreview();
+        }
+      });
+      function pushUndoAt(id, snap) { undoStack.push({ id, data: snap }); redoStack.length = 0; if (undoStack.length > 60) undoStack.shift(); }
+      function vertexDragPath(g, vi, ddx, ddy) {
+        const cmds = parsePathD(g.attrs.d);
+        const p = pathPoints(cmds)[vi];
+        if (!p) return;
+        const cm = cmds[p.ci];
+        const sx1 = g.ch.sx || 1, sy1 = g.ch.sy || 1;
+        if (p.axis === 'x') cm.args[p.ai] = rnd(cm.args[p.ai] + ddx / sx1);
+        else if (p.axis === 'y') cm.args[p.ai] = rnd(cm.args[p.ai] + ddy / sy1);
+        else { cm.args[p.ai] = rnd(cm.args[p.ai] + ddx / sx1); cm.args[p.ai + 1] = rnd(cm.args[p.ai + 1] + ddy / sy1); }
+        commitNodeAttrs(selEl, setAttrInRaw(g.n.attrsRaw, 'd', toD(cmds)));
+      }
+      function vertexDragPoints(g, vi, ddx, ddy) {
+        const v = (g.attrs.points || '').match(/-?\d*\.?\d+(?:e-?\d+)?/g) || [];
+        const ddxl = ddx / (g.ch.sx || 1), ddyl = ddy / (g.ch.sy || 1);
+        if (vi * 2 + 1 < v.length) { v[vi * 2] = rnd(+v[vi * 2] + ddxl); v[vi * 2 + 1] = rnd(+v[vi * 2 + 1] + ddyl); }
+        commitNodeAttrs(selEl, setAttrInRaw(g.n.attrsRaw, 'points', v.join(' ')));
+      }
+      function endDrag() { if (drag) { drag = null; refreshAll(); } }
+      el('canvas').addEventListener('pointerup', endDrag);
+      el('canvas').addEventListener('pointercancel', endDrag);
+
+      // wheel zoom at cursor
+      el('canvas').addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const f = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+        const oldK = view.k;
+        const newK = Math.max(0.15, Math.min(10, oldK * f));
+        if (newK === oldK) return;
+        const cnvR = el('canvas').getBoundingClientRect();
+        const mx = e.clientX - cnvR.left, my = e.clientY - cnvR.top;
+        view.x = mx - (mx - view.x) * (newK / oldK);
+        view.y = my - (my - view.y) * (newK / oldK);
+        view.k = newK;
+        view.centered = false;
+        drawPreview();
+      }, { passive: false });
+
+      document.addEventListener('keydown', (e) => {
+        if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') { e.preventDefault(); undo(); return; }
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) { e.preventDefault(); redo(); return; }
+        if (e.key === 'Escape') { selEl = -1; selPort = null; refreshAll(); return; }
+        if ((e.key === 'Delete' || e.key === 'Backspace') && selEl >= 0) {
+          pushUndo();
+          const c = window.PID_SYMBOLS[current];
+          const n = analyze(c.svg)[selEl];
+          c.svg = c.svg.slice(0, n.start) + c.svg.slice(n.end);
+          selEl = -1; markDirty(); refreshAll(); return;
+        }
+        const d = e.shiftKey ? 5 : 0.5;
+        if (selEl >= 0) {
+          const dx = e.key === 'ArrowLeft' ? -d : e.key === 'ArrowRight' ? d : 0;
+          const dy = e.key === 'ArrowUp' ? -d : e.key === 'ArrowDown' ? d : 0;
+          if (dx || dy) { e.preventDefault(); translateElem(selEl, dx, dy); markDirty(); drawPreview(); }
+          return;
+        }
+        const p = selPort && G.symbolConnections(current).find(q => q.id === selPort);
+        if (p) {
+          if (e.key === 'ArrowLeft') p.x -= d; else if (e.key === 'ArrowRight') p.x += d;
+          else if (e.key === 'ArrowUp') p.y -= d; else if (e.key === 'ArrowDown') p.y += d;
+          else return;
+          e.preventDefault();
+          p.x = Math.round(p.x * 10) / 10; p.y = Math.round(p.y * 10) / 10;
+          refreshAll();
+        }
+      });
+
+      // ---- zoom buttons ----
+      el('zoomIn').addEventListener('click', () => { view.k = Math.min(10, view.k * 1.25); view.centered = false; drawPreview(); });
+      el('zoomOut').addEventListener('click', () => { view.k = Math.max(0.15, view.k / 1.25); view.centered = false; drawPreview(); });
+      el('zoomFit').addEventListener('click', () => { view.k = 1; view.centered = true; drawPreview(); });
+      window.addEventListener('resize', () => { view.centered = true; drawPreview(); });
+
+      // ---- persistence ----
+      function exportComponent() {
+        const c = window.PID_SYMBOLS[current];
+        const blob = new Blob([JSON.stringify({ id: current, ...JSON.parse(JSON.stringify(c)) }, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = current.replaceAll('/', '__') + '.json';
+        a.click(); URL.revokeObjectURL(a.href);
+        status('exported ' + current);
+      }
+      let genHandle = null, genText = null;
+      async function linkGen() {
+        try {
+          [genHandle] = await window.showOpenFilePicker({
+            types: [{ description: 'P&ID Generator', accept: { 'text/javascript': ['.js'] } }],
+            suggestedName: 'P&IDGenerator.js'
+          });
+          const f = await genHandle.getFile();
+          genText = await f.text();
+          el('saveBtn').disabled = false;
+          status('linked ' + f.name + ' (' + f.size.toLocaleString() + ' bytes)');
+        } catch (err) { if (err.name !== 'AbortError') status('link failed: ' + err.message); }
+      }
+      function buildGenText(base) {
+        const ASSIGN = 'window.PID_SYMBOLS = ';
+        const start = base.indexOf(ASSIGN);
+        let i = base.indexOf('{', start), depth = 0, q = false, esc2 = false;
+        for (; i < base.length; i++) {
+          const ch = base[i];
+          if (q) { if (esc2) esc2 = false; else if (ch === '\\') esc2 = true; else if (ch === '"') q = false; continue; }
+          if (ch === '"') q = true;
+          else if (ch === '{' || ch === '[') depth++;
+          else if (ch === '}' || ch === ']') { depth--; if (!depth) break; }
+        }
+        return base.slice(0, start + ASSIGN.length) + JSON.stringify(window.PID_SYMBOLS) + base.slice(i + 1);
+      }
+      async function saveGen() {
+        try {
+          const out = buildGenText(genText);
+          const w = await genHandle.createWritable();
+          await w.write(out); await w.close();
+          genText = out;
+          status('saved ' + Object.keys(window.PID_SYMBOLS).length + ' components -> generator');
+        } catch (err) { status('save failed: ' + err.message); }
+      }
+      el('exportBtn').addEventListener('click', exportComponent);
+      el('linkBtn').addEventListener('click', linkGen);
+      el('saveBtn').addEventListener('click', saveGen);
+      el('revert').addEventListener('click', () => {
+        pushUndo();
+        window.PID_SYMBOLS[current] = JSON.parse(JSON.stringify(PRISTINE[current]));
+        selPort = null; selEl = -1;
+        refreshAll(); status('reverted ' + current);
+      });
+      if (!window.showOpenFilePicker) { el('linkBtn').disabled = el('saveBtn').disabled = true; status('File System Access API unavailable -- use export json + apply-component.mjs'); }
+
+      // ---- list ----
+      const listEl = el('list'), countEl = el('count');
+      function renderList() {
+        countEl.textContent = visible.length + ' of ' + ALL.length + ' components';
+        let html = '', lastGroup = '';
+        for (const id of visible) {
+          const group = id.split('/').slice(0, 2).join('/');
+          if (group !== lastGroup) { html += '<div class="group">' + group + '</div>'; lastGroup = group; }
+          html += '<div class="item' + (id === current ? ' sel' : '') + (isDirty(id) ? ' dirty' : '') + '" data-id="' + id + '">' + id + '</div>';
+        }
+        listEl.innerHTML = html || '<div class="group">no matches</div>';
+      }
+      function select(id) {
+        if (!ALL.includes(id)) return;
+        current = id; selPort = null; selEl = -1;
+        view = { k: 1, x: 0, y: 0, centered: true };
+        drawPreview(); renderProps(); renderList();
+        status(isDirty(id) ? 'unsaved changes in this component' : '');
+      }
+      function step(d) { select(visible[(visible.indexOf(current) + d + visible.length) % visible.length] ?? visible[0]); }
+      function refreshAll() { drawPreview(); renderProps(); renderList(); }
+      function markDirty() { renderList(); } // dirty state derives from PRISTINE diff
+      listEl.addEventListener('click', (e) => {
+        const item = e.target.closest('.item[data-id]');
+        if (item) select(item.dataset.id);
+      });
+      el('prev').addEventListener('click', () => step(-1));
+      el('next').addEventListener('click', () => step(1));
+      for (const t of ['tPorts', 'tExtents', 'tAnchor', 'tLabel']) el(t).addEventListener('change', drawPreview);
+      el('search').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        visible = ALL.filter(id => {
+          if (id.toLowerCase().includes(q)) return true;
+          const c = window.PID_SYMBOLS[id];
+          return (c.standard || '').toLowerCase().includes(q) ||
+            (c.behavior ? Object.keys(c.behavior).some(k => k.toLowerCase().includes(q)) : false);
+        });
+        if (!visible.includes(current)) current = visible[0];
+        if (current) select(current);
+        else { el('previewWrap').innerHTML = ''; el('compTitle').textContent = ''; renderList(); }
+      });
+
+      // ---- right panel event delegation ----
+      el('props').addEventListener('change', (e) => {
+        const t = e.target;
+        const c = window.PID_SYMBOLS[current];
+        if (t.dataset.path) {
+          const v = t.type === 'number' ? parseFloat(t.value) : t.value;
+          if (t.type !== 'number' || Number.isFinite(v)) {
+            if (t.dataset.path.startsWith('port.')) return;
+            pushUndo();
+            const segs = t.dataset.path.split('.');
+            let obj = c;
+            while (segs.length > 1) { const k = segs.shift(); obj = obj[k] = obj[k] || {}; }
+            obj[segs[0]] = v;
+          }
+        } else if (t.dataset.flag) { pushUndo(); c[t.dataset.flag] = t.checked; }
+        else if (t.dataset.beh) { pushUndo(); c.behavior = c.behavior || {}; c.behavior[t.dataset.beh] = t.checked; }
+        else if (t.dataset.portEdit) {
+          const p = G.symbolConnections(current).find(q => q.id === t.dataset.portEdit);
+          if (!p) return;
+          const f = t.dataset.pf;
+          p[f] = (f === 'x' || f === 'y' || f === 'cardinality') ? parseFloat(t.value) : t.value;
+        } else if (t.dataset.elattr !== undefined && t.dataset.elattr) {
+          pushUndo(); setNodeAttr(selEl, t.dataset.elattr, t.value);
+        } else if (t.dataset.elattrNew !== undefined && t.dataset.elattrNew) {
+          if (t.value.trim()) { pushUndo(); setNodeAttr(selEl, t.dataset.elattrNew, t.value); }
+        } else return;
+        drawPreview(); renderProps(); renderList();
+      });
+      el('props').addEventListener('click', (e) => {
+        const t = e.target;
+        if (t.id === 'addPort') {
+          pushUndo();
+          const def = window.PID_SYMBOLS[current];
+          def.ports = def.ports || [];
+          let n2 = def.ports.length + 1, id = 'port' + n2;
+          while (def.ports.some(p => p.id === id)) id = 'port' + (++n2);
+          def.ports.push({ id, x: 50, y: 50, type: 'nozzle', role: 'connection', direction: null, flowDirection: null, connectionClass: 'process', connectionType: 'process', cardinality: 1, lead: 14, ownerId: '', position: null, orientation: null, allowedTypes: null, networkId: null });
+          refreshAll(); return;
+        }
+        const del = t.closest('[data-del-port]');
+        if (del) {
+          pushUndo();
+          const def = window.PID_SYMBOLS[current];
+          def.ports = (def.ports || []).filter(p => p.id !== del.dataset.delPort);
+          if (selPort === del.dataset.delPort) selPort = null;
+          refreshAll(); return;
+        }
+        if (t.id === 'delElem' && selEl >= 0) {
+          pushUndo();
+          const c = window.PID_SYMBOLS[current];
+          const n = analyze(c.svg)[selEl];
+          c.svg = c.svg.slice(0, n.start) + c.svg.slice(n.end);
+          selEl = -1; markDirty(); refreshAll(); return;
+        }
+        if (t.id === 'dupElem' && selEl >= 0) {
+          pushUndo();
+          const c = window.PID_SYMBOLS[current];
+          const n = analyze(c.svg)[selEl];
+          c.svg = c.svg.slice(0, n.end) + c.svg.slice(n.start, n.end) + c.svg.slice(n.end);
+          markDirty(); refreshAll(); return;
+        }
+        if (t.id === 'applyAllBtn') {
+          const sw = el('swAll').value.trim(), st = el('strokeAll').value.trim();
+          const c = window.PID_SYMBOLS[current];
+          if (!sw && !st) { status('nothing to apply'); return; }
+          pushUndo();
+          const nodes = analyze(c.svg);
+          let out = '', last = 0;
+          for (const n of nodes) {
+            if (n.kind !== 'shape') continue;
+            let raw = n.attrsRaw;
+            if (sw) raw = setAttrInRaw(raw, 'stroke-width', sw);
+            if (st) raw = setAttrInRaw(raw, 'stroke', st);
+            out += c.svg.slice(last, n.start) + '<' + n.name + raw + (n.selfClose ? ' />' : '>');
+            last = n.end;
+          }
+          c.svg = out + c.svg.slice(last);
+          markDirty(); drawPreview(); status('applied defaults to every shape');
+        }
+      });
+
+      select(ALL[0]);
+    })();
+    </script>
+  </body>
+</html>
+

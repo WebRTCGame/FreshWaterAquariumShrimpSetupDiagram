@@ -3235,6 +3235,96 @@ What is left is genuinely not a layout problem and should stop being presented a
 wide flat chain cannot fill a tall sheet without either more process or a different process.
 The demo is 2.88:1 against a 1.58:1 sheet. `min.dsl` is two valves. Those are drawings of
 small processes, and the honest lever for them is content.
+### 9.67 The instrument tag overflows its bubble — real defect, fix reverted, not shipped
+
+Told the demo "hasn't improved at all", which was fair. Stopped theorising, audited that
+specific page, then zoomed into the ugliest region. Four rendering defects are visible
+there, and one of them is unambiguous. **The fix is measured, and it is not shipped.**
+
+#### The objective defect list for the demo
+
+```
+  [0]  angled segments        0        [6]  entity box overlaps    0
+  [3]  crossings              0        [9]  off-sheet pipes       0
+  [5]  lines through symbols  0        [10] crossings w/o gap     0
+  [7]  label collisions       0        [11] UTILISATION          40%
+  [4]  COLLINEAR OVERLAP      1   <- the T3.4 junction case
+  [1]  TINY TEXT           28/61   <- I broke this, see below
+```
+
+#### I broke the audit in 9.64, and did not notice for two commits
+
+`[1]` reports 28 of 61 text runs below the 3.5mm floor, at `fs=3.23`. That is a false
+positive storm I created. `denormaliseText` divides `font-size` by `k` so the type renders
+at nominal size, but `audit-svg.mjs` compares the raw attribute against 3.5mm **without
+accounting for the wrapper `scale(k)`** — so nominal-3.5mm text reads as 3.23 and gets
+flagged. Nominal 3.5 x 1.082 = 3.79, above the floor, exactly as intended.
+
+**This is the coordinate-space trap for the fifth time, and the worst instance yet, because
+it disarmed a guard.** 9.63 produced clean audits and I did not query why the numbers moved.
+The audit must multiply font-size by the wrapper scale, or read the effective size some
+other way. Until then treat every `[1]` count in this log as inflated by 1/k.
+
+#### The real defect: `FIC` / `101` does not fit its bubble
+
+The instrument tag is emitted at `inst.y + 0.5` and `inst.y + 5.5` while the bubble radius
+is ~4.5mm. **The loop number's baseline alone is 5.5mm below centre, so "101" is drawn
+entirely OUTSIDE the circle**, under "FIC", on every instrument on the sheet. Two further
+faults compound it:
+
+- **A circle is not a box.** Text on a line at offset `dy` only has the chord
+  `2*sqrt(r^2 - dy^2)`, so even a centred block overflows unless the radius is solved for.
+- **The width factor is wrong for the case.** `0.55em` is the mixed-case average used
+  elsewhere; the letters line is **bold uppercase**, nearer `0.68em`. The circle was
+  therefore solved too small and the glyphs touched the ring.
+
+And the symbol itself is not what it appears: the demo declares `FIC-101 dcs`, so
+`BUBBLE_KEYS.dcs` resolves to `shared-display`, whose body contains **both** a rect and a
+circle. The rect is 90% of the viewBox and the circle 80%, so the **circle is the binding
+constraint** — a shape test that picks the rect under-sizes. `bubbleRadiusFor()` was
+written to solve exactly this (chord-aware for circles, half-width for rects, per-shape
+width factors) and is correct as a piece of geometry.
+
+#### Why it is not shipped
+
+Two attempts, both measured, both rejected:
+
+```
+  grow the bubble to fit the text   ->  spike 997 -> 1274, dense 299 -> 419
+  centre the block, keep the size   ->  spike 997 -> 1327, labelCollisions 3 -> 14
+```
+
+The second is the informative one: **merely moving the instrument text by ~2.75mm adds
+eleven label collisions on the dense sheet.** The routing terms are untouched (crossings 15
+to 15, bends 82 to 82) — only annotation placement changed. So on `spike` there is no room
+for the corrected position, and shipping it would trade a visible overflow for eleven
+invisible collisions while the score got worse.
+
+**The root cause is a size decision, not a geometry bug.** `fs(3.2)` yields 4.5mm letters,
+which is too large for a standard ISA bubble — real ones are ~12mm across with 2.5-3mm
+type. So the fix belongs in the **letters**, bringing them down to about `fs(2.4)`, not in
+the bubble. That is a legibility judgement and it is not mine to make silently, and the
+project already has an unresolved `typeScale` / `typeFloor` tension (T6.14) sitting in the
+same area. Filed as **T6.15** rather than guessed at.
+
+#### The other three defects, unfixed and unmeasured
+
+Visible in the same zoom, listed so they are not lost:
+
+1. **The junction dot is a heavy solid black blob**, visually much larger than the 2.5mm
+   blue `pid-junction-dot` the renderer emits — so either something else draws it or the
+   node style is wrong. Not chased; the demo has 5 junctions and this is the ugliest thing
+   on the sheet.
+2. **Flow arrows are oversized.** The blue triangles are wider than the pipe and read as
+   the primary mark rather than as direction. No metric covers them.
+3. **Valve label stacks crowd each other** — 4-line stacks (tag / type / state / size) sit
+   close enough to read as one block, and `GATE VALVE` sits on a line. The score counts
+   label collisions as 3 on spike and these are not among them, so the boxes are too
+   generous or the stacks are placed without regard to each other.
+
+None of these is a layout problem. They are symbol and annotation rendering, which is where
+the remaining ugliness actually lives — 9.66 spent its whole budget on composition levers
+and the sheet still looks cheap because of things no score term measures.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

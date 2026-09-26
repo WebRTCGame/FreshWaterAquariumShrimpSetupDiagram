@@ -455,6 +455,23 @@ consumption across the five live engine files: of the symbol metadata, only
   goes **silent** when the band is widened to fit — the row that shows it measures
   rather than always warning. Reports a standing finding on all five sheets. See
   §9.50.
+- [ ] **T6.15** **Instrument tag type is too large for its bubble — decide the size.**
+  Found 2026-09-26 (log 9.67). The tag is emitted at `y+0.5` / `y+5.5` with a ~4.5mm
+  bubble, so the loop number is drawn **outside** the circle on every instrument. Tried
+  and rejected, both measured: growing the bubble took spike 997 -> 1274; centring the
+  block took spike 997 -> **1327 with labelCollisions 3 -> 14** (routing untouched —
+  crossings 15, bends 82 — so it is purely annotation placement, and the dense sheet
+  has no room for the corrected position).
+
+  The cause is a **size** decision, not a geometry bug: `fs(3.2)` gives 4.5mm letters,
+  too large for a standard ISA bubble (real ones are ~12mm with 2.5-3mm type). Fix belongs
+  in the letters (~`fs(2.4)`), not the bubble. Belongs with **T6.14** — both are the same
+  `typeScale` / `typeFloor` tension, and neither should be decided silently.
+
+  `bubbleRadiusFor()` (chord-aware for circles, half-width for rects, 0.68/0.58 width
+  factors for bold caps) is written and correct, and is the thing to call once the size
+  is settled. Note the demo FIC is a `dcs` instrument, so the binding constraint is the
+  **circle** (80% of viewBox), not the rect (90%) that a naive shape test picks.
 - [ ] **T6.14** Decide the `annotation.typeScale` / `typeFloor` tension the new check
   exposes. `typeScale 1.4` inflates a 2.6mm line tag to 3.6mm, against a stated
   print target of 3.5mm body / 2.6mm tags and an explicit "do not inflate" rule. The

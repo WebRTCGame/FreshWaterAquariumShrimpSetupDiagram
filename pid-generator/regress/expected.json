@@ -398,5 +398,102 @@
    }
   },
   "budget": 41
+ },
+ "manifold": {
+  "harness": {
+   "errors": [],
+   "warnings": [
+    "[PID-LAY-001] content (854x474mm) exceeds sheet (864x559mm) — reduce scale or layout",
+    "[PID-TXT-001] annotation type OVER: 9 run(s) at 3.6mm, 16 run(s) at 3.9mm, 8 run(s) at 4.2mm, 11 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-GEO-002] geometry \"V-4 -> J-H\": port lead-in only 6.0mm (< 14mm) — bend too close to the V-4 port",
+    "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 10.0mm (< 14mm) — bend too close to the T-2 port"
+   ],
+   "warningsTotal": 4,
+   "score": {
+    "total": 282,
+    "weights": {
+     "err": 1000,
+     "nonOrtho": 500,
+     "overlap": 150,
+     "ungapped": 150,
+     "pp": 15,
+     "ps": 10,
+     "ss": 5,
+     "label": 30,
+     "sheet": 100,
+     "bend": 2,
+     "len": 0.05,
+     "tap": 0.2,
+     "sig": 0.2,
+     "warn": 5,
+     "overlapLen": 12
+    },
+    "routing": {
+     "crossings": 1,
+     "pp": 1,
+     "ps": 0,
+     "ss": 0,
+     "bends": 31,
+     "length": 2703,
+     "nonOrtho": 0
+    },
+    "sheet": {
+     "offSheet": 0
+    },
+    "annotations": {
+     "labelCollisions": 1
+    },
+    "lines": {
+     "overlaps": 0,
+     "ungapped": 0,
+     "astarGiveups": 0
+    },
+    "instruments": {
+     "tapReachTotal": 21,
+     "maxSignalLen": 80
+    },
+    "issues": {
+     "errors": 0,
+     "warnings": 4
+    }
+   }
+  },
+  "audit": {
+   "paths": "13 process, 2 signal, 2 taps | entities: 15 | texts: 61",
+   "counts": {
+    "0": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0,
+    "7": 1,
+    "8": 2,
+    "9": 0,
+    "10": 0,
+    "11": 83,
+    "13": 0
+   },
+   "lists": {
+    "0": [],
+    "3": [],
+    "4": [],
+    "5": [],
+    "6": [],
+    "7": [
+     "\"N/O F/C\" & \"V-2\" @(150,199)"
+    ],
+    "8": [
+     "V-1->T-1 2mm (385,183)->(385,185)",
+     "V-1->T-1 2.5mm (385,185)->(383,185)"
+    ],
+    "9": [],
+    "10": [],
+    "11": [
+     "content 753x372mm bbox (55,85)->(808,457) | 98% W x 85% H | drawable 768x439mm | sheet 864x559mm"
+    ],
+    "13": []
+   }
+  },
+  "budget": 254
  }
 }

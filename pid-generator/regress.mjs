@@ -6,7 +6,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 // Fails on: any error, any warning change, score change, any audit count change.
 // Title block carries today's date, so SVG bytes are NOT compared — only the
 // machine-checked facts (errors/warnings/score/audit).
-const CASES = ['spike', 'min', 'dense', 'split'];
+const CASES = ['spike', 'min', 'dense', 'split', 'manifold'];
 const EXPECTED = 'regress/expected.json';
 
 function sh(cmd, args) {

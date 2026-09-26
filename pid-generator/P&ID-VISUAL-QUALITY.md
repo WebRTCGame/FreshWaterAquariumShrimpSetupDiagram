@@ -2798,6 +2798,146 @@ shape for that pattern, and the restore must be hash-verified.
 No code change; the tree is byte-identical to the last commit. The deliverable is the
 four-constant table above, which should be the first thing anyone reads before touching
 margins again. `T3.7` is closed as **not a defect**.
+### 9.62 T3.4 — symptom confirmed, cause refuted, remedy not justified
+
+The filed item had three claims. Two did not survive measurement.
+
+**1. The symptom is real, and rarer than stated.** Exactly **one** coincident run
+exists in the whole corpus, matching the filed description:
+
+```
+  case    junctions  fan-out pairs  <2mm apart  sharing >=3mm
+  demo        5            7             7                1     <- 8.3mm at x=470
+  spike       5            4             4                0
+  dense       2            2             2                0
+  min         1            0             0                0
+  split       2            0             0                0
+```
+
+The many `0.00mm` readings are **not** the defect: every one of them is two lines
+touching **at the junction node**, which is what lines meeting at a node are supposed
+to do. Measuring point-to-point distance without excluding the shared node makes a
+correct drawing look broken. Only the *collinear overlap away from the node* counts,
+and there is one of those.
+
+The geometry, printed rather than described:
+
+```
+  V-102->J-1     (470,261) (470,250)                    arrives UP from below
+  J-1->PSV-101   (470,250) (470,258) (470,260) (465,260) (465,274)
+```
+
+So a line **departing** the junction doubles back down the arriving line's corridor
+for 8.3mm, then turns away. Two coincident segments are drawn twice, so the line is
+locally thicker there. Real, visible, and one instance.
+
+**2. The cause is NOT `minPortRun`.** The item blames "the overlap being forced by
+`minPortRun` (14mm), which requires a line leaving a junction to run straight".
+Swept 4 / 8 / 14 / 20 / 28mm:
+
+```
+  minPortRun 14mm -> coincident 8.3mm   (A 4 pts, B 7 pts)
+  minPortRun  8mm -> coincident 8.3mm   (A 4 pts, B 7 pts)
+  minPortRun  4mm -> coincident 8.3mm   (A 4 pts, B 7 pts)
+  minPortRun 20mm -> coincident 8.3mm   (A 4 pts, B 7 pts)
+  minPortRun 28mm -> coincident 8.3mm   (A 4 pts, B 7 pts)
+```
+
+**Byte-identical across a 7x range of the rule.** The attribution is not merely
+unsupported, it is refuted. Note the shape of the result: a smooth parameter with a
+completely flat response is *evidence of absence*, not a null result — it says the
+rule is not in the causal path at all. Contrast §9.52, where `fieldNear` moved
+non-monotonically and was rejected as search noise.
+
+**3. The proposed remedy is not justified by the evidence.** The item asks for "a new
+constraint, not a weight: departure directions at a shared node must differ", to be
+added to the T2 constraints registry. One occurrence in fourteen fan-out pairs, from
+a mechanism the sweep rules out, does not justify new registry infrastructure — that
+would be building a general mechanism for a single data point, and T2 is already the
+item I flagged as too large to start blind.
+
+**Re-scoped T3.4** is a *narrow local* question, not a registry one: why does a line
+leaving J-1 take a departure direction that retraces the arriving corridor? The three
+collinear vertices `(470,250) (470,258) (470,260)` are the hint — a shared-polyline
+cleaner should collapse collinear runs, so either these come from different sources
+(a junction lead-in stub plus a route that agrees with it) or the cleaner is skipping
+them because the endpoints differ. That is a lead-in-direction question, answerable in
+one place, and it is the right next step **if** anyone wants this instance fixed.
+
+What this needs before it can be worked on properly is a **corpus that exercises
+junctions**: `min` and `split` have zero fan-out pairs, and 14 pairs across five
+sheets is too small a sample to design a constraint against. That is a fixture gap,
+and it is the honest blocker — not the constraint registry.
+### 9.63 `manifold.dsl` — the fixture T3.4 was missing, and what it immediately exposed
+
+9.62 ended with the honest conclusion that T3.4 cannot be worked on: one occurrence in
+fourteen fan-out pairs, `min` and `split` producing **zero** fan-out pairs, and a cause
+the sweep refuted. The blocker named was a **fixture gap**, not the constraint registry —
+so that is what got built. A fixture is the one thing here that is pure addition: it
+cannot break a layout, and it makes an unmeasurable item measurable.
+
+A three-branch manifold with a return header: two junctions with **four lines each**
+(1 in / 3 out, and 3 in / 1 out), and **a different size per branch** (2", 3", 4").
+Those two choices are deliberate and each covers something the corpus did not.
+
+```
+  case      junctions  fan-out pairs   <- before: min 0, split 0
+  manifold      4            6
+```
+
+Corpus fan-out pairs 14 -> 20, and more importantly now *designed* rather than
+accidental.
+
+#### It exercised the valve-size ambiguity guard on a real sheet
+
+The guard added in 9.59 — print nothing when the nearest equipment is reached with two
+different sizes — had only ever been proven by construction, never by a rendered case.
+The manifold proves it, because a header with heterogeneous branches is exactly the
+ambiguous case:
+
+```
+  V-1   label=2"   from=2"@0 via T-1   to=AMBIG(4"/3")
+  V-2   label=3"   from=3"@0 via T-2   to=AMBIG(4"/2")
+  V-3   label=4"   from=4"@0 via T-3   to=AMBIG(4"/2"/3")
+  V-4   label=4"   from=AMBIG(2"/3"/4")  to=4"@0 via P-1
+```
+
+On the header side of every valve the walk reaches vessels of two or three different
+sizes, so it reports `AMBIG` and **falls back to the one end it can resolve**. That is
+the designed behaviour and it is now demonstrated rather than asserted: a valve on a
+header genuinely has no single line size on the header side, and the honest answer is
+the branch size. Note what did **not** happen — no `4"/3"` was printed, which is what
+the unbounded walk of 9.59 would have produced.
+
+#### It made a layout weakness visible
+
+Looking at the sheet: the supply header, pump and all four valves are crammed into the
+top-left ~25% while the three vessels stack down the middle-right, leaving large empty
+regions top-right and bottom-left. Score 282, 1 crossing, 1 label collision, 0 off-sheet,
+0 errors — the numbers are respectable, and they are **hiding** the problem. Nothing in
+the score penalises a lopsided aspect ratio, because the score has no term for it.
+
+This is the concrete argument for T2 that 9.56 only made abstract: pass order decides
+where a header lands, no term in the objective notices, and the result is a drawing that
+is technically clean and visually unbalanced. A fixture that shows it is worth more
+than another paragraph arguing for it.
+
+#### One real defect found on the way, and one question
+
+- **Title overflow (real, unfixed, filed as T3.8).** The first version was titled
+  "Three-branch manifold with return header" and it was **clipped at the sheet edge** —
+  longer than the title block is wide, with no truncation, no wrap and no warning. Any
+  project with a long name hits this. I shortened the fixture title rather than bless a
+  baseline with a known clipping defect in it, which is the right call for a fixture but
+  is not a fix.
+- **A DSL description is ignored in favour of the type label.** The fixture declares
+  `T-1 tank "Branch 1 vessel"` and both the drawing and the tag list read
+  `CONE ROOF TANK`, from `TYPE_LABELS`. If an explicit description is meant to win, it
+  currently does not. Unverified either way — recorded as an open question, not a
+  finding, because I have not established which behaviour is intended.
+
+Net: `REGRESS OK (spike, min, dense, split, manifold)`, five cases, manifold baseline
+blessed at 282 with 0 errors.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

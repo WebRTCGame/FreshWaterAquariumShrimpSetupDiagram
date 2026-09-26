@@ -440,16 +440,51 @@ consumption across the five live engine files: of the symbol metadata, only
   floor additionally binds for every base ≤2.50mm, flattening three roles onto
   exactly 3.5mm so they are no longer individually distinguishable. This is a drafter's
   decision — screen legibility vs print fidelity — not a bug to fix unilaterally.
-- [ ] **T3.4** **Junction fan-out** — lines that MEET at a node run coincident for
-  6-8mm before separating, which is the real "squished" defect. On the demo,
-  `V-102->J-1` and `J-1->PSV-101` share 8mm at x=470 at **0.0mm** clearance, and
-  `J-1->PSV-101` / `PSV-101->OP-CD` share 6mm. A **new constraint, not a weight**:
-  departure directions at a shared node must differ. Two hypotheses were killed by
-  measurement first — `layout.minSep` is byte-identical on the demo across
-  45/55/65/80/95mm, and `routing.fieldNear` leaves the zero-gap count at 2 across
-  35/80/150/250/290 — because the overlap is forced by `minPortRun` (14mm), which
-  requires a line leaving a junction to run straight, and straight-from-J-1 is along
-  the arriving line's corridor. Belongs with the T2 constraints registry. §9.52.
+- [ ] **T3.4** **Junction fan-out — symptom confirmed, cause REFUTED, re-scoped.**
+  Measured 2026-09-26 (log 9.62). **Still open, but no longer a T2 item.**
+
+  *Symptom: confirmed, and rarer than this entry claimed.* Exactly **one** coincident
+  run in the corpus — `V-102->J-1` / `J-1->PSV-101`, 8.3mm at x=470 — in fourteen
+  fan-out pairs across five sheets. The numerous `0.00mm` readings are lines touching
+  **at the junction node**, which is correct behaviour; only collinear overlap *away*
+  from the node counts. Any future measurement here must exclude the shared node or it
+  will report a correct drawing as broken.
+
+  *Cause: this entry blamed `minPortRun` (14mm). That is refuted.* Swept 4/8/14/20/28mm,
+  the coincidence is **8.3mm at every value** — byte-identical across a 7x range. A
+  smooth parameter with a flat response is evidence of absence, not a null result.
+
+  *Remedy: withdrawn.* "A new constraint in the T2 registry" is not justified by one
+  occurrence whose cause the sweep rules out. That would be general infrastructure for a
+  single data point, in the one item already flagged as too large to start blind.
+
+  **Re-scoped to a narrow local question:** why does a line leaving J-1 take a departure
+  direction that retraces the arriving corridor? The vertices `(470,250) (470,258)
+  (470,260)` are collinear, and a shared-polyline cleaner should have collapsed them —
+  so either a junction lead-in stub and the route agree on a bad direction, or the
+  cleaner skips collinear points whose endpoints differ. One place to look.
+
+  **The real blocker was a fixture gap, not the registry** — and it is now HALF closed:
+  `regress/manifold.dsl` (9.63) is a three-branch manifold with two four-line junctions and a
+  different size per branch, taking corpus fan-out pairs from 14 to 20 and giving `min` and
+  `split` company. It also exercises the valve-size ambiguity guard on a real sheet for the
+  first time. One junction-heavy sheet is enough to *see* the problem; designing a
+  constraint against it still wants a few more. `min` and `split` have zero
+  fan-out pairs, which is why they were not the sample.
+- [ ] **T3.8** **A long title is clipped at the sheet edge, silently.** Found 2026-09-26
+  while building the manifold fixture (9.63). A title of "Three-branch manifold with
+  return header" overran the title block and was cut off by the sheet boundary: no
+  truncation, no wrap, no warning, and the audit does not look at the title block. Any
+  project with a long name hits this. Needs a width-aware fit (shrink, then ellipsis,
+  then warn) — and the same treatment for the other title-block lines, which are
+  currently literal font sizes with no measurement at all.
+
+- [ ] **T3.9** **Does an explicit DSL description beat `TYPE_LABELS`?** Open question,
+  not a finding. `equipment T-1 tank "Branch 1 vessel"` renders as `CONE ROOF TANK` in
+  both the drawing and the tag list, so the type label wins over the authored
+  description. That may well be intended (a consistent type vocabulary is a reasonable
+  P&ID convention) but it is currently undocumented and unverified either way. Deciding
+  it also decides what the equipment schedule is allowed to print.
 - [ ] **T3.5** The demo is **under-allocated, not crowded**: 64% W x 39% H, entity
   centres spanning 170 of 463mm. Content aspect 2.96:1 against a drawable 1.79:1, so
   it cannot fill the height without first being narrowed — "spread it out" pushes it

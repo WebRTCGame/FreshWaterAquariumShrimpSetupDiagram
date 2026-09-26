@@ -275,6 +275,27 @@ or unaffordable without it.
 - [ ] **T2.1** `CONSTRAINTS` registry with hard/soft kinds *(Stage 2)*
 - [ ] **T2.2** Migrate `passTerminals` → constraint; delete the pass *(Stage 2)*
 - [ ] **T2.3** Migrate `passDecrowd` → constraint; delete the pass *(Stage 2)*
+- [ ] **T2.6** **Add `layout.rowSpacing` to the layout search as a dimension.**
+  Found 2026-09-26 (log 9.66). The search renders 3 orders x 2 sweeps and keeps the
+  lowest score; adding row pitch makes it evaluate the height/length trade *per sheet*.
+
+  - **Do NOT add a fill or composition score term.** Measured: the demo has a 93%-height
+    candidate that the score rejects, and it is right to — that candidate costs **2.5x the
+    line length and 4x the crossings**. A term strong enough to override that reproduces
+    the reverted `util` term.
+  - **`layout.colSpacing` is dead** (byte-identical 140->40mm). `pid-router.js:96-97` uses
+    it only as a wrap threshold, and nothing in the corpus wraps, so it cannot move the
+    layout. Either give it a real effect or delete it — a parameter advertised as
+    "auto-layout column pitch" that does nothing invites tuning that achieves nothing.
+  - `layout.minSep` is inert on the demo across 45-95mm (9.52, re-confirmed 9.66).
+  - `layout.rowSpacing` **is** live, with a knee: 145->200 gives the demo +6% height for
+    +10 score with line length *falling*; 145->260 gives +22% height for +53 score and
+    +2 crossings; 340 is worse than 260 on everything. This is **not** the `ROW_SOLVED`
+    experiment, which stretched the *solved* pitch and was catastrophic.
+
+  Left deliberately un-hardcoded: where to sit on that curve is a drafting judgement, and
+  picking a single value is re-blessing a baseline with extra steps. Let the search decide
+  per sheet. **Add a candidate, not a score term.**
 - [ ] **T2.4** Layered ordering + coordinate assignment solver; replace the in-place slot/median code *(Stage 2)*
 - [ ] **T2.5** Delete `PID_LAYOUT_ORDERS`, `layoutOrder` DSL plumbing and the order-search dimension *(Stage 2)*
 

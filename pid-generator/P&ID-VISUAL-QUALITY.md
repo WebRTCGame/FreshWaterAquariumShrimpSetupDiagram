@@ -3125,6 +3125,116 @@ The cheapest honest improvement is not a new mechanism, it is a page that says
 `equipment T-1 tank at 420,200` exists and what the zone is. **A drawing tool whose
 manual placement is undocumented is a drawing tool that makes people fight the
 auto-layout.**
+### 9.66 What can actually improve the layout — and the two levers that do not exist
+
+Asked, a third time and more directly, what would greatly improve the layout. The previous
+two answers were "add more content" (wrong, and I was told so) and "add a composition score
+term" (untested). Both are now settled by measurement.
+
+#### The score is not the problem. It is correctly refusing a bad trade.
+
+All six candidates the search already renders were measured for composition. The demo:
+
+```
+  order sweep   score   extent      useW  useH  aspect  |log mismatch|
+  JVI    0      235   606x 210mm    73%   40%  2.88   0.600   <- score winner
+  JIV    0      335   606x 210mm    73%   40%  2.88   0.600
+  JVI    1      250   606x 190mm    73%   36%  3.19   0.700
+  VJI    1      471   608x 485mm    73%   93%  1.25   0.234   <- best composed
+  VJI    0      399   343x 505mm    41%   97%  0.68   0.848
+```
+
+So the engine **does** produce a 93%-height drawing and **throws it away** for a 40%-height
+one. That looked like free headroom for a composition term, and it is not. The 236 points
+between them are:
+
+```
+  routing.crossings     2 -> 8      (+6)
+  routing.bends        39 -> 59    (+20)
+  routing.length     1607 -> 4104   (2.5x the line)
+```
+
+**The height is bought with 2.5x the total line length and 4x the crossings.** A 93%-height
+drawing needing 4104mm of pipe where 1607mm will do is not better, only taller. The score
+is right to refuse it, and a composition term strong enough to override that would be
+reproducing the `util` failure exactly. **Do not add a fill or composition term.**
+
+#### The real reason `util` failed, restated: there was no lever
+
+`util` was rejected for measuring pipes instead of symbols, and for having nothing to act on.
+The second reason is the deeper one, and checking it properly changes the plan. Of the three
+composition levers in the registry, **two do not exist**:
+
+**`layout.colSpacing` is DEAD.** Swept 140 -> 40mm, a 3.5x range, and produced
+**byte-identical** output on both sheets — same total, same height, same length, same
+crossings:
+
+```
+    140mm  demo  235  40%  len 1607   40mm  demo  235  40%  len 1607
+     70mm  demo  235  40%  len 1607    45mm  demo  235  40%  len 1607
+```
+
+The mechanism, `pid-router.js:96-97`:
+
+```js
+const colsPerRow = Math.max(2, numCols <= Math.floor(availW / BASE_COL) ? numCols : ...);
+const COL = numCols <= colsPerRow ? availW / Math.max(numCols, 1) : ...;
+```
+
+When everything fits on one row — which is the demo, dense and split — `COL = availW/numCols`
+and `BASE_COL` is **bypassed entirely**. It is a wrap *threshold*, not a column pitch, and
+nothing in the corpus wraps. A registered layout parameter described as "auto-layout column
+pitch" that cannot move the layout is worse than no parameter: it invites tuning that does
+nothing. Same family as the dead `view.grid || 20` fallbacks.
+
+**`layout.minSep` is inert where it was expected to act.** 9.52 already found it
+byte-identical on the demo across 45-95mm; re-confirmed here.
+
+#### The lever that IS live: `layout.rowSpacing`
+
+`ROW` is what actually sets tier height, and it moves the drawing:
+
+```
+  row    case   total   useH    len     dLen  cross
+  145    demo    235    40%    1607      +0     2     <- default
+  200    demo    245    46%    1550     -57     3
+  260    demo    288    62%    1996    +389     4
+  340    demo    309    60%    2019    +412     4
+  200   dense    314    38%    2924    +215     5
+  260   dense    326    52%    3152    +443     3
+```
+
+This is a **real trade, not a free win**, and the curve has a knee:
+
+- `145 -> 200` buys the demo **+6% height for +10 score**, and line length actually
+  *falls* by 57mm. Cheap.
+- `145 -> 260` buys **+22% height for +53 score** and +2 crossings. Expensive.
+- `340` is worse than `260` on height and better on nothing — the curve turns over.
+
+Note this is **not** the `ROW_SOLVED` experiment. That stretched the *solved* row pitch and
+was catastrophic (spike 1276 -> 1359..1894). This changes the *base* `rowSpacing`, which is a
+different parameter behaving far more mildly. Recording the distinction so the old negative
+result is not misread as covering this.
+
+#### The recommendation, and why it is not mine to make
+
+Do **not** hardcode a new `rowSpacing`. Raising it to 260 makes the numbers look better on
+the demo and costs crossings on every sheet — that is re-blessing a baseline to make
+something pass, with extra steps. Where to sit on that curve is a drafting judgement: a
+62%-height sheet with 4 crossings may beat a 40%-height sheet with 2, and that is not a
+technical question.
+
+**Add `rowSpacing` to the search as a dimension**, alongside the three pass orders. The
+search already renders 3 orders x 2 sweeps and keeps the lowest score; adding row pitch
+makes it try each point on the curve per sheet and lets the score — which 9.66 shows is
+trustworthy about exactly this trade — pick. That is the same architecture that made the
+order search work in 9.56, and it is the opposite of a new score term: **add a candidate,
+not a term.**
+
+What is left is genuinely not a layout problem and should stop being presented as one: a
+wide flat chain cannot fill a tall sheet without either more process or a different process.
+The demo is 2.88:1 against a 1.58:1 sheet. `min.dsl` is two valves. Those are drawings of
+small processes, and the honest lever for them is content.
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

@@ -3044,6 +3044,87 @@ It says the fix for an under-filled sheet is "a richer demo, not a layout change
 that survives — a 14-entity chain still cannot fill the height of an ARCH D sheet, because
 3.18:1 content on a 1.57:1 sheet is a geometry problem, not a bug. But the claim that
 nothing would fill the sheet was wrong, and the reason it was wrong is the clamp.
+### 9.65 `at` already exists — the gap was silence, not mechanism
+
+Asked whether we need a way to place equipment on the page and pin its location. We do,
+and it has existed the whole time. Before building anything, measure what is actually
+there:
+
+- `at x,y` is accepted on **equipment, valves, instruments, junctions, stubs and
+  off-page** connections. It sets `_fixed`, and **every** layout pass skips pinned items
+  (barycentre, slots, coords, decrowd, terminals, centring) — `pid-router.js` has ten
+  separate `if (e.at || e.rel) continue` guards.
+- `rel <ref>` places an item relative to another at a 70mm offset.
+- Pins land **exactly**. Sweeping one tank across the zone:
+
+```
+  pin x      rendered x    delta
+   100          100          0     honoured
+   300          300          0     honoured
+   500          500          0     honoured
+   700          700          0     honoured
+   810          804         -6     MOVED
+   816          804        -12     MOVED
+   860          804        -56     MOVED
+```
+
+So the mechanism is sound and the honest answer to "do we need this" is *no, you have
+it*. Three real gaps remain, and only the first is a bug.
+
+#### 1. An out-of-zone pin is relocated SILENTLY — fixed as PID-LAY-002
+
+The zone is `x 48..816 / y 42..481`. A pin beyond it is clamped, and the only feedback
+was **downstream and about something else**:
+
+```
+  E COLLINEAR_OVERLAP  lines sharing a corridor (T-2->J-R & T-3->J-R ...)
+  W [PID-SHT-001]     line "T-1 -> J-R" leaves the sheet
+```
+
+Nothing said *"your pin was moved"*. The user is told their drawing is wrong without
+being told their instruction was not obeyed — which is the worst kind of silence in a
+drafting tool, because it makes the engine look **unreliable** rather than
+**constrained**. Those need very different responses: one is a bug report, the other is
+a note about where you put it.
+
+`PID-LAY-002` reports the adjustment with both coordinates and which way:
+
+```
+  W [PID-LAY-002] "T-1" pinned at 860,200 was placed at 804,200 (56.0mm left)
+        -- outside the placement zone x 48..816 / y 42..481
+```
+
+Proven in **both** directions: fires on the out-of-zone pin above, and is **silent
+across the whole corpus** — including `min.dsl`, which *does* pin `at 160,280` and is
+correctly left alone. A check that only knows how to fire is not a check.
+
+#### 2. Pinning costs layout quality, and nothing says so
+
+```
+  manifold, all four vessels pinned:  score 282 -> 449   (+167)
+    crossings      1 -> 5
+    bends         31 -> 41
+    labelColl      1 -> 2
+    offSheet       0 -> 0
+```
+
+That is the price of manual control and it is legitimate — the user traded
+auto-optimal for intent. But it is **invisible**: nothing reports that pinning cost five
+crossings. A drafter who pins things and gets a worse drawing has no way to learn
+whether the tool or their constraint is at fault. Worth reporting, ideally as a
+"pins moved N crossings" advisory rather than a warning, since the user chose it.
+
+#### 3. No documentation, no UI
+
+A search of every `.md` for the syntax finds **two incidental lines**, both in
+historical review files. There is no user-facing documentation of `at` or `rel` anywhere,
+and no drag-to-place in the page — placement is hand-edited DSL text. So the capability
+is invisible to exactly the person who would want it.
+
+The cheapest honest improvement is not a new mechanism, it is a page that says
+`equipment T-1 tank at 420,200` exists and what the zone is. **A drawing tool whose
+manual placement is undocumented is a drawing tool that makes people fight the
+auto-layout.**
 ### 9.57 Still outstanding after this pass
 - **Pipes record no port binding** (`T7.13`) — a pipe is `{from, to}` with no port
 

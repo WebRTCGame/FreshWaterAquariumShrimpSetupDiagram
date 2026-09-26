@@ -290,6 +290,34 @@ function validateModel(data) {
     if (seen[e.id]) w.push(`[PID-TAG-001] duplicate id "${e.id}"`);
     seen[e.id] = true;
   }
+
+  // ---- PID-LAY-002: a PINNED position that was not honoured ------------------
+  //
+  // `at x,y` works, and works exactly: every layout pass skips pinned items and a pin
+  // inside the placement zone lands on the millimetre. The gap is what happens
+  // OUTSIDE it. The zone is x 48..816 / y 42..481 and a pin beyond that is relocated:
+  //
+  //     at 810,200 -> 804,200      at 860,200 -> 804,200
+  //
+  // silently. The only feedback was downstream and named something else -- a
+  // PID-SHT-001 "leaves the sheet", or a COLLINEAR_OVERLAP error -- so the user was told
+  // their drawing was wrong without being told their instruction was not obeyed. That
+  // is the worst kind of silence in a drafting tool: it makes the engine look
+  // unreliable rather than constrained.
+  //
+  // Report the adjustment with both coordinates so the cause is unambiguous. 0.5mm
+  // tolerance absorbs grid snapping that legitimately applies elsewhere.
+  for (const e of [...data.equipment, ...data.valves, ...data.instruments]) {
+    if (!e.at || e.x == null) continue;
+    const dx = e.x - e.at.x, dy = e.y - e.at.y;
+    const moved = Math.max(Math.abs(dx), Math.abs(dy));
+    if (moved <= 0.5) continue;
+    const who = e.id || e.tag || '?';
+    w.push(`[PID-LAY-002] "${who}" pinned at ${Math.round(e.at.x)},${Math.round(e.at.y)} `
+      + `was placed at ${Math.round(e.x)},${Math.round(e.y)} (${moved.toFixed(1)}mm `
+      + `${dx < 0 ? 'left' : 'right'}) -- outside the placement zone `
+      + `x 48..816 / y 42..481`);
+  }
   for (const i of data.instruments) {
     if (seen[i.tag]) w.push(`[PID-TAG-002] duplicate instrument tag "${i.tag}"`);
     seen[i.tag] = true;

@@ -2148,6 +2148,13 @@ function embedSymbolRaw(glyph, cx, cy, size, rotation) {
 function themeCss(T) {
   return `
 svg[data-theme]{background:${T.bg}}
+/* --- all annotation type is uppercase ---
+   Applied as a PRESENTATION rule rather than by uppercasing the data. The DSL keeps
+   its authored case, so toSource() still round-trips what the user typed, the
+   validator still matches the original strings, and nothing that compares text
+   (tag lookup, collision keys, the DSL textarea) is affected. Only what is drawn
+   changes. */
+svg[data-theme] text{text-transform:uppercase}
 /* --- layers: entity groups; glyph strokes are currentColor and inherit --- */
 .ly-equipment{color:${T.equipment}}
 .ly-valve{color:${T.valve}}
@@ -2261,8 +2268,11 @@ window.PIDGenerator = {
             svg.setAttribute('id', containerId + '-svg');
             svg.setAttribute('role', 'img');
             const score = renderInto(svg, data, themeOpt);
+            // snapshot the debug geometry WITH the candidate, so the winner's can be
+            // restored below (see the note at the restore site)
+            const geo = window.__pidGeo;
             if (!bestOrder || score.total < bestOrder.score.total) {
-              bestOrder = { ord, sw, sep, svg, data, score };
+              bestOrder = { ord, sw, sep, svg, data, score, geo };
             }
           }
         }
@@ -2270,6 +2280,21 @@ window.PIDGenerator = {
       const { svg, data, score } = bestOrder;
       container.innerHTML = '';
       container.appendChild(svg);
+      // Re-publish the debug geometry from the WINNING candidate.
+      //
+      // `window.__pidGeo` is written inside renderInto, and every candidate is a
+      // complete render (see the comment above), so it is written once per candidate
+      // and the last write survives — which is the last candidate TRIED, not the one
+      // that won. Measured on the demo: __pidGeo spanned y 72..542 while the emitted
+      // drawing spanned y 222..372, so the pipe-routes and crossings overlays
+      // described a layout that was not on screen. That is what made the overlay
+      // checkboxes useless, and it is the same shared-mutable-state-across-a-search
+      // hazard as the module globals noted elsewhere.
+      //
+      // Fixed by snapshotting per candidate and restoring the winner's, rather than
+      // re-deriving: renderInto has already done the work and re-running it would
+      // cost a full route.
+      if (bestOrder.geo) window.__pidGeo = bestOrder.geo;
       return {
         svg: svg.outerHTML, warnings: data.warnings, errors: data.errors,
         info: data.info, score, data, layoutOrder: bestOrder.ord,

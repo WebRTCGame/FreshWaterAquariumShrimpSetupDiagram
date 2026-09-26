@@ -442,6 +442,38 @@ alarm LAL-101 from LT-101 condition low
         const grid = data.view.grid || 5;
         const sw = data.view.sheetW || 864, sh = data.view.sheetH || 559;
 
+        // ---- coordinate-space fix (Q2) ----------------------------------------
+        // The drawing lives inside a content group carrying a margin translate
+        // (`translate(20 22)` on a normal sheet), but the overlay layer is appended
+        // as a direct child of the root <svg>. Overlays that read entity
+        // coordinates — e.x, inst.x, j.x — are therefore drawn in CONTENT space and
+        // land offset by the whole margin, so the component boxes, port rings and
+        // label boxes do not sit on the components they describe. The grid and
+        // sheet-bounds overlays are in SHEET space and were already correct, which is
+        // why the two families disagreed.
+        //
+        // Do NOT hardcode the margin here. Reading it back off the content group is
+        // the point: a second copy of the constant is exactly what let the two drift
+        // apart in the first place, and it would drift again the moment the margin
+        // changed or the content overflowed and `wrap` took over with a different
+        // (scale-bearing) transform.
+        const contentG = [...svg.children].find((el) => el.tagName === 'g' && el.getAttribute('transform'));
+        let ox = 0, oy = 0, oscale = 1;
+        if (contentG) {
+          const tr = contentG.getAttribute('transform') || '';
+          const mt = tr.match(/translate\(\s*(-?[\d.]+)[ ,]+(-?[\d.]+)\s*\)/);
+          if (mt) { ox = parseFloat(mt[1]); oy = parseFloat(mt[2]); }
+          const ms = tr.match(/scale\(\s*(-?[\d.]+)/);
+          if (ms) oscale = parseFloat(ms[1]);
+        }
+        // entity-space overlays go in here; sheet-space ones (grid, sheet bounds)
+        // stay in the parent so they are unaffected
+        const ge = ns('g');
+        if (contentG) ge.setAttribute('transform', `translate(${ox} ${oy}) scale(${oscale})`);
+        g.appendChild(ge);
+        const CONTENT_SPACE_OVERLAYS = ['tog-bbox', 'tog-exclusion', 'tog-ports', 'tog-labels'];
+        const target = (name) => (CONTENT_SPACE_OVERLAYS.includes(name) ? ge : g);
+
         // -- Grid --
         if (isOn('tog-grid')) {
           const gg = ns('g'); gg.setAttribute('opacity', '0.15');
@@ -481,15 +513,15 @@ alarm LAL-101 from LT-101 condition low
             try { sz = glyphSizeOf(e.symbol || 'pip/equipment/vessel-vertical') * (e.scale || 1) * SC; } catch {}
             const r = ns('rect'); attrs(r, { x: e.x - sz/2, y: e.y - sz/2, width: sz, height: sz,
               fill: '#2196f3', 'fill-opacity': 0.06, stroke: '#2196f3', 'stroke-width': 0.3, 'stroke-dasharray': '2 2' });
-            g.appendChild(r);
+            ge.appendChild(r);
             // label
             const t = ns('text'); attrs(t, { x: e.x - sz/2, y: e.y - sz/2 - 1.5, fill: '#2196f3', 'font-size': 3.5, opacity: 0.6 });
-            t.textContent = e.id; g.appendChild(t);
+            t.textContent = e.id; ge.appendChild(t);
           }
           for (const inst of data.instruments) {
             const r = ns('rect'); attrs(r, { x: inst.x - 8, y: inst.y - 8, width: 16, height: 16,
               fill: '#9c27b0', 'fill-opacity': 0.06, stroke: '#9c27b0', 'stroke-width': 0.3, 'stroke-dasharray': '2 2' });
-            g.appendChild(r);
+            ge.appendChild(r);
           }
         }
 
@@ -502,19 +534,19 @@ alarm LAL-101 from LT-101 condition low
             const r = ns('rect'); attrs(r, { x: e.x - sz/2 - PAD, y: e.y - sz/2 - PAD,
               width: sz + 2*PAD, height: sz + 2*PAD,
               fill: '#f44336', 'fill-opacity': 0.04, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
-            g.appendChild(r);
+            ge.appendChild(r);
           }
           // junction exclusion (6mm radius)
           for (const j of data.junctions) {
             const c = ns('circle'); attrs(c, { cx: j.x, cy: j.y, r: 6,
               fill: '#f44336', 'fill-opacity': 0.04, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
-            g.appendChild(c);
+            ge.appendChild(c);
           }
           // instrument exclusion (14mm radius)
           for (const i of data.instruments) {
             const c = ns('circle'); attrs(c, { cx: i.x, cy: i.y, r: 14,
               fill: '#f44336', 'fill-opacity': 0.03, stroke: '#f44336', 'stroke-width': 0.2, 'stroke-dasharray': '1 1' });
-            g.appendChild(c);
+            ge.appendChild(c);
           }
         }
 
@@ -524,19 +556,19 @@ alarm LAL-101 from LT-101 condition low
             if (nz.tipPosition) {
               const c = ns('circle'); attrs(c, { cx: nz.tipPosition.x, cy: nz.tipPosition.y, r: 1.5,
                 fill: '#ff9800', stroke: '#e65100', 'stroke-width': 0.3 });
-              g.appendChild(c);
+              ge.appendChild(c);
             }
             if (nz.position) {
               const c = ns('circle'); attrs(c, { cx: nz.position.x, cy: nz.position.y, r: 1,
                 fill: 'none', stroke: '#ff9800', 'stroke-width': 0.3 });
-              g.appendChild(c);
+              ge.appendChild(c);
             }
           }
           // junction dots
           for (const j of data.junctions) {
             const c = ns('circle'); attrs(c, { cx: j.x, cy: j.y, r: 2,
               fill: '#4caf50', stroke: '#2e7d32', 'stroke-width': 0.3 });
-            g.appendChild(c);
+            ge.appendChild(c);
           }
         }
 
@@ -549,7 +581,7 @@ alarm LAL-101 from LT-101 condition low
             const path = ns('path'); attrs(path, { d, fill: 'none',
               stroke: geo.tap ? '#ff5722' : (geo.kind === 'signal' ? '#9c27b0' : '#2196f3'),
               'stroke-width': geo.tap ? 0.4 : 0.6, opacity: 0.7, 'stroke-linejoin': 'round' });
-            g.appendChild(path);
+            ge.appendChild(path);
             // direction arrow at midpoint
             if (geo.pts.length >= 2) {
               const mid = Math.floor(geo.pts.length / 2);
@@ -559,7 +591,7 @@ alarm LAL-101 from LT-101 condition low
               const arrow = ns('polygon');
               attrs(arrow, { points: '-2,-1 2,0 -2,1', fill: '#2196f3', opacity: 0.5,
                 transform: `translate(${mx.toFixed(1)},${my.toFixed(1)}) rotate(${ang.toFixed(0)})` });
-              g.appendChild(arrow);
+              ge.appendChild(arrow);
             }
           }
         }
@@ -576,9 +608,9 @@ alarm LAL-101 from LT-101 condition low
                 if (x && PIDEngine.isRealCrossing(si, sj)) {
                   const c = ns('circle'); attrs(c, { cx: x.x, cy: x.y, r: 3,
                     fill: 'none', stroke: '#f44336', 'stroke-width': 0.5, 'stroke-dasharray': '1 1' });
-                  g.appendChild(c);
+                  ge.appendChild(c);
                   const t = ns('text'); attrs(t, { x: x.x + 3, y: x.y - 2, fill: '#f44336', 'font-size': 3, opacity: 0.7 });
-                  t.textContent = 'X'; g.appendChild(t);
+                  t.textContent = 'X'; ge.appendChild(t);
                 }
               }
             }
@@ -601,7 +633,7 @@ alarm LAL-101 from LT-101 condition low
             const r = ns('rect'); attrs(r, {
               x: mid ? x - w/2 : x, y: y - h, width: w, height: h,
               fill: '#4caf50', 'fill-opacity': 0.05, stroke: '#4caf50', 'stroke-width': 0.15 });
-            g.appendChild(r);
+            ge.appendChild(r);
           }
         }
 

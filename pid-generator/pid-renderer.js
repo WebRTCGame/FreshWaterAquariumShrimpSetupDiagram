@@ -1871,6 +1871,11 @@ const shiftFor = (lineIdx, x) => {
   // must run after every fs() call above, and before finalizeValidation, which is
   // where the score is priced from the warning list
   checkTypeBand();
+  // Resolve the type sizes ONCE and publish them, so annotationsSvg (sheet
+  // furniture) draws the equipment schedule at exactly the same sizes the
+  // annotation layer uses. Recomputing the formula over there would be a third
+  // copy of a constant that has already drifted once.
+  data.typeMm = { eqTag: fs(3.2), eqType: fs(2.8) };
   const lineIssues = validateGeometry(data, geometries, pipes, tapGeos);
   finalizeValidation(data);
 
@@ -2036,6 +2041,24 @@ function annotationsSvg(data, W, H) {
     }
   }
 
+  // ---- equipment tag list, top edge (T3.6) --------------------------------
+  // Clones of the equipment annotations, in the band autoLayout reserved. Same text,
+  // same sizes (data.typeMm, published from the one fs() choke point) as the drawing.
+  const el = data.equipList;
+  if (el && el.rows.length) {
+    const tm = data.typeMm || { eqTag: 4.5, eqType: 4.0 };
+    const lx = pad + 10;                              // one common left edge
+    el.rows.forEach((row, i) => {
+      const y = pad + 12 + el.pitch * i;
+      s += `<text x="${lx}" y="${y}" font-size="${tm.eqTag}" font-weight="bold" fill="#111" text-decoration="underline">${esc(row.tag)}</text>`;
+      if (row.type) s += `<text x="${lx}" y="${y + 3.6}" font-size="${tm.eqType}" fill="#666">${esc(row.type)}</text>`;
+    });
+    // Never drop rows silently -- a reader has to be able to tell the list is partial.
+    if (el.dropped > 0) {
+      const y = pad + 12 + el.pitch * (el.rows.length + 1);
+      s += `<text x="${lx}" y="${y}" font-size="${tm.eqType}" fill="#666">+${el.dropped} MORE</text>`;
+    }
+  }
   // legend, bottom-left inside the frame
   if (v.legend) {
     const lx = pad + 24, ly = H - pad - 48;

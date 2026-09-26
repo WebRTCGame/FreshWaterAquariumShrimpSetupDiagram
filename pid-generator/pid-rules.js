@@ -192,6 +192,15 @@ const PID_RULES = {
       sizeMin:      { value: 2.6, min: 0.5, max: null, unit: 'mm', desc: 'smallest print-legible annotation size; below this PID-TXT-001 warns UNDER' },
       sizeMax:      { value: 3.5, min: 1, max: null, unit: 'mm', desc: 'largest print-legible annotation size; above this PID-TXT-001 warns OVER' },
       sizeScopeMin: { value: 0, min: 0, max: null, unit: 'count', desc: 'do not warn on annotation type if fewer than this many runs are affected (0 = warn always)' },
+      // Equipment schedule along the top edge, as on a real P&ID. The band is RESERVED
+      // by autoLayout (the centring target's zy0 moves down by its height) rather than
+      // drawn into whatever space happens to be left, so it can never land on the
+      // drawing. Max rows is capped because the band is reserved from the top margin:
+      // an unbounded list would push the drawing off the sheet.
+      equipList:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'draw an equipment schedule across the top of the sheet' },
+      equipListPitch:{ value: 9, min: 6, max: null, unit: 'mm', desc: 'vertical pitch of one tag-list item (a bold tag line plus a grey type line under it)' },
+      equipListPad: { value: 4, min: 0, max: null, unit: 'mm', desc: 'clear space between the tag list and the drawing below it' },
+      equipListMax: { value: 14, min: 1, max: null, unit: 'count', desc: 'rows beyond this are dropped and counted; the band comes out of the top margin so an unbounded list would push the drawing off the sheet' },
       labelOffset:  { value: 14, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff' },
       labelOffsetWide: { value: 28, min: 8, max: null, unit: 'mm', desc: 'line-label fallback standoff' },
     },

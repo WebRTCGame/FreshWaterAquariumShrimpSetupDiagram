@@ -819,6 +819,44 @@ function autoLayout(data) {
   //
   // Entities carrying an explicit `at` are user-placed and are honoured as
   // authored, so the block is measured from auto-placed items only.
+  // ---- reserve the equipment-schedule band (T3.6) --------------------------
+  // The schedule is drawn across the top of the sheet, so its height is taken OUT of
+  // the layout zone rather than drawn into whatever space happens to be left. Doing it
+  // the other way round would put the list on top of the drawing the moment a sheet
+  // filled its sheet, which is the normal case rather than an edge case.
+  //
+  // Built here, before the centring target below, because that target zy0 has to know
+  // how much room the list takes. The renderer reads the SAME object, so the two cannot
+  // disagree about how tall it is.
+  // ---- equipment tag list, top edge (T3.6) --------------------------------
+  // A clone of each item's OWN annotation: the bold underlined tag plus the grey
+  // type label, stacked and left-aligned. Same two strings and the same
+  // `noTypeLabel` rule the equipment annotation itself uses, so the list cannot
+  // drift from the drawing.
+  //
+  // Only the HEIGHT matters here, and it is RESERVED: added to the centring target's
+  // zy0 below. Drawn into leftover space instead would put the list on top of the
+  // drawing as soon as a sheet filled its sheet, which is the normal case, not an edge
+  // case. The renderer reads this same object, so the two cannot disagree on height.
+  const eqList = (() => {
+    if (!ruleParam('annotation.equipList', 1)) return null;
+    const rows = equipment
+      .filter((e) => e.tag || e.id)
+      .map((e) => ({
+        tag: e.tag || e.id,
+        type: e.noTypeLabel ? '' : (TYPE_LABELS[e.type] || e.type || ''),
+      }))
+      .sort((a, b) => String(a.tag).localeCompare(String(b.tag), undefined, { numeric: true }));
+    if (!rows.length) return null;
+    // Cap the rows. The band comes out of the top margin, so an unbounded list
+    // would push the drawing off the bottom of the sheet.
+    const max = ruleParam('annotation.equipListMax', 14);
+    const pitch = ruleParam('annotation.equipListPitch', 9);
+    const shown = rows.slice(0, max);
+    return { rows: shown, dropped: rows.length - shown.length, pitch,
+             height: pitch * shown.length + ruleParam('annotation.equipListPad', 4) };
+  })();  data.equipList = eqList;
+
   if (ruleParam('layout.centre', 1)) {
     const FRAME = 18;                 // border frame inset
     const BOT_RESERVE = ruleParam('layout.centreBottomReserve', 60); // title block band
@@ -827,7 +865,9 @@ function autoLayout(data) {
     const SW = data.view.sheetW || 864, SH = data.view.sheetH || 559;
     const zx0 = FRAME + ruleParam('layout.xMargin', 60) * 0.5;
     const zx1 = SW - FRAME - ruleParam('layout.xMargin', 60) * 0.5;
-    const zy0 = FRAME + 24;                    // headroom for the instrument tier
+    // headroom for the instrument tier, PLUS whatever the equipment schedule reserves.
+    // Without this the list and the drawing would share the same band.
+    const zy0 = FRAME + 24 + (eqList ? eqList.height : 0);
     const zy1 = SH - FRAME - BOT_RESERVE;      // clear of the title block
     // Absolute `at` coordinates are the drafter's layout, not the engine's.
     // Centring would fight them — and worse, if only the auto items moved, it

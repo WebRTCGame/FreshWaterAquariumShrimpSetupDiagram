@@ -502,6 +502,55 @@ consumption across the five live engine files: of the symbol metadata, only
 
 ---
 
+### Deferred by request, 2026-09-26
+
+Four items raised in review that are **not** done. Recorded here so they are not lost,
+each with the open question that has to be answered before implementation — not just a
+title.
+
+- [ ] **T3.6** **Equipment list / schedule along the top edge**, as on a real P&ID.
+  Requested: "we need each equipment listed along the top edge of the page as a
+  callout/annotation". **Deferred only because it is a feature, not a patch** — it
+  needs a column layout, a row-pitch budget, and a decision on which fields.
+  *Why it is worth doing first of the four:* it attacks the measured under-allocation
+  directly. The demo uses **39% of usable height** with entity centres spanning only
+  170 of 463 mm, and a real equipment schedule occupies exactly that void (9.52).
+  Open questions: which fields (tag / description / service / size?); is the list
+  per-sheet or whole-drawing; does it consume the top margin so the centring target
+  must move down; does a long list wrap or paginate; does it interact with `legend`
+  (F7), which may be the same feature under another name.
+
+- [ ] **T7.12** **Valve size shown above the valve**, derived from the process line
+  when the DSL does not state it. Requested: "show the valve size above the valve, if
+  it's not specified in the dsl then it should be derived from the process line the
+  valve is on."
+  **Blocked on one ambiguity that must be settled first:** what does "the process line
+  the valve is on" mean when the two sides differ? A valve reducing 4" to 2" has two
+  lines and two sizes, and a valve mid-run inherits one. Also unknown: whether the DSL
+  already accepts a valve `size` (nozzles demonstrably do — `nozzle N1 ... size 4"`),
+  and what the fallback should be when *neither* side declares a size. Guessing here
+  would put wrong text on the drawing, which is worse than putting none.
+
+- [ ] **T4.4** **Label-collision metric measures the authored strings, not the drawn
+  glyphs.** Introduced as a side effect of the uppercase change (all type is now
+  uppercase via CSS, so the data keeps its authored case). Capitals are wider than
+  mixed case, so a collision that only appears once the text is uppercased is
+  **invisible to the metric** — `REGRESS OK` after the change is expected *and* means
+  the metric can now under-report. Needs the collision test to run on the rendered
+  (uppercased, measured) string rather than the source string. Cheap, but it silently
+  weakens an existing check until done.
+
+- [ ] **T3.7** **Routing is bounded by the sheet, not by the placement zone.** Two
+  different things share the word "margin" and they are not the same. Entities are
+  placed inside x 48..816 / y 42..481 (`pid-router.js:823-831`), but the A* is bounded
+  only by `SHEET`, so **lines can enter the border frame and the title-block band** —
+  measured: `spike` lines reach x 830, past the 816 entity limit, and `spike` entities
+  themselves reach 820, 4 mm outside their own zone. `PID-SHT-001` only tests
+  off-sheet, so nothing reports either. Wants one shared margin constant, a check that
+  tests the zone rather than the sheet, and a decision on whether the title-block band
+  is hard-forbidden to routing. Directly relevant to T3.6, which will move the top
+  margin.
+
 ## Sequenced recommendation
 
 If only three things get done, do these:
@@ -546,6 +595,14 @@ Kept here so the todo list is not read as "nothing has shipped":
 | `T6.5` `loop` clobbering | fixed; verified `"1"` → `"FC-101"` |
 | `T6.6` second tap dropped | fixed at pre-pass **and** emitter; 1 leader → 2, proven by fixture |
 | `T6.12` `ruleEnabled()` | deleted — never called, and all 12 disabled rules have no emitters |
+| ISA valve ports off the flow axis | 26 ports moved onto the axis; `control-valve` was **2.5 mm low and fully detached** from its pipe |
+| Dead `crossesLine` guard | wired in; smoothing was re-introducing crossings in **156/251 A\* calls** on `spike`; spike 1185 → 988 |
+| 5 malformed arc sweep flags | Chrome was silently **dropping the remainder of each path**; `silencer` rendered as nothing |
+| `PID-TXT-001` | new runtime warning for annotation type outside the print band; reports on all five sheets |
+| Dead `view.grid` fallbacks | five sites said `\|\| 20` where the schema default is 5; one was the *snapping* pitch |
+| Overlay coordinate space | overlays drew content-space coordinates into a sheet-space layer, offset by the whole margin |
+| `__pidGeo` published per candidate | it held the **last candidate tried**, not the winner; `demo` geometry spanned y 72..542 against a drawing at y 222..372 |
+| All annotation type uppercase | CSS presentation rule, so `toSource()` still round-trips the authored case |
 | `T7.5` duplicate connection source | synced; `SYM-META-CONFLICT` 4 → 0 |
 | `T7.8` bbox extractor self-test | added, and verified it *fails* on the original bug |
 | `preview.mjs` | one-command visual review, incl. mm-coordinate zoom (§9.35) |

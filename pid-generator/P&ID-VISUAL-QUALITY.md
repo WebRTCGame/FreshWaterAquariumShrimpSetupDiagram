@@ -2429,7 +2429,64 @@ Not more space — **junction fan-out**: when several lines meet at one node, th
 departure directions must differ. That is a new constraint, not a tuning knob, and it
 belongs with the T2 constraints registry rather than as a weight tweak. Filed as T3.4.
 
-### 9.53 Still outstanding after this pass
+### 9.54 Overlay checkboxes, and the geometry they were showing
+
+Reported: the demo page's overlay checkboxes "illustrate locations that aren't on the
+final layout that I can see, it really makes them useless". Correct, and there were
+**two independent bugs**, either of which alone would have made the pipes overlay lie.
+
+#### Bug 1 - coordinate space
+
+The drawing lives inside a content group carrying a margin translate; the overlay
+layer is appended as a direct child of the root `<svg>`. So overlays reading entity
+coordinates - bbox, ports, labels, and (once checked) pipes and crossings - were drawn
+in **content** space and landed offset by the entire margin, while grid and sheet-bounds
+were already correct in **sheet** space. The two families disagreed, which is exactly
+the symptom reported.
+
+Fixed by reading the content group's own `transform` off the DOM and re-using it.
+Deliberately **not** hardcoded: a second copy of the margin constant is what let the
+two drift apart in the first place, and it would drift again the moment the margin
+changed or the content overflowed and `wrap` took over with a scale-bearing transform.
+I also classified the overlays wrong on the first pass - `tog-pipes` and
+`tog-crossings` read `__pidGeo[].pts` and are content-space, not sheet-space; only
+`tog-grid` and `tog-sheet` are genuinely sheet-space.
+
+#### Bug 2 - stale geometry, the one that made "pipe routes" useless
+
+`window.__pidGeo` is written inside `renderInto`, and **every candidate is a complete
+render** ("the lowest `score.total` wins"). So it was written once per candidate and the
+last write survived - the last candidate *tried*, not the one that *won*.
+
+| | `__pidGeo` extent | extent actually drawn |
+|---|---|---|
+| `demo` | y **72..542** | y **222..372** |
+| `spike` | y 62..432 | y 87..408 |
+| `dense` | y 172..362 | y 182..351 |
+
+Fixed by snapshotting the geometry alongside each candidate and restoring the winner's
+on selection. Verified afterwards: `__pidGeo` matches the drawn path extent **exactly**
+on demo, spike and dense.
+
+This is the same shared-mutable-state-across-a-search hazard already recorded for the
+module globals, reached from a different direction. Worth noting that the earlier
+instance was *assumed* to be a bug and turned out to be fine (`__pidGeo` is reassigned,
+not pushed, so it does not accumulate) - the check was still worth running, because
+the second half of the guess was the one that was wrong.
+
+#### Also in this pass
+
+**All annotation type uppercase**, applied as a **CSS presentation rule**
+(`svg[data-theme] text{text-transform:uppercase}`) rather than by mutating the data,
+so `toSource()` still round-trips the authored case, the validator still matches the
+original strings, and nothing that compares text is affected. Only the drawing changes.
+
+**Known gap this introduces:** the label-collision metric measures the *authored*
+strings, and capitals are wider, so a collision visible only after uppercasing is
+invisible to it. `REGRESS OK` after the change is expected - and also means the metric
+can now under-report. Filed as T4.4.
+
+### 9.55 Still outstanding after this pass
 
 - **Annotation type is 1.0-1.9 mm over the stated print band on every sheet**, and
   `typeFloor` flattens three roles onto 3.5 mm. Both are decisions rather than defects,

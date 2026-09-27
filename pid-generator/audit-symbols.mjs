@@ -139,7 +139,14 @@ for (const [key, sym] of Object.entries(symbols)) {
   const nonSquare = Math.abs(vb.w - vb.h) > 0.01;
   let worstPort = 0, worstPortId = null;
   for (const p of (sym.ports || [])) {
-    const vx = (p.x / 100) * vb.w, vy = (p.y / 100) * vb.h;
+    // vb.x / vb.y belong on BOTH sides of this comparison. The "actual" side omitted them
+    // while the "engine" side (fixed in the previous commit) includes them, so the
+    // residual was a constant per symbol rather than a property of any port:
+    //   relief-safety  vb.x=24 vb.y=-24.33 s=0.07043 -> hypot(1.690, 1.714) = 2.41mm
+    //   box-furnace    vb.x=9  vb.y=-4     s=0.625   -> hypot(5.625, 2.500) = 6.16mm
+    // which is exactly what both survivors reported. A check that compares two mappings
+    // must derive both from the same origin, or it measures its own omission.
+    const vx = vb.x + (p.x / 100) * vb.w, vy = vb.y + (p.y / 100) * vb.h;
     const ax = ox + vx * s, ay = oy + vy * s;            // actual, relative to box top-left
     // Where the ENGINE puts it. This must be portOffset()'s formula, not the naive
     // ((p-50)/100)*size: that one is only right for a SQUARE viewBox, and portOffset has

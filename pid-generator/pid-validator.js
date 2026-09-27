@@ -27,29 +27,98 @@ function validateGeometry(data, geometries, pipes, tapGeos) {
     }
   }
   // Phase 3: every pipe must keep a straight run of >= MIN_PORT_RUN from each port
-  // before its first bend. The router enforces this via the lead-in stub; this flags
-  // any residual violation (e.g. a tiny span forced a shorter lead-in).
-  // Phase 3: a bend may not sit within MIN_PORT_RUN of a port. Only flag when a
-  // real bend exists near the port AND there was geometric room for a full
-  // straight run (short L/straight routes are physically exempt).
+  // before its first BEND. The router enforces this with the lead-in stub; this
+  // flags any residual violation (e.g. a tiny span forced a shorter lead-in).
+  //
+  // THE MEASUREMENT WAS WRONG, and it was wrong in the direction that invents
+  // defects. It took `d0 = dist(pts[0], pts[1])` — the length of the LEAD-IN STUB,
+  // which the router deliberately makes short — and called that the lead-in. The
+  // quantity the rule is about is the distance from the port to the first point
+  // where the direction CHANGES, which for a normal route is the stub PLUS the
+  // first routed segment, because the two are collinear and the stub is a separate
+  // entry in the polyline.
+  //
+  //   V-4 -> J-H   (85,191) (91,191) (124,191) (124,180) (130,180)
+  //     stub 6mm, then 33mm STRAIGHT, then a bend. The straight run is 39mm and the
+  //     drawing is correct; the check reported 6.0mm because it stopped at the stub.
+  //   T-2 -> J-R   (470,349.75) (480,350) (480,270)
+  //     10mm then a genuine corner. This one IS a real finding.
+  //
+  // Four of the six corpus findings were the first kind. That matters beyond the
+  // warning count, because `PID-GEO-002` is priced by the objective (9.73's
+  // `breachPerMm`): the search was being charged 24 points on spike and 72 on
+  // manifold for geometry that was never wrong, which is the search optimising
+  // against a fiction.
+  //
+  // Collinearity, not the segment list, is the definition. Walk out from the port
+  // while each successive segment continues in the same direction, and report the
+  // accumulated length at the first real bend. If the route never bends there is
+  // nothing to report, whatever the segment count.
   const MIN_PORT_RUN = ruleParam('routing.minPortRun', 14);
+  // Total shortfall across every short lead-in on the sheet, in mm. REPORTED, not
+  // priced — see the note at the finding site for the measurement.
+  let leadInShort = 0;
   const leadIn = (g, pts, pEnd) => {
     if (!pEnd || pEnd.junction || pts.length < 2) return;
-    const idxLast = pts.length - 1;
     const isStart = pEnd === g.pA;
-    const d0 = PIDEngine.dist(pts[0], pts[1]);
-    const dN = PIDEngine.dist(pts[idxLast - 1], pts[idxLast]);
-    const d1 = pts.length >= 3 ? PIDEngine.dist(pts[1], pts[2]) : Infinity;
-    const dPrev = pts.length >= 3 ? PIDEngine.dist(pts[idxLast - 2], pts[idxLast - 1]) : Infinity;
-    const hasBend = pts.length >= 3;
-    // jogs under 5mm render as a straight line; flag only visible short lead-ins
-    if (isStart && hasBend && d0 >= 5 && d0 < MIN_PORT_RUN - 0.5 && d0 + d1 > MIN_PORT_RUN * 2 + 4) {
-      w.push(`[PID-GEO-002] geometry "${g.p.from} -> ${g.p.to}": port lead-in only ${d0.toFixed(1)}mm (< ${MIN_PORT_RUN}mm) — bend too close to the ${g.p.from} port`);
-      breach.push({ code: 'PID-GEO-002', mm: MIN_PORT_RUN - d0 });
+    const at = (i) => pts[isStart ? i : pts.length - 1 - i];
+    const n = pts.length;
+    if (n < 3) return;                       // no bend anywhere
+    // direction of the first segment out of the port
+    const a0 = at(0), a1 = at(1);
+    let ux = a1.x - a0.x, uy = a1.y - a0.y;
+    const L0 = Math.hypot(ux, uy) || 1;
+    ux /= L0; uy /= L0;
+    // Walk the leading segments while each one continues in the same direction. The
+    // bend is at the START of the segment that turns, so that segment contributes
+    // NOTHING to the run — adding it first and testing second reports the run as
+    // `straight + the first millimetre of the turn`, which is how the first version
+    // of this fix reported 10.0mm for a 4mm lead-in.
+    let run = 0, k = 0, bent = false;
+    for (k = 0; k + 1 < n; k++) {
+      const p = at(k), q = at(k + 1);
+      const dx = q.x - p.x, dy = q.y - p.y;
+      const L = Math.hypot(dx, dy);
+      if (L < 0.01) continue;
+      if (Math.abs((dx / L) * uy - (dy / L) * ux) > 1e-3) { bent = true; break; }
+      run += L;
     }
-    if (!isStart && hasBend && dN >= 5 && dN < MIN_PORT_RUN - 0.5 && dN + dPrev > MIN_PORT_RUN * 2 + 4) {
-      w.push(`[PID-GEO-002] geometry "${g.p.from} -> ${g.p.to}": port lead-in only ${dN.toFixed(1)}mm (< ${MIN_PORT_RUN}mm) — bend too close to the ${g.p.to} port`);
-      breach.push({ code: 'PID-GEO-002', mm: MIN_PORT_RUN - dN });
+    if (!bent) return;                       // the route never turns: nothing to report
+    // ROOM EXEMPTION, kept from the version this replaces. A two-valve stub that
+    // turns 5mm after the port because the whole run is 20mm long has not got a
+    // drafting error, it has got a small drawing, and flagging it trains the reader
+    // to ignore the check. The old test was a proxy on the first two segments; the
+    // honest one is "would keeping straight have been possible", which is whether
+    // there is still MIN_PORT_RUN of line beyond the bend.
+    let after = 0;
+    for (let m = k + 1; m + 1 < n; m++) after += PIDEngine.dist(at(m), at(m + 1));
+    if (after < MIN_PORT_RUN) return;
+    // jogs under 5mm render as a straight line; flag only visible short lead-ins
+    if (run >= 5 && run < MIN_PORT_RUN - 0.5) {
+      const who = isStart ? g.p.from : g.p.to;
+      w.push(`[PID-GEO-002] geometry "${g.p.from} -> ${g.p.to}": port lead-in only ${run.toFixed(1)}mm (< ${MIN_PORT_RUN}mm) — bend too close to the ${who} port`);
+      // REPORTED, NOT PRICED. This is the 9.23 `astarGiveups` decision applied a
+      // second time, and the same reasoning: a term the search cannot satisfy makes
+      // it trade a visible defect for an invisible one.
+      //
+      // It was priced when the finding was wrong. `d0 = dist(pts[0], pts[1])` is the
+      // length of the LEAD-IN STUB, which the router deliberately makes short, so
+      // the "violation" was an artefact of where the polyline records a stub as its
+      // own segment. Four of six corpus findings were that, and the search was
+      // being charged 24 points on spike and 72 on manifold for geometry that was
+      // never wrong.
+      //
+      // With the measurement fixed, the check finds EIGHT real violations and
+      // pricing them costs **+309** across the corpus: demo +141, spike +168, dense
+      // +40, and the layouts it buys have MORE crossings (spike 7 -> 15). The
+      // router grants a full 14mm stub only where there is room in the port's own
+      // direction, and the remainder are geometry-locked — a short span between two
+      // items 20mm apart cannot have a 14mm lead-in, which is the same "small
+      // drawing" exemption the ROOM test below already encodes.
+      //
+      // So the count stays (in `data.leadInShort`) and the price goes. The fix for a
+      // finding is a shorter pipe, not a heavier weight.
+      leadInShort += MIN_PORT_RUN - run;
     }
   };
   for (const g of geometries) {
@@ -279,7 +348,7 @@ function validateGeometry(data, geometries, pipes, tapGeos) {
   // the routing pass resolves all resolvable ones, so any that remain are genuine.
   if (overlaps) data.errors.push({ code: 'COLLINEAR_OVERLAP', message: `line audit: ${overlaps} collinear overlap(s) â€” lines sharing a corridor (${overlapList.join('; ')})` });
   if (ungapped) w.push(`[PID-GEO-003] line audit: ${ungapped} crossing(s) without a gap break (too close to a bend; pass 3 skipped) (${ungappedList.join('; ')})`);
-  return { overlaps, ungapped, breach };
+  return { overlaps, ungapped, breach, leadInShort: Math.round(leadInShort * 10) / 10 };
 }
 
 /**

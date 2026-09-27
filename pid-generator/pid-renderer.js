@@ -516,15 +516,26 @@ function renderInto(svg, data, themeName) {
       // what separates multiple pipes fanning out of the same free node.
       const MIN_PORT_RUN = ruleParam('routing.minPortRun', 14);
       const spanX = Math.abs(pB.x - pA.x), spanY = Math.abs(pB.y - pA.y);
-      const roomy = spanX >= MIN_PORT_RUN * 2 && spanY >= MIN_PORT_RUN * 2;
       const jEnds = !!(pA.junction || pB.junction);
-      const hasNozzle = !!(pA.nozzle || pB.nozzle);
       const stub = view.stubLength || 0;
-      let effStub;
-      if (roomy) effStub = Math.max(stub, MIN_PORT_RUN);
-      else if (jEnds) effStub = Math.max(ruleParam('routing.junctionStubMin', 6), Math.min(MIN_PORT_RUN, spanX / 3 || Infinity, spanY / 3 || Infinity));
-      else if (hasNozzle) effStub = MIN_PORT_RUN; // nozzle connections always get a stub for alignment
-      else effStub = 0;
+      // Room for a full lead-in is a question about the PORT'S OWN DIRECTION, and
+      // the test was about both axes at once:
+      //
+      //   const roomy = spanX >= MIN_PORT_RUN * 2 && spanY >= MIN_PORT_RUN * 2;
+      //
+      // so a 300mm horizontal pipe between two items sitting on the same line was
+      // judged "not roomy" — spanY is a few millimetres — and was granted a 6mm stub
+      // instead of 14mm. That is a bend six millimetres after the nozzle, and it is
+      // six of the eight PID-GEO-002 findings in the corpus. A lead-in runs ALONG the
+      // port, so the room it needs is the room in the port's direction and nothing
+      // else. Per end, because the two ports can face different ways.
+      const roomFor = (p) => !!(p.dir && (Math.abs(p.dir.x) > 0.5 ? spanX : spanY) >= MIN_PORT_RUN * 2);
+      const stubFor = (p) => {
+        if (roomFor(p) || p.nozzle) return MIN_PORT_RUN;
+        if (jEnds) return Math.max(ruleParam('routing.junctionStubMin', 6), Math.min(MIN_PORT_RUN, spanX / 3 || Infinity, spanY / 3 || Infinity));
+        return 0;
+      };
+      const effStub = Math.max(stubFor(pA), stubFor(pB), stub);
       // shrink each stub to stop before any obstacle box: a stub poking into a
       // neighbor forces relax off-axis, and the tip connector then draws through it.
       // ponytail: nozzle ends always keep a full run — the shared rule above lets
@@ -2651,7 +2662,7 @@ const shiftFor = (lineIdx, x) => {
     routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), nonOrtho },
     sheet: { offSheet },
     annotations: { labelCollisions },
-    lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups, breach: Math.round(breach), breachMm: Math.round(breachMm * 10) / 10 },
+    lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups, breach: Math.round(breach), breachMm: Math.round(breachMm * 10) / 10, leadInShort: lineIssues.leadInShort || 0 },
     instruments: { tapReachTotal: Math.round(tapReachTotal), maxSignalLen: Math.round(maxSignalLen) },
     issues: { errors: nErr, warnings: nWarn }
   };

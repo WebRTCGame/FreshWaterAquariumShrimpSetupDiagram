@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>P&ID Symbol Contact Sheet</title>
+<style>
+  :root { --ink:#111; --dim:#666; --rule:#d4d4d4; --bad:#c00; --warn:#b8860b; --ok:#0a7; }
+  * { box-sizing: border-box; }
+  body { font: 13px/1.45 ui-sans-serif,system-ui,sans-serif; margin: 0; color: var(--ink); background:#fafafa; }
+  header { position: sticky; top: 0; z-index: 5; background:#fff; border-bottom:1px solid var(--rule);
+           padding: 10px 16px; display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+  h1 { font-size: 15px; margin: 0 12px 0 0; font-weight: 650; }
+  .ctl { display:flex; gap:10px; align-items:center; color: var(--dim); }
+  .ctl label { display:flex; gap:4px; align-items:center; cursor:pointer; user-select:none; }
+  #filters { margin-left:auto; display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { border:1px solid var(--rule); border-radius: 11px; padding: 2px 9px; cursor:pointer;
+          font-size:11.5px; background:#fff; user-select:none; }
+  .chip[aria-pressed="true"] { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #summary { padding: 7px 16px; color: var(--dim); border-bottom:1px solid var(--rule); background:#fff; }
+  #grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(178px,1fr)); gap:10px; padding:12px; }
+  .card { background:#fff; border:1px solid var(--rule); border-radius:6px; padding:7px 8px 8px; }
+  .card.hide { display:none; }
+  .card.has-bad { border-color:#e6b3b3; }
+  .stage { position:relative; height:112px; display:flex; align-items:center; justify-content:center;
+           background:
+             repeating-linear-gradient(0deg, transparent 0 13px, #f0f0f0 13px 14px),
+             repeating-linear-gradient(90deg, transparent 0 13px, #f0f0f0 13px 14px);
+           border:1px solid #eee; border-radius:4px; overflow:hidden; }
+  .stage svg { overflow: visible; }
+  .nm { font: 11px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace; margin-top:5px; word-break:break-word; color:var(--dim); }
+  .meta { font: 10.5px/1.35 ui-monospace,Menlo,monospace; color:#888; margin-top:2px; }
+  .badges { display:flex; gap:3px; flex-wrap:wrap; margin-top:4px; }
+  .b { font: 9.5px/1.5 ui-monospace,Menlo,monospace; padding:0 4px; border-radius:3px; background:#f2f2f2; color:#666; }
+  .b.bad { background:#fdecec; color:var(--bad); }
+  .b.warn { background:#fdf6e3; color:var(--warn); }
+  .legend { display:flex; gap:12px; flex-wrap:wrap; padding:8px 16px; color:var(--dim); font-size:11.5px; }
+  .sw { display:inline-block; width:9px; height:9px; border-radius:50%; vertical-align:-1px; margin-right:3px; }
+</style></head>
+<body>
+<header>
+  <h1>P&amp;ID Symbol Contact Sheet</h1>
+  <div class="ctl">
+    <label><input type="checkbox" id="oPorts" checked> ports</label>
+    <label><input type="checkbox" id="oAnchor" checked> anchor</label>
+    <label><input type="checkbox" id="oExt" checked> extents</label>
+    <label><input type="checkbox" id="oLabel" checked> label</label>
+    <label><input type="checkbox" id="oBox"> nominal box</label>
+  </div>
+  <div id="filters"></div>
+</header>
+<div id="summary"></div>
+<div class="legend">
+  <span><i class="sw" style="background:#0a7"></i>process port</span>
+  <span><i class="sw" style="background:#c00"></i>port off the flow axis / no axis</span>
+  <span><i class="sw" style="background:#7a3"></i>anchor</span>
+  <span><i class="sw" style="background:#06c"></i>declared extents</span>
+  <span><i class="sw" style="background:#a0a"></i>label anchor</span>
+  <span class="mono">1 unit = 1mm &middot; grid 5mm</span>
+</div>
+<div id="grid"></div>
+
+<script src="pid-textmetrics.js"></script>
+<script src="pid-rules.js"></script>
+<script src="pid-collide.js"></script>
+<script src="geometric_objects.js"></script>
+<script src="pid-symbols-bundle.js"></script>
+<script src="pid-parser.js"></script>
+<script src="pid-router.js"></script>
+<script src="pid-validator.js"></script>
+<script src="pid-renderer.js"></script>
+<script>
+const P = window.PIDGenerator;
+const IDS = P.componentIds();
+
+// ---- findings per symbol, recomputed here from the same rules the audit uses ----
+// Deliberately the CHECK, not the data: this page exists to make the numbers visible so a
+// human can judge whether a flagged symbol is actually wrong.
+const vbOf = (svg) => {
+  const m = /viewBox="([\d.-]+) ([\d.-]+) ([\d.]+) ([\d.]+)"/.exec(svg || '');
+  return m ? { x:+m[1], y:+m[2], w:+m[3], h:+m[4] } : null;
+};
+function flagsFor(key, g, drawn) {
+  const f = [];
+  const sym = window.PID_SYMBOLS[key] || {};
+  if (drawn.letterboxed && drawn.fill < 0.6) f.push(['warn', 'box ' + Math.round(drawn.fill*100) + '%']);
+  if (!(sym.ports||[]).length) f.push(['bad', 'no ports']);
+  const b = sym.behavior, minP = b && b.minProcessPorts;
+  if (minP && (sym.ports||[]).filter(p => p.connectionClass === 'process').length < minP)
+    f.push(['bad', 'needs ' + minP + ' ports']);
+  if (sym.anchor && (sym.anchor.x !== 50 || sym.anchor.y !== 50)) f.push(['warn', 'anchor off-centre']);
+  if (g.viewBox && Math.abs(g.viewBox.x) > 0.01 || g.viewBox && Math.abs(g.viewBox.y) > 0.01)
+    f.push(['warn', 'vb origin']);
+  return f;
+}
+
+// ---- one card ----
+function card(key) {
+  const g = P.symbolGeometry(key);
+  const drawn = P.symbolDrawnSize(key);
+  const f = flagsFor(key, g, drawn);
+  const el = document.createElement('div');
+  el.className = 'card' + (f.some(x => x[0] === 'bad') ? ' has-bad' : '');
+  el.dataset.key = key;
+  el.dataset.badges = f.map(x => x[1]).join(',');
+
+  // scale so the largest dimension fits the stage with room for the label anchor
+  const pad = 34;
+  const half = Math.max(drawn.w, drawn.h, 18) / 2 + pad;
+  const k = 52 / half;
+
+  let marks = '';
+  if (document.getElementById('oBox').checked) {
+    marks += '<rect x="' + (-drawn.w/2) + '" y="' + (-drawn.h/2) + '" width="' + drawn.w +
+      '" height="' + drawn.h + '" fill="none" stroke="#bbb" stroke-dasharray="1.5 1.5" stroke-width="' + (0.3/k) + '"/>';
+  }
+  if (document.getElementById('oExt').checked && g.extents && g.viewBox) {
+    // extents are in viewBox units; map through the same letterbox the engine uses
+    const s = Math.min(drawn.w / g.viewBox.w, drawn.h / g.viewBox.h);
+    const ox = -(drawn.w - g.viewBox.w * s) / 2, oy = -(drawn.h - g.viewBox.h * s) / 2;
+    const X = (vx) => (ox + (vx - g.viewBox.x) * s).toFixed(2);
+    const Y = (vy) => (oy + (vy - g.viewBox.y) * s).toFixed(2);
+    const e = g.extents;
+    marks += '<rect x="' + X(e.x0) + '" y="' + Y(e.y0) + '" width="' + ((e.x1-e.x0)*s).toFixed(2) +
+      '" height="' + ((e.y1-e.y0)*s).toFixed(2) + '" fill="none" stroke="#06c" stroke-width="' + (0.25/k) + '" opacity="0.8"/>';
+  }
+  if (document.getElementById('oPorts').checked) {
+    const axis = (window.PID_SYMBOLS[key] || {}).flowAxis;
+    for (const p of g.ports) {
+      if (p.connectionClass !== 'process') continue;
+      const off = (axis === 'h' ? Math.abs(p.dy) > 0.6 : Math.abs(p.dx) > 0.6);
+      marks += '<circle cx="' + p.dx.toFixed(2) + '" cy="' + p.dy.toFixed(2) + '" r="' + (1.1/k) +
+        '" fill="' + (off ? '#c00' : '#0a7') + '" fill-opacity="0.9" stroke="#fff" stroke-width="' + (0.3/k) + '"/>';
+    }
+  }
+  if (document.getElementById('oAnchor').checked && g.anchor) {
+    marks += '<path d="M' + (g.anchor.dx-1.4).toFixed(2) + ' ' + g.anchor.dy.toFixed(2) +
+      'h2.8M' + g.anchor.dx.toFixed(2) + ' ' + (g.anchor.dy-1.4).toFixed(2) +
+      'v2.8" stroke="#7a3" stroke-width="' + (0.35/k) + '" fill="none"/>';
+  }
+  if (document.getElementById('oLabel').checked && g.labelAnchor && g.viewBox) {
+    const s = Math.min(drawn.w / g.viewBox.w, drawn.h / g.viewBox.h);
+    const ox = -(drawn.w - g.viewBox.w * s) / 2, oy = -(drawn.h - g.viewBox.h * s) / 2;
+    const lx = (ox + (g.labelAnchor.x - g.viewBox.x) * s), ly = (oy + (g.labelAnchor.y - g.viewBox.y) * s);
+    marks += '<line x1="0" y1="' + (drawn.h/2).toFixed(2) + '" x2="' + lx.toFixed(2) + '" y2="' + ly.toFixed(2) +
+      '" stroke="#a0a" stroke-width="' + (0.2/k) + '" stroke-dasharray="' + (0.8/k) + ' ' + (0.8/k) + '"/>' +
+      '<text x="' + lx.toFixed(2) + '" y="' + ly.toFixed(2) + '" font-size="' + (2.2/k) +
+      '" fill="#a0a" text-anchor="middle">tag</text>';
+  }
+
+  el.innerHTML =
+    '<div class="stage"><svg width="104" height="104" viewBox="-52 -52 104 104">' +
+      '<g transform="scale(' + k.toFixed(4) + ')">' + g.markup + marks + '</g>' +
+    '</svg></div>' +
+    '<div class="nm">' + key + '</div>' +
+    '<div class="meta">' + drawn.w.toFixed(1) + 'x' + drawn.h.toFixed(1) + 'mm of ' + g.size +
+      'mm &middot; ' + (g.ports ? g.ports.length : 0) + ' ports' +
+      (g.viewBox ? ' &middot; vb ' + g.viewBox.w.toFixed(0) + 'x' + g.viewBox.h.toFixed(0) : '') + '</div>' +
+    '<div class="badges">' + f.map(x => '<span class="b ' + x[0] + '">' + x[1] + '</span>').join('') + '</div>';
+  return el;
+}
+
+const grid = document.getElementById('grid');
+const frag = document.createDocumentFragment();
+const all = IDS.map(card);
+all.forEach(c => frag.appendChild(c));
+grid.appendChild(frag);
+
+// ---- filters ----
+const counts = {};
+all.forEach(c => { for (const b of (c.dataset.badges || '').split(',').filter(Boolean)) counts[b] = (counts[b]||0)+1; });
+const keys = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
+const filters = document.getElementById('filters');
+for (const k of keys) {
+  const s = document.createElement('span');
+  s.className = 'chip'; s.setAttribute('aria-pressed','false'); s.textContent = k + ' (' + counts[k] + ')';
+  s.onclick = () => {
+    const on = s.getAttribute('aria-pressed') === 'true';
+    s.setAttribute('aria-pressed', String(!on));
+    apply();
+  };
+  filters.appendChild(s);
+}
+function apply() {
+  const on = [...filters.querySelectorAll('.chip')].filter(c => c.getAttribute('aria-pressed')==='true')
+    .map(c => c.textContent.replace(/ (d+)$/, ''));
+  let shown = 0;
+  for (const c of all) {
+    const badges = (c.dataset.badges || '').split(',').filter(Boolean);
+    const hit = on.length === 0 || on.every(o => badges.includes(o));
+    c.classList.toggle('hide', !hit);
+    if (hit) shown++;
+  }
+  document.getElementById('summary').textContent =
+    IDS.length + ' symbols, ' + shown + ' shown' + (on.length ? ' (filter: ' + on.join(' + ') + ')' : '');
+}
+for (const id of ['oPorts','oAnchor','oExt','oLabel','oBox']) {
+  document.getElementById(id).onchange = () => {
+    grid.innerHTML = ''; const f2 = document.createDocumentFragment();
+    all.length = 0; IDS.map(card).forEach(c => { all.push(c); f2.appendChild(c); });
+    grid.appendChild(f2); apply();
+  };
+}
+apply();
+window.__symbols = IDS;
+</script>
+</body></html>

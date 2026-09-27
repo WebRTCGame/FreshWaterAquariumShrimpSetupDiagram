@@ -308,9 +308,9 @@ or unaffordable without it.
 - [ ] **T2.5** Delete `PID_LAYOUT_ORDERS`, `layoutOrder` DSL plumbing and the order-search dimension *(Stage 2)*
 
 ### Performance / search
-- [ ] **T3.1** Layout-only fitness (extent, overlap, rank crossings, bubble-host distance) with no routing *(Stage 3)*
+- [ ] **T3.1** Layout-only fitness (extent, overlap, rank crossings, bubble-host distance) with no routing *(Stage 3)* — **now the top performance item.** 9.74.7 grew the column-pitch axis from two values to four because that is where the search wanted to grow (1891 -> 1827, each sheet taking its own pitch), and the bill is spike rendering in 28.5s instead of 13.4s. The search is now limited by route cost, not by search space, so this is what makes the next axis affordable rather than an optimisation of an existing one.
 - [ ] **T3.2** Route only the finalists; measure the speedup *(Stage 3)*
-- [ ] **T3.3** Promote `minSep` to a real, continuous search dimension *(Stage 3)*
+- [ ] **T3.3** Promote `minSep` to a real, continuous search dimension *(Stage 3)* — blocked on T3.1: a new dimension is a new full route per candidate today.
 
 ### Objective
 - [ ] **T4.1** Fit score weights against Stage 0 metrics across the corpus; drop non-predictive terms *(Stage 4)*
@@ -537,6 +537,40 @@ consumption across the five live engine files: of the symbol metadata, only
   and the audit's differ (14 against 23 on `spike`) because their segment sets
   differ at the nozzle leaders; **do not reconcile them by sharing code** — the
   disagreement is the check's value. §9.73.
+  **Partly advanced, and the blocker is now named.** Two of the four causes are fixed
+  and neither was the interesting one. A rotated line designation must now be able to
+  fit its own run (the candidate filter took a 12mm riser for a 40mm string, so
+  `4"-PG-101-2C2-R10-52-N` stood vertically through P-101), and a run with a LEADER is
+  exempt from the check in both `[15]` and `PID-ANN-001`, because a line designation is
+  *supposed* to sit beside its line and point at it — 8 of spike's 27 were that. Census
+  after: demo 6, spike 24, dense 6, manifold 6, min 0, split 0, and the names are the
+  useful part (`"P-1" on 1 segment`, `"NZ-C1-B" on 1`, `"LT" on 1`): a census of the
+  tags that ran out of positions and took the least-bad one. Score-neutral, 2019 either
+  way, because nothing in the objective can see a rotated label crossing a line. §9.74.4.
+
+- [ ] **T3.11** **The layout cannot see nozzle annotations, and that blocks the tap
+  placement.** NEW, 2026-09-27, and it is the blocker for a fix that is otherwise
+  obviously right: stack the instrument bubble on the tap's LANDING POINT rather than
+  the host's centre. Measured, and it is the change that most improves the two sheets
+  a reader looks at — demo 464 -> 404 with utilisation 28% -> 33%, dense 445 -> 430
+  with crossings 4 -> 2 — and a clear net loss: spike 837 -> 1041 with 4 label
+  collisions, sum 2234 -> 2411.
+
+  The cause is structural. Nozzles are materialised *after* `autoLayout` runs, so the
+  layout has no knowledge of a nozzle tag. A bubble moved onto the run therefore lands
+  on the tag that already wants that piece of paper (`"NZ-D101-2" & "PT"`), and the
+  line-designation and valve-stack placers then lose the corridor fight
+  (`"gate valve" & "4"-PG-101-1E1-H-INS-50-T"`). Nothing downstream can recover it,
+  because the bubble position was chosen before the thing it collided with existed.
+
+  **Do** move nozzle materialisation (or at least the nozzle-tag reservation) to before
+  `autoLayout`, and publish the reservations on `data` the way `drawZone` is published.
+  Then re-run the landing-point experiment. §9.74.8.
+
+  Note the dead code still sitting in `pid-router.js` that was supposed to do this: it
+  scans `data.nozzles`, which is empty at layout time, so it never executed. Its own
+  comment says so, from the 2026-09-25 attempt — and that comment was added when the
+  attempt was REVERTED, so nobody was reading the code the comment was warning about.
 
 - [ ] **T3.9** **Does an explicit DSL description beat `TYPE_LABELS`?** Open question,
   not a finding. `equipment T-1 tank "Branch 1 vessel"` renders as `CONE ROOF TANK` in

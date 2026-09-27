@@ -3936,3 +3936,289 @@ is the next item, and it is filed as T3.10 rather than left in a log.
 
 `REGRESS OK (spike, min, dense, split, manifold)` plus the visual gate, and
 `manifold` is now in the visual corpus so it cannot move unseen.
+
+---
+
+## 9.74 The lead-in was being denied the room it needed, and the fill term was measuring the wrong rectangle
+
+Two measurement bugs found by reading the code against the numbers, and one search
+axis that had been too short. Corpus **2234 -> 1827** (-18%).
+
+### 9.74.1 `roomy` was about both axes, so a long horizontal pipe never got a lead-in
+
+```js
+const roomy = spanX >= MIN_PORT_RUN * 2 && spanY >= MIN_PORT_RUN * 2;
+```
+
+A lead-in runs ALONG the port, so the room it needs is the room in the port's
+direction. Requiring *both* axes meant a 300mm horizontal pipe between two items on
+the same line was judged "not roomy" — `spanY` is a few millimetres — and got a 6mm
+stub instead of 14mm. That is a bend six millimetres after the nozzle, and it was six
+of the eight `PID-GEO-002` findings in the corpus. Now per end, in the port's own
+direction:
+
+```
+  case       before    after
+  demo         464      380    crossings 4 -> 1, pipe 1733 -> 1590mm
+  spike        837      825    crossings 11 -> 7
+  dense        445      440
+  min          119       65
+  split         45       45
+  manifold     324      264
+  sum         2234     2019
+```
+
+### 9.74.2 The check measured the STUB, not the RUN
+
+```js
+const d0 = PIDEngine.dist(pts[0], pts[1]);
+```
+
+which is the length of the LEAD-IN STUB — the thing the router deliberately makes
+short. The quantity the rule is about is the distance from the port to the first point
+where the direction CHANGES, which for a normal route is the stub plus the first
+routed segment, because the two are collinear and the stub is its own polyline entry:
+
+```
+  V-4 -> J-H  (85,191) (91,191) (124,191) (124,180) (130,180)
+    stub 6mm, then 33mm STRAIGHT, then a bend. The run is 39mm and the drawing is
+    correct; the check reported 6.0mm because it stopped at the stub.
+  T-2 -> J-R  (470,349.75) (480,350) (480,270)
+    10mm then a genuine corner. This one IS a real finding.
+```
+
+Four of the six corpus findings were the first kind. It now walks the leading segments
+while each continues in the same direction and reports the accumulated length at the
+first real bend. The bend is at the START of the turning segment, so that segment
+contributes nothing — adding it first and testing second was how the first version of
+this fix reported 10.0mm for a 4mm lead-in.
+
+The ROOM EXEMPTION is kept and now means what it says: a two-valve stub that turns 5mm
+after the port because the whole run is 20mm long has not got a drafting error, it has
+got a small drawing. The old test was a proxy on the first two segments; the honest one
+is "would keeping straight have been possible", i.e. is there still `minPortRun` of
+line beyond the bend.
+
+### 9.74.3 GEO-002 is REPORTED and NOT PRICED
+
+`PID-GEO-002` is priced by the objective (`breachPerMm`), so the search was being
+charged 24 points on spike and 72 on manifold for geometry that was never wrong — the
+search optimising against a fiction. With the measurement fixed, the check fires
+**eight** real times, and pricing them costs **+309** across the corpus (demo +141,
+spike +168, dense +40) and buys layouts with MORE crossings (spike 7 -> 15).
+
+This is the 9.23 `astarGiveups` decision applied a second time, with the same
+reasoning: a term the search cannot satisfy makes it trade a visible defect for an
+invisible one. The count stays in `score.lines.leadInShort`; the price goes. **The fix
+for a short lead-in is a shorter pipe, not a heavier weight.** `breachPerMm` still
+prices GEO-001, which the router genuinely can fix.
+
+### 9.74.4 A rotated designation must be able to fit its own run, and a leader is not a defect
+
+A line designation follows its line; that is why the emitter rotates by 90 on a
+vertical segment. But a rotated designation is as long as the TEXT, so it needs a run
+at least as long, and the candidate filter used a flat `len >= 12` for both
+orientations. On the demo, `4"-PG-101-2C2-R10-52-N` stood vertically through P-101 and
+its suction run, plus a second vertical `4"` beside V-106.
+
+```
+  rotated 90-degree runs   before  after
+    demo                        1      0
+    spike                       6      4
+    dense                       2      2
+    manifold                    3      2
+```
+
+A vertical run must now be `width + 4mm` long to be offered; a horizontal one is placed
+at a fraction along the run with a leader, so 12mm stands. If nothing can hold the
+designation along its own direction, the fallback offers the longest segment as a
+HORIZONTAL placement — a horizontal designation with a leader is correct drafting.
+
+That change raised `[15]`, and every extra finding was correct: a line designation is
+*supposed* to sit beside its line and point at it. So `[15]` and `PID-ANN-001` now
+exempt a run that a leader touches — a check that reports the convention as a defect is
+worse than no check, because the real findings get read as noise.
+
+### 9.74.5 The fill term was measuring against a rectangle the drawing may not use
+
+```js
+const FW = (view.sheetW || 864) - 36, FH = (view.sheetH || 559) - 36;
+```
+
+That is the FRAME. The drawing does not live there: the equipment list owns a band
+across the top and the title block a band along the bottom, and `data.drawZone` already
+encodes both for the centring pass and the fit. Measuring sheet use against the frame
+understated it by 12% of area on EVERY sheet, and a term that is uniformly 12% off
+never reaches its target. The same block measured entity extent as
+`(e.symbolSize || e.size || 30)`, a field that predates `sizeOf` and is stale for
+instrument bubbles since they were sized to their tags.
+
+```
+  case       before    after
+  demo         380      344    fill 28% -> 37%
+  spike        825      789    fill 53% -> 73%
+  dense        440      384    fill 31% -> 45%
+  sum         2019     1891
+```
+
+### 9.74.6 A bounding box cannot tell a drawing that FILLS its box from one that IS its box
+
+An L, a ring or a U reaches 90% of the zone in extent and puts a fraction of that area
+on the sheet, and 9.70 recorded exactly that as the reason the demo looked sparse. So
+the block also computes INK — symbol boxes, label boxes, and pipe length times stroke
+width, as a fraction of the zone — and publishes it as `score.fill.ink`.
+
+**MEASURED AND NOT USED AS A PENALTY.** Ink coverage is 2-16% on the corpus, an order
+of magnitude below `fillTarget`, so a penalty on it is a large near-constant that
+swamps every preference term: the search chases a number nothing can move and the
+corpus went 2019 -> 2589. A P&ID is mostly white paper and no correct drawing puts 10%
+of a zone in ink. What the number is FOR is that it ranks candidates completely
+differently from the bounding box:
+
+```
+  case       bbox      ink     ink/bbox
+  demo        37%      3%        0.08
+  dense       19%      7%        0.16
+  manifold    86%      6%        0.07
+  spike       73%     15%        0.21
+  min          10%      2%        0.20
+  split        27%      4%        0.15
+```
+
+manifold is the fullest sheet by extent and the second-sparsest by ink; the demo is
+the reverse. Neither number answers "does this look full" alone, and reporting only the
+first is what let 9.70's sparse demo pass as clean.
+
+Audit `[11]` now carries `INK n% of zone`, and `[13]` has a SHAPE finding beside its
+extent one. The threshold is a RATIO — ink to the area the ink's own bounding box
+claims — and it has to be, because an absolute ink floor of 10% fires on five of the
+six sheets, all of them good drawings. At 0.11 it fires on exactly the two that have a
+shape problem (demo 0.08, manifold 0.07) and nothing else. The extent floor and the
+shape ratio are separate findings because they have different causes: one is a small
+drawing and the other is a badly-shaped one, and the fix for the second is re-flowing
+the depth ranks, not splitting the sheet.
+
+### 9.74.7 Two column pitches were not enough, and the gate was comparing a search against a subset of itself
+
+`layout.colMaxAlt` gave the search two column-pitch values. Moving only the second:
+
+```
+  alt     demo   spike   dense   manifold   sum
+  110      344     789     384       264     1891   <- 0/110
+  150      344     904     384       225     1967
+  200      319     904     384       264     1981
+  240      331     904     384       264     1988
+```
+
+spike needs 110 and refuses anything wider (789 -> 904, crossings 7 -> 16: a longer
+pitch gives the router more room to make detours and it takes them). manifold wants 150
+(264 -> 225, crossings 1 -> 0). The demo wants 200 (344 -> 319, and its shape goes
+from 78%x48% to 65%x68%). A two-element axis has to pick ONE and the other two sheets
+pay for it. With `0/110/150/200` each sheet takes its own:
+
+```
+  case       before    after
+  demo         344      319
+  spike        789      789
+  dense        384      384
+  min           65       65
+  split         45       45
+  manifold     264      225
+  sum         1891     1827
+```
+
+**The gate caught a real defect in the search, not in the drawing.** `regress.mjs`
+failed with "manifold: candidates preference score 264 worse than blessed 225 by 39
+(tolerance 34)". The multi-start path's placement search covered order, coordinate
+sweeps and min separation but NOT the row pitch or the column-pitch cap — so the two
+paths had been scoring candidates from different spaces, and the gate had been
+comparing a search against a subset of itself. Both axes are now searched on both
+paths, and the candidate-vs-blessed deltas went from `+104 / +37 / +39` to **`+0` on
+all five cases** — a stronger result than the one that was being gated for.
+
+**And a lesson about how a pair of numbers reads.** 220mm and 300mm row pitch tie as a
+PAIR (`{220,300}` and `{300}` both sum 1967), which looks at a glance like "300 is
+dominated by 220" and is exactly backwards: the third candidate is what carries the
+demo and dense, and `{145,220}` loses 41 points to `{145,300}`. I deleted
+`rowSpacingAlt2` on that reading, measured the corpus, and got 1868 instead of 1827.
+A pair test can only see a tie, never a candidate's value.
+
+### 9.74.8 Two negative results, measured and reverted
+
+1. **Stack the instrument bubble on the tap's LANDING POINT** rather than the host's
+   centre. Right in principle — a tap is a drop, and the drop should start where it
+   lands — and it is the change that most improves the two sheets a reader looks at
+   (demo 464 -> 404 with utilisation 28% -> 33%, dense 445 -> 430 with crossings
+   4 -> 2). It is also a clear net loss: spike 837 -> 1041 with 4 label collisions,
+   min 119 -> 133, manifold 324 -> 360, sum 2234 -> 2411.
+
+   The cause is structural and worth more than the change: the layout has no knowledge
+   of NOZZLE TAGS, because nozzles are not materialised until after `autoLayout` runs —
+   so a bubble moved onto the run lands on the nozzle tag that already wants that piece
+   of paper (`"NZ-D101-2" & "PT"`), and the line-designation and valve-stack placers
+   then lose the corridor fight (`"gate valve" & "4"-PG-101-1E1-H-INS-50-T"`). Filed as
+   **T3.11**: the item is not the placement, it is that the layout cannot see nozzle
+   annotations.
+
+   The dead code that was supposed to handle this is still in `pid-router.js`, and it
+   scans `data.nozzles`, which is empty at layout time. So the alignment never
+   executed, and the block is a no-op wearing a fix's clothes. Its own comment says so,
+   from the 2026-09-25 attempt — and that comment was added when the attempt was
+   REVERTED, so nobody was reading the code the comment was warning about. The earlier
+   revert ("spike 1051 -> 2161") is still good evidence, and it is evidence about the
+   wrong thing: that version picked a nozzle by proximity via `symbolConnections`.
+   Naming the TAPPED PORT is not a proximity search, and the difference is the whole of
+   it.
+
+2. **Score valve-stack candidates by covered INK** rather than by segment count, and
+   add four "kick" offsets. The metric is strictly better — a count cannot tell one
+   segment clipping a corner from three running down the middle, and the audit named
+   what the count chose: `"control valve" on 3 segment(s)` on spike, twice. It loses
+   anyway: sum 2234 -> 2284 (demo 451 with a label collision, spike 897 with two).
+   Optimising annotation placement harder makes the drawing worse, because placement is
+   downstream of layout and the layout cannot make room for it. Same lesson as number
+   1, from the other end.
+
+3. **`layout.colsPerRowMax` as a search axis: rejected.** Forcing the tier wrap destroys
+   the sheets that already match the sheet aspect — spike 789 -> 3146 and dense
+   384 -> 3345 at `colsPerRowMax:3`, 3923 at 2, with non-orthogonal segments appearing.
+   The auto aspect heuristic is doing real work; `colsPerRowMax` stays a per-sheet human
+   override, which is what 9.68's comment already says.
+
+4. **`routing.bendPenalty`: already at its optimum, and the curve is churn.** 0/8/14/20/
+   32/50/80 sum 2020/1922/1931/**1891**/1970/1987/2001. demo, min and split are
+   completely insensitive; the movement is layout re-roll, not a routing trade. Not a
+   lever.
+
+### 9.74.9 The render-time bill, and what it buys
+
+Four column pitches x three row pitches is the difference between spike rendering in
+13.4s and 28.5s. That is a real cost and it is stated rather than absorbed. The column
+pitch is where the search wanted to grow, and it bought 64 points (1891 -> 1827) for
+the doubling. **T3.1/T3.2 — a layout-only fitness so the cheap dimensions can be
+searched without paying for a route — is now worth more than it was**, and the
+definition of done in the redesign doc ("the placement search evaluates > 50 candidates
+in less wall time than today's 6") is the right target.
+
+### Net
+
+```
+                 before this pass                     after
+  sum of totals            2234                        1827
+  demo                    464 / 28% W                 319 / 65% W, 0 crossings
+  spike                   837 / 53%                   789 / 73%, crossings 11 -> 7
+  dense                  445 / 26%                   384 / 45%
+  min                    119 / 7%                     65
+  split                   45 / 15%                    45
+  manifold               324 / 63%                   225 / 99% W x 87% H
+  label-on-linework     4/23/5/0/0/-      6/24/6/6/0/0, and leadered runs exempt
+  rotated designations      12                             8
+  candidate vs blessed   +104/+37/+39                 +0/+0/+0/+0/+0
+  REGRESS                     green                        green
+```
+
+The shape problem is NOT solved: the demo's ink/bbox ratio is 0.08 and manifold's is
+0.07, and audit [13] says so on both. The demo's void moved from a wide band with wide
+margins to an L with a long diagonal tail to the battery limit. Score, extent and
+crossings all improved; the shape did not. That is filed, not fixed, and the check that
+found it is the one that will keep saying so.

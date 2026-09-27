@@ -519,15 +519,13 @@
    "errors": [],
    "warnings": [
     "[PID-LAY-001] drawing exceeds the drawable zone (width 836 > 768mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead",
-    "[PID-TXT-001] annotation type OVER: 22 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-TXT-001] annotation type OVER: 25 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 10.0mm (< 14mm) — bend too close to the T-2 port",
-    "[PID-GEO-002] geometry \"FIC-1 -> V-1\": port lead-in only 11.0mm (< 14mm) — bend too close to the V-1 port",
-    "[PID-GEO-005] line \"J-H -> V-2\" passes through V-1",
-    "[PID-ANN-001] 5 label(s) are drawn over process linework: centrifugal pump x1, control valve x4, N/O F/C x1, gate valve x1, gate valve x1. A label on a pipe is unreadable; audit item [15] names all of them."
+    "[PID-ANN-001] 2 label(s) are drawn over process linework: gate valve x1, gate valve x1. A label on a pipe is unreadable; audit item [15] names all of them."
    ],
-   "warningsTotal": 6,
+   "warningsTotal": 4,
    "score": {
-    "total": 264,
+    "total": 225,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -550,19 +548,19 @@
     },
     "fill": {
      "w": 100,
-     "h": 86,
-     "util": 86,
+     "h": 88,
+     "util": 88,
      "ink": 6,
      "gap": 0,
      "entities": 11
     },
     "routing": {
-     "crossings": 1,
-     "pp": 1,
+     "crossings": 0,
+     "pp": 0,
      "ps": 0,
      "ss": 0,
-     "bends": 36,
-     "length": 2736,
+     "bends": 34,
+     "length": 2463,
      "nonOrtho": 0
     },
     "sheet": {
@@ -574,23 +572,23 @@
     "lines": {
      "overlaps": 0,
      "ungapped": 0,
-     "astarGiveups": 0,
+     "astarGiveups": 1,
      "breach": 0,
      "breachMm": 0,
-     "leadInShort": 7
+     "leadInShort": 4
     },
     "instruments": {
-     "tapReachTotal": 21,
-     "maxSignalLen": 53
+     "tapReachTotal": 22,
+     "maxSignalLen": 75
     },
     "issues": {
      "errors": 0,
-     "warnings": 5
+     "warnings": 3
     }
    }
   },
   "audit": {
-   "paths": "13 process, 2 signal, 2 taps | entities: 15 | texts: 61",
+   "paths": "13 process, 2 signal, 2 taps | entities: 15 | texts: 62",
    "counts": {
     "0": 0,
     "3": 1,
@@ -598,10 +596,10 @@
     "5": 0,
     "6": 0,
     "7": 0,
-    "8": 3,
+    "8": 2,
     "9": 0,
-    "10": 0,
-    "11": 83,
+    "10": 1,
+    "11": 86,
     "12": 0,
     "13": 1,
     "14": 0,
@@ -611,38 +609,39 @@
    "lists": {
     "0": [],
     "3": [
-     "V-1->T-1 X J-H->V-2 @(165,183)"
+     "FT-1~tap-> X J-H->V-3 @(60,155)"
     ],
     "4": [],
     "5": [],
     "6": [],
     "7": [],
     "8": [
-     "V-4->J-H 1mm (105,191)->(105,190)",
-     "V-1->T-1 2mm (385,183)->(385,185)",
-     "V-1->T-1 2.5mm (385,185)->(383,185)"
+     "V-1->T-1 2mm (165,183)->(165,185)",
+     "V-1->T-1 2.5mm (165,185)->(163,185)"
     ],
     "9": [],
-    "10": [],
+    "10": [
+     "FT-1~tap-> X J-H->V-3 @(60,155)"
+    ],
     "11": [
-     "content 754x372mm bbox (54,85)->(808,457) | 98% W x 85% H | drawable 768x439mm | sheet 864x559mm | INK 6% of zone"
+     "content 757x382mm bbox (51,80)->(808,462) | 99% W x 87% H | drawable 768x439mm | sheet 864x559mm | INK 6% of zone"
     ],
     "12": [],
     "13": [
-     "spans 85% of the drawable but fills only 7% of its own bounding box with ink — the drawing is the shape of its box (L, U or ring); re-flow the depth ranks rather than scaling the sheet"
+     "spans 87% of the drawable but fills only 7% of its own bounding box with ink — the drawing is the shape of its box (L, U or ring); re-flow the depth ranks rather than scaling the sheet"
     ],
     "14": [],
     "15": [
-     "\"centrifugal pump\" on 2 segment(s) @(24,168)",
-     "\"control valve\" on 4 segment(s) @(142,175)",
-     "\"N/O F/C\" on 3 segment(s) @(142,170)",
-     "\"2\"\" on 1 segment(s) @(142,165)",
-     "\"gate valve\" on 1 segment(s) @(178,221)",
-     "\"gate valve\" on 1 segment(s) @(88,196)"
+     "\"centrifugal pump\" on 1 segment(s) @(60,217)",
+     "\"control valve\" on 2 segment(s) @(123,186)",
+     "\"2\"\" on 1 segment(s) @(123,196)",
+     "\"gate valve\" on 1 segment(s) @(128,201)",
+     "\"gate valve\" on 1 segment(s) @(128,221)",
+     "\"FT\" on 1 segment(s) @(60,144)"
     ],
     "16": []
    }
   },
-  "budget": 238
+  "budget": 203
  }
 }

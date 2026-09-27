@@ -3057,6 +3057,11 @@ window.PIDGenerator = {
         layoutOrder: placement ? placement.ord : null,
         coordIters: placement ? placement.sw : undefined,
         minSep: placement ? placement.sep : undefined,
+        // The two pitch axes too, for the reason at the placement search: this path
+        // scores candidates from the same space the default path does, or the gate in
+        // regress.mjs is comparing a search against a subset of itself.
+        rowSpacing: placement ? placement.rs : undefined,
+        colMax: placement ? placement.cm : undefined,
       });
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('id', containerId + '-svg');
@@ -3114,6 +3119,28 @@ window.PIDGenerator = {
       // two-point row search can miss it depending on where the other dimensions
       // happen to land. Three pitches cover the knee of the curve measured in 9.66
       // (flat below 180, rising to 220, past its peak by 300) and take the dependence out.
+      //
+      // THE THIRD PITCH IS NOT PADDING, and I nearly deleted it on a bad experiment.
+      // Pinning the axis to {rs, 300} for each rs in turn:
+      //
+      //   axis      demo  spike  dense  min  split  manifold   sum
+      //   {145,300} 319    789    384    65     45       225     1827
+      //   {145,220} 344    789    400    65     45       225     1868
+      //   {220,300} 319    949    384    65     45       328     1967
+      //   {300}     319    949    384    65     45       328     1967
+      //
+      // 220 and 300 tie as a PAIR (rows 3 and 4), which reads at a glance like "300 is
+      // dominated by 220" and is exactly backwards: the third candidate is what carries
+      // the demo and dense, and {145, 220} loses 41 points to {145, 300}. A pair test
+      // cannot see a candidate's value, only its tie, and the earlier version of this
+      // comment confidently concluded the wrong thing from one.
+      //
+      // The cost is real and stated: four column pitches x three row pitches is the
+      // difference between spike rendering in 13.4s and 28.7s. T3.1/T3.2 -- a
+      // layout-only fitness so the cheap dimensions can be searched without paying for
+      // a route -- is the documented remedy and it is now worth more than it was, because
+      // the column-pitch axis went from two values to four and that is where the search
+      // wanted to grow.
       const rowsBase = ruleParam('layout.rowSpacing', 145);
       const rowsAlt = ruleParam('layout.rowSpacingAlt', 220);
       const rowsAlt2 = ruleParam('layout.rowSpacingAlt2', 300);
@@ -3132,8 +3159,27 @@ window.PIDGenerator = {
       // a CANDIDATE and not a new score term, for the reason 9.66 established: the
       // corpus genuinely splits on it (spike 943 -> 838 at 110mm, manifold
       // 324 -> 373; at 90mm the reverse), and no single value is right for both.
+      //
+      // TWO values were not enough, and the sweep says so unambiguously. Holding
+      // everything else fixed and moving only the second value:
+      //
+      //   alt     demo   spike   dense   manifold   sum
+      //   110      344     789     384       264     1891   <- 0/110, current
+      //   150      344     904     384       225     1967
+      //   200      319     904     384       264     1981
+      //   240      331     904     384       264     1988
+      //
+      // spike needs 110 and refuses anything wider (789 -> 904, crossings 7 -> 16:
+      // a longer pitch gives the router more room to make detours and it takes them).
+      // manifold wants 150 (264 -> 225, crossings 1 -> 0). The demo wants 200
+      // (344 -> 319, and its shape goes from 78%x48% to 65%x68%, which is the ink/bbox
+      // ratio [13] complains about). A two-element axis has to pick ONE and the other
+      // two sheets pay for it. Three options is the smallest set that lets each sheet
+      // take its own, and it is still a candidate list — the score decides, not a rule.
       const colBase = ruleParam('layout.colMax', 0), colAlt = ruleParam('layout.colMaxAlt', 110);
-      const colCaps = doCoord && colAlt !== colBase ? [colBase, colAlt] : [colBase];
+      const colAlt2 = ruleParam('layout.colMaxAlt2', 150);
+      const colAlt3 = ruleParam('layout.colMaxAlt3', 200);
+      const colCaps = doCoord ? [...new Set([colBase, colAlt, colAlt2, colAlt3])] : [colBase];
 
       const orders = ruleParam('layout.orderSearch', 1)
         ? PID_LAYOUT_ORDERS.slice(0, Math.max(1, ruleParam('layout.orderCandidates', 3)))
@@ -3188,12 +3234,24 @@ window.PIDGenerator = {
     // candidates. Layout seeds activate barycenter noise in autoLayout; routing
     // seeds activate A*/refinement tie-breaks. Total renders = nLayouts * (n + 1).
     //
-    // Placement (order + coordinate sweeps + min separation) is resolved ONCE
-    // here, on the legacy seed, and then held fixed for every routing candidate.
-    // It is deterministic and independent of the routing seed, so re-searching it
-    // per candidate would multiply cost for nothing — and NOT searching it at all
-    // left this path scoring worse than the default path (regress caught it:
-    // "candidates winner 1317 worse than blessed 1065").
+    // Placement (order + coordinate sweeps + min separation + row pitch + column
+    // pitch cap) is resolved ONCE here, on the legacy seed, and then held fixed for
+    // every routing candidate. It is deterministic and independent of the routing
+    // seed, so re-searching it per candidate would multiply cost for nothing — and
+    // NOT searching it at all left this path scoring worse than the default path
+    // (regress caught it: "candidates winner 1317 worse than blessed 1065").
+    //
+    // It searches the SAME five axes the default path does, and that is not tidiness.
+    // It used to search three of them — order, coordinate sweeps and min separation —
+    // and never the row pitch or the column-pitch cap, so the two paths were scoring
+    // candidates from different spaces and `regress.mjs` could not compare them. It
+    // only became visible when the column-pitch axis grew to four values: manifold
+    // needs 150mm and the default path found it (225) while this path, which could
+    // not ask for 150mm, topped out at 264 — a 39-point gap against a 34-point
+    // tolerance, and REGRESS FAIL rather than a warning. A gate that compares two
+    // searches is only meaningful if they searched the same thing, and the honest
+    // reading of the failure is that the gate had been comparing a search against a
+    // subset of itself.
     const placement = (() => {
       if (!ruleParam('layout.orderSearch', 1) && !ruleParam('layout.coordSearch', 1)) return { ord: null, sw: null, sep: null };
       const doCoord = ruleParam('layout.coordSearch', 1);
@@ -3201,16 +3259,24 @@ window.PIDGenerator = {
       const sepBase = ruleParam('layout.minSep', 45), sepAlt = ruleParam('layout.minSepAlt', 45);
       const seps = doCoord && sepAlt > sepBase ? [sepBase, sepAlt] : [sepBase];
       const ords = PID_LAYOUT_ORDERS.slice(0, Math.max(1, ruleParam('layout.orderCandidates', 3)));
+      const rowsBase = ruleParam('layout.rowSpacing', 145);
+      const rowSeps = [...new Set([rowsBase, ruleParam('layout.rowSpacingAlt', 220), ruleParam('layout.rowSpacingAlt2', 300)])].sort((a, b) => a - b);
+      const colBase = ruleParam('layout.colMax', 0);
+      const colCaps = doCoord ? [...new Set([colBase, ruleParam('layout.colMaxAlt', 110), ruleParam('layout.colMaxAlt2', 150), ruleParam('layout.colMaxAlt3', 200)])] : [colBase];
       let bp = null;
       for (const ord of ords) {
         for (const sw of sweeps) {
           for (const sep of seps) {
-            pidSeed(null);
-            const d = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep });
-            const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            s.setAttribute('id', containerId + '-svg');
-            const sc = renderInto(s, d, themeOpt);
-            if (!bp || sc.total < bp.total) bp = { ord, sw, sep, total: sc.total };
+            for (const rs of rowSeps) {
+              for (const cm of colCaps) {
+                pidSeed(null);
+                const d = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep, rowSpacing: rs, colMax: cm });
+                const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                s.setAttribute('id', containerId + '-svg');
+                const sc = renderInto(s, d, themeOpt);
+                if (!bp || sc.total < bp.total) bp = { ord, sw, sep, rs, cm, total: sc.total };
+              }
+            }
           }
         }
       }

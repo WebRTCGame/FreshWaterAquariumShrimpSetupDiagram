@@ -12,12 +12,22 @@
 // resulting error per symbol per port.
 //
 // Usage: node audit-symbols.mjs [--verbose]
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const raw = readFileSync('pid-symbols-bundle.js', 'utf8');
 const jsonStr = raw.replace(/^\s*window\.PID_SYMBOLS\s*=\s*/, '').replace(/;\s*$/, '');
 const symbols = JSON.parse(jsonStr);
 const verbose = process.argv.includes('--verbose');
+// --fix-extents recomputes every declared `extents` from the glyph ink, using the SAME
+// contentBBox the check measures with. Deliberately not a second implementation: a copy
+// drifts from the check, the two then disagree about what "the ink" is, and the repair
+// and the audit end up grading different quantities -- which is exactly how the port-drift
+// check came to report 26 phantom findings with confident, plausible numbers.
+//
+// Safe to rewrite wholesale: a JSON round-trip of this file is byte-identical, so the
+// diff carries only the intended change and no other writer gets a reformatted file.
+const fixExtents = process.argv.includes('--fix-extents');
+const extentsChanged = [];
 
 // --- content bbox from the glyph's own primitives -------------------------
 // Exact for rect/circle/line/ellipse/polyline/polygon; for <path> it takes the
@@ -183,6 +193,17 @@ for (const [key, sym] of Object.entries(symbols)) {
   if (ex && bbox) {
     const dev = Math.max(Math.abs(ex.x0 - bbox.x0), Math.abs(ex.y0 - bbox.y0), Math.abs(ex.x1 - bbox.x1), Math.abs(ex.y1 - bbox.y1));
     const wide = Math.max(ex.x1 - ex.x0, ex.y1 - ex.y0), want = Math.max(bbox.x1 - bbox.x0, bbox.y1 - bbox.y0);
+    if (fixExtents) {
+      // whole units: extents are read as integers elsewhere, so a fractional box is
+      // just noise in the diff
+      const nx0 = Math.floor(bbox.x0), ny0 = Math.floor(bbox.y0);
+      const nx1 = Math.ceil(bbox.x1), ny1 = Math.ceil(bbox.y1);
+      const cur = sym.extents || {};
+      if (cur.x0 !== nx0 || cur.y0 !== ny0 || cur.x1 !== nx1 || cur.y1 !== ny1) {
+        extentsChanged.push(`${key}: (${cur.x0},${cur.y0})-(${cur.x1},${cur.y1}) -> (${nx0},${ny0})-(${nx1},${ny1})`);
+        sym.extents = { x0: nx0, y0: ny0, x1: nx1, y1: ny1 };
+      }
+    }
     if (dev > Math.max(4, want * 0.15))
       add('SYM-EXTENTS', key, `extents (${ex.x0},${ex.y0})-(${ex.x1},${ex.y1}) vs measured (${bbox.x0.toFixed(0)},${bbox.y0.toFixed(0)})-(${bbox.x1.toFixed(0)},${bbox.y1.toFixed(0)}) off by ${dev.toFixed(0)}u`);
   }
@@ -277,6 +298,23 @@ for (const t of SELFTEST) {
 }
 if (!selfFail) console.log(`[SELFTEST] ok — ${SELFTEST.length} hand-counted bbox assertions pass\n`);
 
+if (fixExtents) {
+  if (!extentsChanged.length) {
+    console.log('[FIX-EXTENTS] nothing to change');
+  } else {
+    // Re-read before writing. Another writer may have touched the bundle since this run
+    // read it, and silently overwriting their work is how five no-ops ship (see the scope
+    // note in fix-symbol-defects.mjs). Bail loudly instead.
+    if (readFileSync('pid-symbols-bundle.js', 'utf8') !== raw) {
+      console.error('[FIX-EXTENTS] ABORT: pid-symbols-bundle.js changed on disk since this run read it.');
+      process.exit(2);
+    }
+    const pre = raw.match(/^(\s*window\.PID_SYMBOLS\s*=\s*)([\s\S]*)(;\s*)$/);
+    writeFileSync('pid-symbols-bundle.js', pre[1] + JSON.stringify(symbols) + pre[3]);
+    console.log(`[FIX-EXTENTS] ${extentsChanged.length} symbol extents recomputed from ink:`);
+    for (const c of extentsChanged) console.log('   ' + c);
+  }
+}
 // --- report ----------------------------------------------------------------
 const byCode = {};
 for (const f of F) (byCode[f.code] = byCode[f.code] || []).push(f);

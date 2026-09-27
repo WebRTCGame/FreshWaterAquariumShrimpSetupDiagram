@@ -1717,8 +1717,10 @@ const shiftFor = (lineIdx, x) => {
     for (const gg of geometries) for (const sgm of PIDEngine.segs(gg.pts)) tagLineSegs.push({ sgm, gg });
     for (const t of tapGeos) for (const sgm of PIDEngine.segs(t.pts)) tagLineSegs.push({ sgm });
     // Boxes for the line designations this pass just placed, so the equipment-tag
-    // placer below can avoid them. Empty until the loop above has run.
+    // placer below can avoid them, and the dashed leaders so the label-over-linework
+    // check can exempt them. Both are empty until the loop above has run.
     const lineLabelBoxes = [];
+    const leaderSegs = [];
     for (const nz of (data.nozzles || [])) {
       if (!nz.tipPosition) continue;
       const orient = nz.orientation || 0;
@@ -1768,17 +1770,45 @@ const shiftFor = (lineIdx, x) => {
     for (const g of geometries) {
       if (!g.label || g.labelOnce) continue;
       const pts = g.pts;
-      // ponytail: longest-first segment candidates — a pinched longest run
-      // shouldn't force a collision when a shorter run sits in the clear
+      // How long a designation is, and therefore how much RUN it needs. A line
+      // designation follows the line it belongs to — that is the convention, and it
+      // is why the emitter rotates by 90 on a vertical segment — but a rotated
+      // designation is as long as the text, so a 30mm riser cannot hold a 40mm
+      // string. The candidate filter used a flat `len >= 12` for both orientations,
+      // which let a 12mm riser carry a designation that then ran 28mm past both ends
+      // of it, straight across the process. Measured on the demo before this:
+      // `4"-PG-101-2C2-R10-52-N` standing vertically through P-101 and its suction
+      // run, and a second vertical `4"` beside V-106.
+      //
+      // A vertical run must therefore be at least as long as the text; a horizontal
+      // one is placed at a fraction along the run with a leader, so length is not
+      // what constrains it and 12mm stands.
+      const lblW = PIDText.widthMm(g.label, fs(2.6), false);
       const cands = [];
       for (let k = 1; k < pts.length; k++) {
         const a = pts[k - 1], b = pts[k];
         const horiz = Math.abs(a.y - b.y) < 0.5;
         const len = horiz ? Math.abs(a.x - b.x) : Math.abs(a.y - b.y);
-        if (len >= 12) cands.push({ a, b, horiz, len });
+        if (len < 12) continue;
+        // rotated: the text runs ALONG the segment, so the segment must hold it
+        if (!horiz && len < lblW + ruleParam('annotation.labelRunClear', 4)) continue;
+        cands.push({ a, b, horiz, len });
       }
       cands.sort((p, q) => q.len - p.len);
-      if (!cands.length) continue;
+      if (!cands.length) {
+        // No segment long enough to hold the designation along its own direction.
+        // Better a horizontal designation on a short riser — with a leader, which is
+        // what the emitter draws for any non-rotated placement — than a rotated one
+        // that overhangs its run. Fall back to the longest segment regardless.
+        for (let k = 1; k < pts.length; k++) {
+          const a = pts[k - 1], b = pts[k];
+          const horiz = Math.abs(a.y - b.y) < 0.5;
+          const len = horiz ? Math.abs(a.x - b.x) : Math.abs(a.y - b.y);
+          if (len >= 12) cands.push({ a, b, horiz: true, len });
+        }
+        cands.sort((p, q) => q.len - p.len);
+        if (!cands.length) continue;
+      }
       const minY = Math.min(g.pA.y, g.pB.y);
       // entity tag stacks live below symbols — keep line labels out of them.
       // ponytail: nozzle tags reserved too (same tip+offset math as emission) —
@@ -1885,6 +1915,7 @@ const shiftFor = (lineIdx, x) => {
         : textBox(anchor.x, anchor.y, g.label, fs(2.6)));
       const lead = (Math.abs(anchor.x - lm.x) > 1 || Math.abs(anchor.y - lm.y) > 1)
         ? `<line x1="${lm.x}" y1="${lm.y}" x2="${anchor.x}" y2="${anchor.y}" stroke="#0D47A1" stroke-width="0.3" stroke-dasharray="2 2"/>` : '';
+      if (lead) leaderSegs.push({ x1: lm.x, y1: lm.y, x2: anchor.x, y2: anchor.y });
       pipesSvg += lead + `<text x="${anchor.x}" y="${anchor.y}" text-anchor="middle" font-size="${fs(2.6)}" font-style="italic" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3"${ang ? ` transform="rotate(${ang} ${anchor.x} ${anchor.y})"` : ''}>${esc(g.label)}</text>`;
     }
 
@@ -2626,8 +2657,18 @@ const shiftFor = (lineIdx, x) => {
   // excludes nozzle leaders (a nozzle tag belongs on its own nozzle).
   {
     const all = pidTextBoxes(svg.innerHTML || '');
+    // A run with a LEADER is exempt, and that is what makes this a check rather than
+    // a complaint. A line designation is supposed to sit beside its line and point
+    // at it, and the emitter draws a dashed leader whenever the label is offset.
+    // Without the exemption this counted 8 of spike's 27 findings as correct
+    // drafting — and a check that reports correct drafting is worse than no check,
+    // because the real findings get read as noise. Same exemption as audit [15].
+    const leadered = (b) => leaderSegs.some((L) =>
+      Math.min(Math.max(L.x1, L.x2), b.x1) > Math.max(Math.min(L.x1, L.x2), b.x0) - 1 &&
+      Math.min(Math.max(L.y1, L.y2), b.y1) > Math.max(Math.min(L.y1, L.y2), b.y0) - 1);
     const hits = [];
     for (const b of all) {
+      if (leadered(b)) continue;
       let n = 0;
       for (const sg of lineSegs) if (collide.segHitsRect(sg, b, -ruleParam('annotation.labelOnLineTol', 0.75))) n++;
       if (n) hits.push(`${b.t} x${n}`);

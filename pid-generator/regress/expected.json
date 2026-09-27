@@ -99,7 +99,7 @@
     "12": 0,
     "13": 0,
     "14": 1,
-    "15": 25,
+    "15": 24,
     "16": 2
    },
    "lists": {
@@ -163,7 +163,7 @@
   "harness": {
    "errors": [],
    "warnings": [
-    "[PID-TXT-001] annotation type OVER: 5 run(s) at 3.6mm, 4 run(s) at 3.9mm, 2 run(s) at 4.2mm, 4 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-TXT-001] annotation type OVER: 6 run(s) at 3.6mm, 4 run(s) at 3.9mm, 2 run(s) at 4.2mm, 4 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 8.0mm (< 14mm) — bend too close to the FIC-1 port"
    ],
    "warningsTotal": 2,
@@ -280,7 +280,7 @@
    "errors": [],
    "warnings": [
     "[PID-VAL-004] control valve \"V-2\" has no defined fail action",
-    "[PID-TXT-001] annotation type OVER: 10 run(s) at 3.6mm, 11 run(s) at 3.9mm, 6 run(s) at 4.2mm, 9 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-TXT-001] annotation type OVER: 12 run(s) at 3.6mm, 11 run(s) at 3.9mm, 6 run(s) at 4.2mm, 9 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 11.0mm (< 14mm) — bend too close to the FV-1 port",
     "[PID-ANN-001] 2 label(s) are drawn over process linework: P-1 x1, control valve x1. A label on a pipe is unreadable; audit item [15] names all of them."
    ],
@@ -363,7 +363,7 @@
     "12": 0,
     "13": 0,
     "14": 0,
-    "15": 7,
+    "15": 6,
     "16": 0
    },
    "lists": {
@@ -393,8 +393,7 @@
      "\"NZ-C1-B\" on 1 segment(s) @(399,229)",
      "\"control valve\" on 2 segment(s) @(578,201)",
      "\"control valve\" on 1 segment(s) @(288,172)",
-     "\"LT\" on 1 segment(s) @(220,334)",
-     "\"3\"-PW-1-CS150\" on 1 segment(s) @(231,234)"
+     "\"LT\" on 1 segment(s) @(220,334)"
     ],
     "16": []
    }
@@ -405,7 +404,7 @@
   "harness": {
    "errors": [],
    "warnings": [
-    "[PID-TXT-001] annotation type OVER: 5 run(s) at 3.6mm, 5 run(s) at 3.9mm, 2 run(s) at 4.2mm, 3 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
+    "[PID-TXT-001] annotation type OVER: 6 run(s) at 3.6mm, 5 run(s) at 3.9mm, 2 run(s) at 4.2mm, 3 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
    ],
    "warningsTotal": 1,
    "score": {
@@ -516,7 +515,7 @@
    "errors": [],
    "warnings": [
     "[PID-LAY-001] drawing exceeds the drawable zone (width 836 > 768mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead",
-    "[PID-TXT-001] annotation type OVER: 21 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-TXT-001] annotation type OVER: 22 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
     "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 10.0mm (< 14mm) — bend too close to the T-2 port",
     "[PID-GEO-002] geometry \"FIC-1 -> V-1\": port lead-in only 11.0mm (< 14mm) — bend too close to the V-1 port",
     "[PID-GEO-005] line \"J-H -> V-2\" passes through V-1",

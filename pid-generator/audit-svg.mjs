@@ -407,18 +407,30 @@ for (const c of uncovered.slice(0, 20)) console.log(`  ${c.a} X ${c.b} @(${c.x},
 // boxes. Nothing compared text with LINEWORK, so a P&ID could print an equipment
 // tag or a valve label stack straight through a process line — one of the most
 // obvious things a drawing can get wrong — and both the score and this audit would
-// report a clean sheet. Measured on dense before the placers learned to test for
-// it: C-1's tag sat on the vertical run off the reboiler, and FV-1's "CONTROL
-// VALVE" stack ran down the P-1 discharge riser.
+// report a clean sheet.
 //
-// The engine's own counter is PID-ANN-001; this is the same question asked of the
-// emitted markup by a tool that shares no code with the renderer beyond the text
-// metric, which is the point of having it. Only the three annotation roles that
-// carry a tag are tested — line designations are meant to sit beside their line
-// with a leader, and nozzle tags are meant to sit on their nozzle.
+// A run with a LEADER is exempt, and that exemption is the difference between a
+// check and a complaint. A line designation is *supposed* to sit beside its line
+// and point at it: the emitter draws a dashed leader from the label to the run
+// whenever the label is offset. Counting that as "on linework" flagged every
+// correctly-leadered designation on the sheet — 8 of the 27 findings on spike
+// after the rotated-label fix — and a check that reports correct drafting is worse
+// than no check, because the real findings get read as noise.
+//
+// Local implementation, as everywhere in this file: an audit that shares code with
+// the thing it audits cannot disagree with it, and disagreement is the value.
 const LBL_TOL = 0.75;   // a leader arriving at a label is not a line drawn through it
+// Dashed 2-2 leaders, which are emitted only for line designations.
+const leaders = R(/<line x1="(-?[\d.]+)" y1="(-?[\d.]+)" x2="(-?[\d.]+)" y2="(-?[\d.]+)" stroke="#0D47A1" stroke-width="0.3" stroke-dasharray="2 2"/g, s)
+  .map((m) => ({ x1: +m[1], y1: +m[2], x2: +m[3], y2: +m[4] }));
+const hasLeader = (b) => leaders.some((L) => {
+  const ex = Math.min(Math.max(L.x1, L.x2), b.x1) - Math.max(Math.min(L.x1, L.x2), b.x0);
+  const ey = Math.min(Math.max(L.y1, L.y2), b.y1) - Math.max(Math.min(L.y1, L.y2), b.y0);
+  return ex > -1 && ey > -1;
+});
 const onLine = [];
 for (const b of texts) {
+  if (hasLeader(b)) continue;
   let n = 0;
   for (const seg of segsAll) {
     if (!segHitsRect(seg, b, -LBL_TOL)) continue;

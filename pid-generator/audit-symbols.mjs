@@ -156,7 +156,10 @@ for (const [key, sym] of Object.entries(symbols)) {
     //   box-furnace    vb.x=9  vb.y=-4     s=0.625   -> hypot(5.625, 2.500) = 6.16mm
     // which is exactly what both survivors reported. A check that compares two mappings
     // must derive both from the same origin, or it measures its own omission.
-    const vx = vb.x + (p.x / 100) * vb.w, vy = vb.y + (p.y / 100) * vb.h;
+    // Where the BROWSER actually puts it. The viewBox origin is CANCELLED by the
+    // viewport mapping: a viewBox point (vx,vy) lands at ox + (vx - vb.x)*s. So the
+    // percentage maps directly -- do NOT add vb.x here.
+    const vx = (p.x / 100) * vb.w, vy = (p.y / 100) * vb.h;   // the TRUE rendered position
     const ax = ox + vx * s, ay = oy + vy * s;            // actual, relative to box top-left
     // Where the ENGINE puts it. This must be portOffset()'s formula, not the naive
     // ((p-50)/100)*size: that one is only right for a SQUARE viewBox, and portOffset has
@@ -167,8 +170,18 @@ for (const [key, sym] of Object.entries(symbols)) {
     // them said "viewBox is not square -> letterboxed", i.e. the finding was describing
     // the very condition the engine already handles.
     // Note the vb.x / vb.y terms: portOffset includes them, the old check did not.
-    const evx = vb.x + (p.x / 100) * vb.w, evy = vb.y + (p.y / 100) * vb.h;
-    const ex = ox + evx * s, ey = oy + evy * s;   // ENGINE port formula, not the naive one
+    const evx = (p.x / 100) * vb.w, evy = (p.y / 100) * vb.h;
+    // Where portOffset() CLAIMS to put it. This is the quantity under test, and it
+    // currently disagrees with the browser by vb.x*s, vb.y*s -- a real defect in
+    // portOffset(), tracked here on purpose. The note above portOffset() in
+    // pid-parser.js defers correcting it until the grid and lead-in constants are
+    // re-tuned in the same change, and points at this check to say when it is closed.
+    // Transcription of PIDEngine.portOffset (pid-parser.js). Keep these two in step --
+    // or better, call the function. This copy went stale once already: portOffset was
+    // corrected to cancel the viewBox origin and this line kept adding it, so the check
+    // went on reporting a bug that had been fixed. A test that transcribes the thing it
+    // tests is a second implementation, and second implementations drift.
+    const ex = ox + evx * s, ey = oy + evy * s;
     const err = Math.hypot(ax - ex, ay - ey);
     if (err > worstPort) { worstPort = err; worstPortId = p.id; }
     if (p.x < 0 || p.x > 100 || p.y < 0 || p.y > 100)
@@ -288,6 +301,25 @@ const SELFTEST = [
 let selfFail = 0;
 for (const t of SELFTEST) {
   const sym = symbols[t.key];
+// [SELFTEST] the portOffset transcription above is checked against a hand-computed
+// value. y32.11-1961/furnaces/box-furnace is <svg x=-35 y=-35 width=70 height=70
+// viewBox="9 -4 112 110">, so with xMidYMid meet: scale = min(70/112, 70/110) = 0.625,
+// translate = (0, 0.625), and pct(50,50) -> viewBox (65,51) -> viewport (35,35) ->
+// parent (0,0). If the engine-side formula ever stops producing (0,0) here, the
+// transcription and portOffset have drifted apart and every number below is suspect.
+const _bf = symbols['y32.11-1961/furnaces/box-furnace'];
+if (_bf) {
+  const _vb = viewBoxOf(_bf.svg || '');
+  const _s = Math.min(70 / _vb.w, 70 / _vb.h);
+  const _ox = (70 - _vb.w * _s) / 2, _oy = (70 - _vb.h * _s) / 2;
+  const _ex = _ox + 0.5 * _vb.w * _s, _ey = _oy + 0.5 * _vb.h * _s;
+  const _err = Math.hypot(_ex - 35, _ey - 35);
+  if (_err > 0.01) {
+    console.log('[SELFTEST] FAIL portOffset transcription: expected (0,0), got off by '
+      + _err.toFixed(3) + 'mm');
+    process.exitCode = 1;
+  }
+}
   if (!sym) { console.log(`[SELFTEST] MISSING SYMBOL ${t.key}`); selfFail++; continue; }
   const got = contentBBox(sym.svg);
   const ok = got && ['x0', 'y0', 'x1', 'y1'].every((k) => Math.abs(got[k] - t.expect[k]) <= 1.5);

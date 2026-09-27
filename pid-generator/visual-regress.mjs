@@ -44,6 +44,12 @@ const CASES = [
   { name: 'dense', src: 'regress/dense.dsl' },
   { name: 'min', src: 'regress/min.dsl' },
   { name: 'split', src: 'regress/split.dsl' },
+  // manifold joined 2026-09-27. It was in the SCALAR corpus and not the VISUAL one,
+  // which is the same shape of gap as the fixture one 9.63 had to fix: a sheet that
+  // can move without anybody seeing it move. It is also the only sheet with
+  // four-line junctions, so it is the only one where a fan-out regression is
+  // visible at all.
+  { name: 'manifold', src: 'regress/manifold.dsl' },
   { name: 'demo', src: null },        // pid-spike.html's own DSL
 ];
 const cases = ONLY ? CASES.filter((c) => c.name === ONLY) : CASES;

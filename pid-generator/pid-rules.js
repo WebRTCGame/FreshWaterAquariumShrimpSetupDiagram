@@ -135,6 +135,40 @@ const PID_RULES = {
     // no lever to act on it, it only added cost — min 58 -> 186 and split
     // 36 -> 135 with no layout change, punishing small sheets hardest. The key
     // is absent rather than zero so the serialised weights stay byte-comparable.
+    // ---- breach tier: drafting-rule violations the objective can SEE ---------
+    //
+    // The problem this fixes, measured: the search chose a layout carrying a
+    // `PID-GEO-002` (port lead-in 5.5mm against a 14mm rule) over one 6% better on
+    // every preference term, because a warning cost `warn: 5` — less than 24
+    // points of fill. The objective was structurally blind to a breach the
+    // validator reports, so "no drafting-rule violation" was not a thing the
+    // search was optimising for.
+    //
+    // It is priced PROPORTIONALLY and CAPPED, not as a lexicographic cliff, and
+    // the shape is the point. A cliff was built first (`hardWarn: 500`, one point
+    // per violation) and measured: it swung the demo from a 359 layout with 2
+    // crossings and 0 label collisions to a 732 layout with 8 crossings and 6
+    // label collisions — i.e. it bought a subtle tight bend at a nozzle with six
+    // glaring overlaps. A candidate's rank must not flip because of a quantity
+    // unrelated to how bad the violation is; that is the same near-tie fragility
+    // the log records for a cosmetic text move re-rolling a layout.
+    //
+    //   breachPerMm  6      8.5mm short of the lead-in rule = 51 points, which is
+    //                      more than one label collision (30) and far less than
+    //                      six of them (180). The trade the objective should make
+    //                      is in that neighbourhood and nowhere near a cliff.
+    //   breachCap  200      bounded, so a pathological sheet cannot make the term
+    //                      dominate: at the cap it still loses to `fill` (400),
+    //                      which is a preference.
+    //
+    // Only breaches a different ARRANGEMENT can fix are recorded, each with the
+    // distance it is short by (`validateGeometry`'s `breach` array — warnings are
+    // prose and the score cannot price prose). `PID-INS-020` (tag wider than its
+    // bubble, 6 findings on spike) is deliberately absent: the remedy is a
+    // symbol-bundle size and a type-scale decision (T6.15/T6.17), so no layout
+    // can earn it back and pricing it would only add a constant.
+    breachPerMm: 6,
+    breachCap: 200,
   },
 
   // ---- line priority: which line breaks at a crossing (low breaks first) ----
@@ -441,6 +475,72 @@ function ruleParam(path, fb) {
   }
   return node;
 }
+// ---- the ONE annotation type-size formula ----------------------------------
+//
+// `annotation.typeScale` inflates, `annotation.typeFloor` clamps, and the result is
+// rounded to 0.1mm. This used to live only inside the renderer's `fs()` closure.
+//
+// It was duplicated for the first time when the instrument bubble grew to fit its
+// tag: the ROUTER also needs to know how big the letters will be, because it
+// reserves the room, and it cannot reach into a renderer's closure. The obvious
+// move — copy the four lines into the parser — is the exact mistake this file's
+// neighbours have already made twice (the `|| 20` grid fallbacks, and the overlay
+// coordinate space that drifted by the whole margin). So the formula is here, in the
+// rules module, and both consumers call it.
+//
+// The renderer's `fs()` adds one thing this does not: it RECORDS each size for
+// PID-TXT-001. That is a side effect of drawing, not of sizing, and it must not
+// fire for a size computed during layout or every run would be counted twice.
+// pid-textmetrics.js is loaded BEFORE this file and has no dependencies of its own,
+// so `PIDText` is already a lexical binding here. The dependency is load order,
+// and load order is a real coupling — it is stated in the file header and in
+// harness2.mjs's `files` list rather than left to be discovered.
+
+function annotationTypeMm(n, sc) {
+  const textScale = Math.max(0.85, sc || 1);
+  const v = n * textScale * ruleParam('annotation.typeScale', 1.4);
+  return Math.max(Math.round(v * 10) / 10, ruleParam('annotation.typeFloor', 3.5));
+}
+
+// ---- instrument bubble geometry (T6.15 / T6.17) ----------------------------
+//
+// Solved here rather than in the renderer because BOTH the layout (which reserves
+// the space, via `PIDEngine.entitySize` -> `entityHalf`) and the drawing (which
+// strokes the circle) must agree on the answer. 9.67 grew the bubble in the
+// renderer alone and spike went 997 -> 1274, because the layout went on reserving
+// the old radius and the drawing overflowed it. One function, two consumers.
+//
+// The declared symbol size is a MINIMUM. A bubble is a circle drawn around text;
+// if the text does not fit, the bubble is wrong at whatever size it happens to be.
+// The solve is chord-aware (the available chord at vertical offset `dy` is
+// 2*sqrt(r^2 - dy^2), so a row's half-width and its vertical offset combine as a
+// corner distance) and uses the real advance table, so a tag of narrow capitals is
+// not over-reserved the way a flat 0.68em factor over-reserved "FIC" by 15%.
+//
+// Returns the required SIDE of the square the glyph is letterboxed into.
+function instrumentBubbleSize(inst, sc) {
+  const letters = String((inst && inst.tag) || '').replace(/[^A-Za-z]/g, '');
+  if (!letters || typeof symbolSize !== 'function') return 0;
+  const s = sc || 1;
+  const fL = annotationTypeMm(3.2, s);
+  const fN = annotationTypeMm(2.6, s);
+  const CAP = PIDText.CAP / 1000, DESC = PIDText.DESC / 1000;
+  const rows = [[letters, fL, true, 0.5]];
+  if (inst.loop) rows.push([String(inst.loop), fN, false, 5.5]);
+  let top = Infinity, bot = -Infinity;
+  for (const [, f, , off] of rows) { top = Math.min(top, off - CAP * f); bot = Math.max(bot, off + DESC * f); }
+  const shift = -(top + bot) / 2;              // centre the ink block
+  let need = 0;
+  for (const [str, f, bold, off] of rows) {
+    const hw = PIDText.widthMm(str, f, bold) / 2;
+    const dy = (off + shift) - (CAP - DESC) * f / 2;   // ink centre off the bubble centre
+    need = Math.max(need, Math.hypot(hw, dy));
+  }
+  // the glyph draws its circle at r = 0.4 * size, and its rect at 0.45 * size, so
+  // the circle is the binding constraint for every bubble in the library
+  return need / 0.4;
+}
+
 function lineRank(kind) {
   if (kind === 'signal') return PID_RULES.linePriority.signal;
   if (kind === 'tap') return PID_RULES.linePriority.tap;

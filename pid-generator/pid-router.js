@@ -754,12 +754,19 @@ function autoLayout(data) {
     // from 18.0mm only to 25.0mm and left three still overlapping.
     //
     // So: y axis keeps the glyph + label-zone rule (stacked labels hang below), x axis
-    // uses the widest line of the two stacks. 0.62em is deliberately conservative for
-    // the grey caps of a type label.
+    // uses the widest line of the two stacks.
+    //
+    // The widths come from `PIDText`, the same per-character table the renderer
+    // measures with. This used to be a private `str.length * 0.62 * fontSize` copy
+    // of the renderer's model, described as "deliberately conservative for the grey
+    // caps of a type label" -- and it was conservative in the wrong direction: 0.62
+    // against a real 0.678 regular-caps average is 9% NARROW, so the floor it set
+    // was lower than the floor the drawing needed. Two copies of one model is how
+    // they drifted; there is now one.
     const labelHalf = (e) => {
       const lines = [e.tag || e.id || '', TYPE_LABELS[e.type] || e.type || ''];
       let w = 0;
-      for (const s2 of lines) w = Math.max(w, String(s2).length * 0.62 * ((s2 === lines[0] ? 4.2 : 3.9)));
+      for (const s2 of lines) w = Math.max(w, PIDText.widthMm(s2, s2 === lines[0] ? 4.2 : 3.9, s2 === lines[0]));
       return w / 2;
     };
     const gapAir = ruleParam('layout.decrowdAir', 6);

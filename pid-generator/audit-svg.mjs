@@ -1,4 +1,13 @@
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+// The text metric is IMPORTED, not reimplemented. This file used to carry its own
+// `content.length * fs * 0.55`, which is how the audit and the engine ended up
+// disagreeing about what "wide" means -- and an audit that measures differently
+// from the thing it audits reports confidently on a model that does not exist.
+// That is the whole of the 9.64 `[1] TINY TEXT` false-positive storm, which the
+// log blamed on a coordinate space and which was really a third copy of a number.
+const require_ = createRequire(import.meta.url);
+const PIDText = require_('./pid-textmetrics.js');
 // ponytail: SVG-only layout audit — parses an exported pid SVG (no DOM, no render)
 // so an LLM can "see" geometry as ranked text. Usage: node audit-svg.mjs <file.svg>
 const file = process.argv[2] || 'pid-spike-export(1).svg';
@@ -73,6 +82,25 @@ for (const m of R(/<circle[^>]*data-pid-id="([^"]+)"[^>]*cx="(-?[\d.]+)"[^>]*cy=
   boxes.push({ id: m[1], x0: +m[2] - 3.5, x1: +m[2] + 3.5, y0: +m[3] - 3.5, y1: +m[3] + 3.5, cx: +m[2], cy: +m[3] });
 
 // ---- texts (approx boxes) ----
+//
+// Measured with `PIDText`, the same per-character table the engine reserves space
+// with, and SCALED BY THE WRAPPER before comparing against a millimetre floor.
+//
+// The scale is the part 9.67 got wrong and never fixed. `fit page` wraps the
+// drawing in `<g transform="translate(...) scale(k)">` and `denormaliseText()`
+// divides every text `font-size` back down by `k` so the TYPE renders at nominal
+// millimetres while the GEOMETRY scales. Comparing the raw attribute against a
+// 3.5mm floor therefore reads nominal-3.5mm text as 3.5/k and flags it: the audit
+// reported 28 of 61 runs on the demo as "tiny" when not one was. A guard that
+// cries wolf on every run of type is a guard nobody reads, and that is exactly
+// what happened — item [1] was disarmed for two commits.
+//
+// `scale(k)` is read from the emitted transform, so this is the scale the browser
+// will actually apply, not a re-derivation of it.
+const WRAP_SCALE = (() => {
+  const g = /<g[^>]*transform="translate\([^)]*\)\s*scale\(([\d.]+)\)"/.exec(s);
+  return g ? +g[1] : 1;
+})();
 const texts = [];
 for (const m of R(/<text\b([^>]*)>([^<]*)<\/text>/g, s)) {
   const a = m[1];
@@ -81,14 +109,25 @@ for (const m of R(/<text\b([^>]*)>([^<]*)<\/text>/g, s)) {
   if (!content) continue;
   const xm = a.match(/x="(-?[\d.]+)"/), ym = a.match(/y="(-?[\d.]+)"/), fm = a.match(/font-size="(-?[\d.]+)"/);
   if (!xm || !ym) continue;
-  const fs = fm ? +fm[1] : 3, x = +xm[1], y = +ym[1];
-  // ponytail: rotate(90) labels run vertically — swap the approx box axes or
+  const fsRaw = fm ? +fm[1] : 3;
+  // text inside a symbol's own <svg> viewport is NOT denormalised -- it must scale
+  // with its symbol, or every glyph in every symbol would shrink by 1/k. Detected
+  // by counting open/close tags ahead of this match rather than by pattern-matching
+  // the preceding markup, which cannot tell "inside a symbol" from "after a
+  // transform on some unrelated group".
+  const ahead = s.slice(0, m.index);
+  const inSymbol = (ahead.match(/<svg[\s>]/g) || []).length > (ahead.match(/<\/svg>/g) || []).length;
+  const fs = inSymbol ? fsRaw : fsRaw * WRAP_SCALE;
+  const x = +xm[1], y = +ym[1];
+  // ponytail: rotate(90) labels run vertically -- swap the approx box axes or
   // every vertical designation flags phantom collisions
   const vert = /rotate\(90/.test(a);
-  const w0 = content.length * fs * 0.55, h0 = fs * 1.15;
+  const ex = PIDText.extentEm(content);
+  const w0 = PIDText.widthMm(content, fs, /font-weight="bold"/.test(a));
+  const h0 = (ex.y1 - ex.y0) * fs;
   const w = vert ? h0 : w0, h = vert ? w0 : h0;
   const mid = /text-anchor="middle"/.test(a);
-  texts.push({ t: content.slice(0, 28), x, y, fs, x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y - h, y1: y });
+  texts.push({ t: content.slice(0, 28), x, y, fs: fsRaw, fsEff: fs, x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y + ex.y0 * fs, y1: y + ex.y1 * fs });
 }
 const hit = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
 
@@ -326,9 +365,10 @@ for (const c of uncovered.slice(0, 20)) console.log(`  ${c.a} X ${c.b} @(${c.x},
     const cx = +sv[1] + +sv[3] / 2, cy = +sv[2] + +sv[4] / 2, r = 0.4 * +sv[3];
     for (const m of R(/<text x="(-?[\d.]+)" y="(-?[\d.]+)" text-anchor="middle" font-size="([\d.]+)"(?: font-weight="(\w+)")?[^>]*>([^<]*)<\/text>/g, body)) {
       const x = +m[1], y = +m[2], f = +m[3], str = m[5];
-      const em = m[4] === 'bold' ? 0.68 : 0.55;
+      // real advance, from the same table the engine draws and reserves with
+      const em = m[4] === 'bold';
       const vcen = (y - CAP * f + y + DESC * f) / 2 - cy;
-      const corner = Math.hypot((str.length * f * em) / 2, vcen);
+      const corner = Math.hypot(PIDText.widthMm(str, f, em) / 2, vcen);
       if (corner > r + TAG_TOL) spills.push(`${g[1]} "${str}" needs ${corner.toFixed(2)}mm but the bubble radius is ${r.toFixed(2)}mm (${((corner / r - 1) * 100).toFixed(0)}% over)`);
     }
   }

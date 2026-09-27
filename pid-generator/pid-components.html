@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
       .item { padding: 3px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .item:hover { background: #eef4ff; }
       .item.sel { background: #1E90FF; color: white; }
-      .item.dirty::after { content: " â€¢"; color: #ff8c00; font-weight: bold; }
+      .item.dirty::after { content: " •"; color: #ff8c00; font-weight: bold; }
       .item.sel.dirty::after { color: white; }
       #center { display: flex; flex-direction: column; overflow: hidden; }
       #canvasToolbar { padding: 8px 14px; border-bottom: 1px solid #eee; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; color: #444; }
@@ -70,7 +70,7 @@
   </head>
   <body>
     <aside id="sidebar">
-      <input id="search" placeholder="filter by idâ€¦" autofocus>
+      <input id="search" placeholder="filter by id…" autofocus>
       <div id="count"></div>
       <div id="list"></div>
     </aside>
@@ -87,11 +87,11 @@
         <span class="selinfo" id="selInfo"></span>
         <span class="spacer"></span>
         <span id="shapeBar" title="click then click canvas to place">
-          <button class="mini" data-add="line">â•² line</button>
-          <button class="mini" data-add="rect">â–­ rect</button>
-          <button class="mini" data-add="circle">â—¯ circ</button>
-          <button class="mini" data-add="ellipse">â¬­ ell</button>
-          <button class="mini" data-add="path">ã€° path</button>
+          <button class="mini" data-add="line">? line</button>
+          <button class="mini" data-add="rect">? rect</button>
+          <button class="mini" data-add="circle">? circ</button>
+          <button class="mini" data-add="ellipse">? ell</button>
+          <button class="mini" data-add="path">? path</button>
           <button class="mini" data-add="text">T text</button>
         </span>
         <button class="mini" id="prev">&larr;</button>
@@ -125,7 +125,7 @@
       <details open><summary>behavior</summary><div id="behRows"></div><div id="validLine"></div></details>
       <details open id="secLayers"><summary>elements <span id="elemCount"></span></summary>
         <div id="layers"></div>
-        <div class="hint">click = select &middot; â–²â–¼ = z-order</div>
+        <div class="hint">click = select &middot; ?? = z-order</div>
       </details>
       <details open><summary>ports <span id="portCount"></span></summary>
         <div><button class="mini" id="addPort">+ add port</button></div>
@@ -149,12 +149,13 @@
         <div>
           <textarea id="srcArea" spellcheck="false"></textarea>
           <div class="toolbar"><button class="mini" id="applySrc">apply source</button><button class="mini" id="tidySrc">tidy numbers</button></div>
-          <div class="hint">Full inner markup of the symbol. Apply parses with DOMParser â€” invalid XML is rejected, nothing is lost.</div>
+          <div class="hint">Full inner markup of the symbol. Apply parses with DOMParser — invalid XML is rejected, nothing is lost.</div>
         </div>
       </details>
     </aside>
 
-    <script src="pid-rules.js?v=1788022128"></script>
+    <script src="pid-textmetrics.js?v=20260927"></script>
+<script src="pid-rules.js?v=1788022128"></script>
     <script src="pid-collide.js?v=1788022128"></script>
     <script src="geometric_objects.js?v=1788022128"></script>
     <script src="pid-symbols-bundle.js?v=1788022128"></script>
@@ -175,7 +176,7 @@
       };
       const touchDirty = (id) => {
         dirtyCache.delete(id || current);
-        try { // ponytail: parser caches ports/size by key â€” stale cache made deletes invisible until reload
+        try { // ponytail: parser caches ports/size by key — stale cache made deletes invisible until reload
           if (typeof connCache !== 'undefined') delete connCache[current];
           if (typeof sizeCache !== 'undefined') delete sizeCache[current];
         } catch (_) {}
@@ -777,7 +778,7 @@
         a.href = URL.createObjectURL(blob);
         a.download = 'pid-symbols-bundle.js';
         a.click(); URL.revokeObjectURL(a.href);
-        status('downloaded bundle: ' + Object.keys(window.PID_SYMBOLS).length + ' components â€” overwrite pid-symbols-bundle.js, then hard-reload');
+        status('downloaded bundle: ' + Object.keys(window.PID_SYMBOLS).length + ' components — overwrite pid-symbols-bundle.js, then hard-reload');
       }
       let genHandle = null, genText = null;
       async function linkGen() {
@@ -864,7 +865,7 @@
             (c.behavior ? Object.keys(c.behavior).some(k => k.toLowerCase().includes(q)) : false);
         });
         renderList();
-        if (current && !visible.includes(current)) status(visible.length + ' matches â€” current hidden by filter');
+        if (current && !visible.includes(current)) status(visible.length + ' matches — current hidden by filter');
         if (!current && visible[0]) select(visible[0]);
         if (!visible.length) { el('previewWrap').innerHTML = ''; el('compTitle').textContent = ''; }
       });
@@ -979,8 +980,8 @@
         box.innerHTML = shapes.map((i, k) => {
           const n = nodes[i];
           const short = (n.attrsRaw || '').replace(/\s+/g, ' ').trim().slice(0, 40);
-          return '<div class="lrow' + (i === selEl ? ' sel' : '') + '" data-layer="' + i + '"><span>' + (k + 1) + '</span><span class="grow">' + n.name + ' ' + escHtml(short) + '</span><button data-z="up" data-zi="' + i + '" title="bring forward">â–²</button><button data-z="down" data-zi="' + i + '" title="send backward">â–¼</button></div>';
-        }).join('') || '<div class="hint">no shapes â€” use the palette above the canvas</div>';
+          return '<div class="lrow' + (i === selEl ? ' sel' : '') + '" data-layer="' + i + '"><span>' + (k + 1) + '</span><span class="grow">' + n.name + ' ' + escHtml(short) + '</span><button data-z="up" data-zi="' + i + '" title="bring forward">?</button><button data-z="down" data-zi="' + i + '" title="send backward">?</button></div>';
+        }).join('') || '<div class="hint">no shapes — use the palette above the canvas</div>';
       }
       function moveElemZ(idx, dir) {
         const { c, shapes } = shapeIndexList();
@@ -1014,7 +1015,7 @@
         const i = c.svg.lastIndexOf('</');
         c.svg = (i >= 0 ? c.svg.slice(0, i) : c.svg) + SHAPE_TPL[kind] + (i >= 0 ? c.svg.slice(i) : '');
         selEl = -1; touchDirty(); refreshAll();
-        status('added ' + kind + ' at center â€” drag it into place');
+        status('added ' + kind + ' at center — drag it into place');
       }
       function innerOf(svg) {
         const a = svg.indexOf('>'), b = svg.lastIndexOf('</');
@@ -1030,7 +1031,7 @@
         const c = window.PID_SYMBOLS[current];
         const raw = el('srcArea').value;
         const doc = new DOMParser().parseFromString('<svg xmlns="http://www.w3.org/2000/svg">' + raw + '</svg>', 'image/svg+xml');
-        if (doc.querySelector('parsererror')) { status('source has invalid XML â€” nothing changed'); return; }
+        if (doc.querySelector('parsererror')) { status('source has invalid XML — nothing changed'); return; }
         pushUndo();
         const b = c.svg.lastIndexOf('</');
         c.svg = c.svg.slice(0, c.svg.indexOf('>') + 1) + raw + (b >= 0 ? c.svg.slice(b) : '');
@@ -1055,7 +1056,7 @@
           ids.add(p.id);
           if (p.x < 0 || p.x > 100 || p.y < 0 || p.y > 100) issues.push(p.id + ' off-canvas');
         }
-        // ponytail: ports are 0-100 normalized, geometry/extents/anchor are viewBox units â€” flag a mapping miss
+        // ponytail: ports are 0-100 normalized, geometry/extents/anchor are viewBox units — flag a mapping miss
         const { w: vbW, h: vbH } = viewDims(c);
         const e0 = c.extents || { x0: 0, y0: 0, x1: vbW, y1: vbH };
         for (const p of ports) {
@@ -1076,8 +1077,8 @@
         } catch (_) { /* validator optional, never block editing */ }
         line.className = issues.length ? 'bad' : 'ok';
         line.textContent = issues.length
-          ? '! ' + issues.slice(0, 6).join(' Â· ') + (issues.length > 6 ? ' (+' + (issues.length - 6) + ' more)' : '')
-          : 'ok â€” ports + extents look sane';
+          ? '! ' + issues.slice(0, 6).join(' · ') + (issues.length > 6 ? ' (+' + (issues.length - 6) + ' more)' : '')
+          : 'ok — ports + extents look sane';
       }
       function elemTextRange(c, nodes, idx) {
         const n = nodes[idx];
@@ -1148,7 +1149,7 @@
           v.splice((best + 1) * 2, 0, String(lx), String(ly));
           commitNodeAttrs(idx, setAttrInRaw(n.attrsRaw, 'points', v.join(' ')));
         }
-        touchDirty(); refreshAll(); status('vertex inserted â€” drag to refine');
+        touchDirty(); refreshAll(); status('vertex inserted — drag to refine');
       }
       function deleteVertex(idx, vi) {
         const c = window.PID_SYMBOLS[current];
@@ -1164,7 +1165,7 @@
           commitNodeAttrs(idx, setAttrInRaw(g.n.attrsRaw, 'points', v.join(' ')));
         } else if (g.n.name === 'path') {
           const cm = parsePathD(g.attrs.d)[pt.pi.ci];
-          if (!cm || cm.cmd === 'M' || cm.cmd === 'Z') return status("can't delete " + (cm ? cm.cmd : 'that') + ' â€” delete the element instead');
+          if (!cm || cm.cmd === 'M' || cm.cmd === 'Z') return status("can't delete " + (cm ? cm.cmd : 'that') + ' — delete the element instead');
           pushUndo();
           const cmds = parsePathD(g.attrs.d);
           cmds.splice(pt.pi.ci, 1);
@@ -1182,9 +1183,9 @@
         const dots = (el('tPorts').checked ? G.symbolConnections(current) : []).map(p =>
           '<circle cx="' + p.x / 100 * w + '" cy="' + p.y / 100 * h + '" r="' + w * 0.03 + '" fill="' + colorOf(p) + '" stroke="white" stroke-width="' + w * 0.008 + '"><title>' + escHtml(p.id) + '</title></circle>').join('');
         box.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + Math.round(px) + '" height="' + Math.round(px * h / w) + '" style="background:white;border:1px solid #ddd">' + innerOf(stripped) + dots + '</svg>'
-          + '<div class="hint">nominal ' + mm + 'mm â€” same &lt;text&gt; strip as the real renderer</div>';
+          + '<div class="hint">nominal ' + mm + 'mm — same &lt;text&gt; strip as the real renderer</div>';
         el('ctxNote').textContent = stripped.length !== c.svg.length
-          ? '! baked-in <text> never reaches a diagram â€” labels come from the DSL, not the glyph' : '';
+          ? '! baked-in <text> never reaches a diagram — labels come from the DSL, not the glyph' : '';
       }
       el('shapeBar').addEventListener('click', (e) => {
         const b = e.target.closest('[data-add]');
@@ -1208,7 +1209,7 @@
         while (def.ports.some(p => p.id === id)) id = 'port' + (++n2);
         def.ports.push({ id, x: snapV(pt.x / w * 100, false), y: snapV(pt.y / h * 100, false), type: 'pipe', role: 'connection', direction: null, flowDirection: null, connectionClass: 'process', connectionType: 'process', cardinality: 1, lead: 14, ownerId: '', position: null, orientation: null, allowedTypes: null, networkId: null });
         selPort = id;
-        refreshAll(); status('added ' + id + ' â€” edit type/role in the ports table');
+        refreshAll(); status('added ' + id + ' — edit type/role in the ports table');
       });
       el('props').addEventListener('click', (e) => {
         const z = e.target.closest('[data-z]');

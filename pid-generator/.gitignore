@@ -3,4 +3,6 @@ pid-spike-export*.svg
 render-*.svg
 regress/*.svg
 regress/_*.dsl
+regress/_*.json
+regress/preview/_*.png
 *.bmp

@@ -1,9 +1,11 @@
 // P&ID Renderer — SVG rendering, annotations, public API.
 // Loaded fifth (after pid-parser.js, pid-router.js, pid-validator.js).
 // ponytail: model-side text boxes — every <text> the renderer emits is measured
-// from its markup (same factors as audit-svg), so label-collision counts agree
-// in node and browser. (Browser getBBox measures real glyphs; parity of the
-// *metric* matters more than sub-pixel accuracy. See plan §External references.)
+// from its markup, so label-collision counts agree in node and browser. The
+// measurement itself is `PIDText`, the same table the router reserves space
+// with; that sharing is load-bearing (see pid-textmetrics.js). (Browser getBBox
+// measures real glyphs; parity of the *metric* matters more than sub-pixel
+// accuracy. See plan §External references.)
 function pidTextBoxes(svgHtml) {
   const out = [];
   for (const m of svgHtml.matchAll(/<text\b([^>]*)>([^<]*)<\/text>/g)) {
@@ -16,10 +18,19 @@ function pidTextBoxes(svgHtml) {
     if (!xm || !ym) continue;
     const fs = fm ? +fm[1] : 3, x = +xm[1], y = +ym[1];
     const vert = /rotate\(90/.test(a);
-    const w0 = content.length * fs * 0.55, h0 = fs * 1.15;
+    // real advance for the real string, and the real vertical extent: caps run
+    // cap-top to baseline, not 1.15em
+    const w0 = PIDText.widthMm(content, fs, /font-weight="bold"/.test(a));
+    const ex = PIDText.extentEm(content);
+    const h0 = (ex.y1 - ex.y0) * fs;
     const w = vert ? h0 : w0, h = vert ? w0 : h0;
     const mid = /text-anchor="middle"/.test(a);
-    out.push({ x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y - h, y1: y });
+    // `data-pid-inst` marks a run that lives INSIDE its own instrument bubble. The
+    // score substitutes the bubble box for these (see the label-collision term in
+    // renderInto, T6.16): re-centring the text in the bubble cannot move the
+    // bubble, so it must not be able to re-roll which layout wins either.
+    const im = a.match(/data-pid-inst="([^"]*)"/);
+    out.push({ x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y + ex.y0 * fs, y1: y + ex.y1 * fs, inst: im ? im[1] : null });
   }
   return out;
 }
@@ -272,8 +283,11 @@ function renderInto(svg, data, themeName) {
   // authored with literal sizes in its own unit space), which is exactly the scope
   // we want: this is a check on annotation type, not on sheet furniture.
   const typeSizes = new Map();          // mm -> how many runs used it
+  // The formula lives in PID_RULES (`annotationTypeMm`) because the ROUTER needs it
+  // too — it has to know how big the instrument letters will be in order to reserve
+  // the room, and it cannot reach into this closure. One formula, two consumers.
   const fs = (n) => {
-    const v = Math.max(Math.round(n * textScale * ruleParam('annotation.typeScale', 1.4) * 10) / 10, ruleParam('annotation.typeFloor', 3.5));
+    const v = annotationTypeMm(n, SC);
     typeSizes.set(v, (typeSizes.get(v) || 0) + 1);
     return v;
   };
@@ -300,10 +314,33 @@ function renderInto(svg, data, themeName) {
       data.warnings.push(`[PID-TXT-001] annotation type OVER: ${fmt(over, 'above', hi)}; largest ${worst[0].toFixed(1)}mm. annotation.typeScale is ${ruleParam('annotation.typeScale', 1.4)} and annotation.typeFloor is ${ruleParam('annotation.typeFloor', 3.5)}mm — note the floor BINDS for every base size at or below ${(ruleParam('annotation.typeFloor', 3.5) / ruleParam('annotation.typeScale', 1.4) / textScale).toFixed(2)}mm, so those roles are all flattened to exactly ${ruleParam('annotation.typeFloor', 3.5)}mm and their individual sizes are no longer distinguishable.`);
     }
   };
+  // ---- instrument bubble: sized from the tag it has to hold (T6.15/T6.17) ----
+  //
+  // The declared symbol size is a MINIMUM, not the answer. A bubble is a circle
+  // drawn around text, and a circle that cannot hold its text is wrong at any
+  // size — the number only decides how wrong.
+  //
+  // This was measured twice before and rejected twice (9.67: spike 997 -> 1274;
+  // 9.72 re-attributed that to the tag CENTRING, which was correct), and it can
+  // work now for two reasons. The size is solved in ONE place that both the
+  // drawing and the layout call — growing a bubble in the drawing alone is exactly
+  // what made 9.67's number, because the router went on reserving the old radius
+  // through `PIDEngine.entitySize` -> `entityHalf`. And the width model is right,
+  // so the required radius is right: the old "3-letter tags need 4.93mm" was a
+  // 4.4mm problem inflated 15% by a flat 0.68em factor that over-reserves any tag
+  // of narrow capitals ("FIC" is 0.537em/char, not 0.68).
+  //
+  // The LOOP-NUMBER line, not the letters, is what sets the height: a two-line tag
+  // needs CAP*fL + gap + DESC*fN of vertical room, and that is the whole of it.
   const sizeOf = (e) => {
     let s = isInstrument(e) ? symbolSize(glyphKeyOf(e)) : glyphSizeOf(e);
     if (e.scale) s *= e.scale;
-    return s * SC;
+    s *= SC;
+    if (isInstrument(e)) {
+      const need = instrumentBubbleSize(e, SC);
+      if (need && need > s) s = need;
+    }
+    return s;
   };
 
   // canvas: content-sized, or full page when `fit page`
@@ -1568,22 +1605,38 @@ const shiftFor = (lineIdx, x) => {
     // pipe's longest straight segment, on a short leader offset off the line (never
     // on it), rotated with the segment. Collision-scored against boxes/bubbles.
     // ponytail: text box in pidTextBoxes math (audit agrees by construction)
-    // Advance width per em, by ROLE. 0.55em is the mixed-case average and it was used
-  // for everything, including the BOLD uppercase tag lines -- which are nearer 0.68em.
-  // That made every bold tag box about 20% too narrow, so the collision metric could
-  // not see overlaps that are obvious on the sheet: the demo reports
-  // `labelCollisions: 0` while V-103 GATE VALVE sits on top of FV-101 CONTROL VALVE.
-  // The layout then has no reason to avoid the pile-up, because to it there is none.
   //
-  // Same root cause as T4.4 (the metric counts characters, so it cannot be
-  // case-sensitive) and the same reason `drawnWidth` was reverted in 9.60: a flat
-  // average cannot express the difference. These factors at least separate the roles
-  // that actually differ.
-  const WIDTH_EM = { regular: 0.55, medium: 0.58, bold: 0.68 };
-  const widthEm = (str, fnt, em) => String(str == null ? '' : str).length * fnt * (em || WIDTH_EM.regular);
-  const textBox = (x, y, str, fnt, mid = true, em) => {
-      const w = widthEm(str, fnt, em), h = fnt * 1.15;
-      return mid ? { x0: x - w / 2, x1: x + w / 2, y0: y - h, y1: y } : { x0: x, x1: x + w, y0: y - h, y1: y };
+  // WIDTH MODEL (T4.4, closed). This used to be
+  //   `str.length * fontSize * WIDTH_EM[role]`, with WIDTH_EM = {0.55, 0.58, 0.68}.
+  // Three attempts to improve it at the string level all failed for the same
+  // reason, and the reason is the finding:
+  //   * uppercasing before counting characters is a no-op -- `toUpperCase()` does
+  //     not change `.length`, so the metric moved 0 on all four corpus sheets;
+  //   * splitting by role fixed BOLD (0.55 -> 0.68) and left `regular` at a
+  //     MIXED-CASE average -- for text that is drawn entirely in caps, because
+  //     `svg[data-theme] text { text-transform: uppercase }` does the transform,
+  //     not the emitter. The bold fix removed the demo's visible label pile-up
+  //     (9.70) and the grey type lines were still ~20% narrow;
+  //   * `getComputedTextLength()` is exact and unusable: the score runs for every
+  //     candidate while the SVG is detached, so there is no layout to query.
+  //
+  // So the model is per-character and comes from `PIDText` (Helvetica Core
+  // metrics, the metric model of the CSS generic this drawing uses). Two
+  // consequences, both intended:
+  //   * boxes get WIDER, because uppercase averages 0.678em against mixed case's
+  //     ~0.50em. Every grey type line on every sheet was under-measured;
+  //   * boxes get SHORTER, because an all-caps line runs cap-top to baseline
+  //     (0.718em), not the flat 1.15em that claimed 0.43em of empty space below
+  //     the baseline.
+  // Net: boxes are now the size of the ink. A collision count going up is the
+  // metric correcting itself, not the layout getting worse -- a count blind to a
+  // pile-up the eye can see is exactly why the layout had no reason to avoid it.
+  const widthEm = (str, fnt, bold) => PIDText.widthMm(str, fnt, !!bold);
+  const textBox = (x, y, str, fnt, mid = true, bold) => {
+      const w = widthEm(str, fnt, bold);
+      const ex = PIDText.extentEm(str);
+      const y0 = y + ex.y0 * fnt, y1 = y + ex.y1 * fnt;
+      return mid ? { x0: x - w / 2, x1: x + w / 2, y0, y1 } : { x0: x, x1: x + w, y0, y1 };
     };
     // ponytail: L6 — nozzle tags pick the clear side (default normal, else
     // flipped) BEFORE line labels place; zones + emission share these coords
@@ -1704,7 +1757,7 @@ const shiftFor = (lineIdx, x) => {
       const off = ruleParam('annotation.labelOffset', 14);
       let anchor = null, ang = 0, lm = null, anchorLineFree = false;
       // ponytail: L2 tail span — test the full designation width, not the anchor
-      const hw = String(g.label || '').length * fs(2.6) * 0.55 / 2;
+      const hw = PIDText.widthMm(g.label, fs(2.6), false) / 2;
       // ponytail: slide along the run (30/70%) as well as across it — a wide
       // designation centered mid-run can tail-graze text the anchor itself clears
       // Two sweeps: line-clear anchors first, any clear anchor second.
@@ -1768,7 +1821,7 @@ const shiftFor = (lineIdx, x) => {
         // tag below the equipment, close to the symbol
         const ty = e.y + s / 2 + 3.5;
         g += `<text x="${e.x}" y="${ty}" text-anchor="middle" font-size="${fs(3.2)}" font-weight="bold" fill="#111" text-decoration="underline" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-        eqBoxes.push(textBox(e.x, ty, tag, fs(3.2), true, WIDTH_EM.bold));
+        eqBoxes.push(textBox(e.x, ty, tag, fs(3.2), true, true));
         if (!e.noTypeLabel) g += `<text x="${e.x}" y="${ty + 5.5}" text-anchor="middle" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(TYPE_LABELS[e.type] || e.type)}</text>`;
         if (!e.noTypeLabel) eqBoxes.push(textBox(e.x, ty + 5.5, TYPE_LABELS[e.type] || e.type, fs(2.8)));
       }
@@ -1832,19 +1885,27 @@ const shiftFor = (lineIdx, x) => {
         const ty = vertical ? v.y + 1 : v.y + s / 2 + 3.5;
         const typeLabel = TYPE_LABELS[v.type] || v.type;
         // [string, size, offset, width-em-role] -- the role travels with the row so the
-        const rows = [[tag, fs(3.0), 0, WIDTH_EM.bold]];
+        const rows = [[tag, fs(3.0), 0, true]];
         if (!v.noTypeLabel) rows.push([typeLabel, fs(2.8), 5.5]);
-        if (state) rows.push([state, fs(2.3), 10.5, WIDTH_EM.regular]); // emission-fixed offsets
+        if (state) rows.push([state, fs(2.3), 10.5, false]); // emission-fixed offsets
         // Derived line size (T7.12). Added as a ROW of the existing stack rather than
         // drawn independently, so it inherits the above/below flip and the collision
         // test at 1734. A separately positioned size would have to re-implement both.
         // Blue like the line designations, because that is what it is: a property of
         // the pipe, not of the valve.
         const sizeLabel = v.sizeLabel || '';
-        if (sizeLabel) rows.push([sizeLabel, fs(2.3), 15.5, WIDTH_EM.regular]);
-        const stackBoxes = (fx, fy, mid, dir) => rows.map(([str, fnt, off, role]) => mid
-          ? textBox(fx, fy + dir * off, str, fnt)
-          : { x0: fx - (dir < 0 ? String(str).length * fnt * 0.55 : 0), x1: fx + (dir < 0 ? 0 : String(str).length * fnt * 0.55), y0: fy - fnt * 1.15, y1: fy });
+        if (sizeLabel) rows.push([sizeLabel, fs(2.3), 15.5, false]);
+        const stackBoxes = (fx, fy, mid, dir) => rows.map(([str, fnt, off, role]) => {
+          // the `role` was being dropped here: the tag row is drawn bold but was
+          // measured as regular, so the widest row of every valve stack reserved
+          // the least. A stack has to be measured the way it is emitted.
+          const b = textBox(fx, fy + dir * off, str, fnt, true, role);
+          if (mid) return b;
+          const w = b.x1 - b.x0;
+          return dir < 0
+            ? { x0: fx - w, x1: fx, y0: b.y0, y1: b.y1 }
+            : { x0: fx, x1: fx + w, y0: b.y0, y1: b.y1 };
+        });
         const zones = [...nozzleBoxes, ...eqBoxes];
         const hits = (boxes) => boxes.reduce((n, b) => n + zones.filter(z => collide.rectsHit(b, z)).length, 0);
         // ponytail: L2 — flip only into something clearer (below is legacy;
@@ -1904,10 +1965,14 @@ const shiftFor = (lineIdx, x) => {
       // Deriving the shift from the metrics also makes it correct at any typeScale. fs() and
       // sizeOf() both scale, but not by a guaranteed common factor, and a fixed offset
       // only happened to land near-centre at one setting.
-      const CAP = 0.72, DESC = 0.20;
+      // The vertical block metrics come from the same table as the widths, so the
+      // centring below is derived rather than guessed (T6.16's cousin: a fixed
+      // offset only lands near-centre at one typeScale). CAP 0.72 / DESC 0.20 were
+      // hand-rounded; PIDText carries 0.718 / 0.207.
+      const CAP = PIDText.CAP / 1000, DESC = PIDText.DESC / 1000;
       const fL = fs(3.2), fN = fs(2.6);
-      const tagLines = [[letters, fL, WIDTH_EM.bold, 0.5]];
-      if (loop) tagLines.push([loop, fN, WIDTH_EM.regular, 5.5]);
+      const tagLines = [[letters, fL, true, 0.5]];
+      if (loop) tagLines.push([loop, fN, false, 5.5]);
       let bTop = Infinity, bBot = -Infinity;
       for (const [, f, , off] of tagLines) {
         bTop = Math.min(bTop, off - CAP * f);
@@ -1922,7 +1987,15 @@ const shiftFor = (lineIdx, x) => {
         need = Math.max(need, Math.hypot(widthEm(str, f, em) / 2, y - (CAP - DESC) * f / 2));
       }
       for (const [str, f, em, off] of tagLines) {
-        g += `<text x="${inst.x}" y="${(inst.y + off + shift).toFixed(2)}" text-anchor="middle" font-size="${f}" font-weight="${em === WIDTH_EM.bold ? 'bold' : 'normal'}" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(str)}</text>`;
+        // `data-pid-inst` marks this run as living INSIDE its own bubble. The
+        // candidate score replaces every such run with the bubble box (see the
+        // label-collision term in renderInto): the bubble does not move when the
+        // text inside it is re-centred, so the score must not either. 9.72 measured
+        // what happens when it does — centring the block moved the text 1.8mm, the
+        // near-tied candidates re-rolled, and spike landed on a worse layout
+        // (crossings 9 -> 10, two new collinear tap/pipe overlaps) for a change
+        // that could not physically have moved a pipe, a bubble or a tap leader.
+        g += `<text x="${inst.x}" y="${(inst.y + off + shift).toFixed(2)}" text-anchor="middle" font-size="${f}" font-weight="${em ? 'bold' : 'normal'}" data-pid-inst="${esc(inst.tag)}" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(str)}</text>`;
       }
       // A tag that still will not fit is a layout bug, not something to paper over. Record
       // it so it is countable instead of the sheet quietly showing a number outside its
@@ -2041,8 +2114,15 @@ const shiftFor = (lineIdx, x) => {
   if (dn.n || dn.skipped) {
     data.textNormalised = { scaled: dn.n, inherited: dn.skipped, k: Math.round(k * 1000) / 1000 };
   }
-svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
-  globalThis.__LAST_SVG = (wrap ? wrap : '') + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
+  // annotationsSvg ONCE. It used to be called twice — once for `svg.innerHTML` and
+  // again, identically, to build `__LAST_SVG` — which doubled the furniture work on
+  // every candidate and, worse, pushed any furniture warning TWICE into
+  // `data.warnings`. It stayed invisible while the furniture was pure markup; the
+  // moment the title block started reporting (PID-TBL-001/002, T3.8) every title
+  // finding appeared twice and the score carried 5 phantom points per duplicate.
+  const furniture = annotationsSvg(data, W, H);
+  svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + furniture;
+  globalThis.__LAST_SVG = (wrap ? wrap : '') + body + (wrap ? '</g>' : '') + furniture;
   // must run after every fs() call above, and before finalizeValidation, which is
   // where the score is priced from the warning list
   checkTypeBand();
@@ -2113,14 +2193,51 @@ svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
       if (Math.abs(dot) < 0.5) bends++;
     }
   }
-  // annotation collisions: overlap between any two rendered label text boxes
-  // (model-side boxes — identical in node and browser, see pidTextBoxes)
+  // Annotation collisions: overlap between any two rendered label text boxes.
+  //
+  // Instrument TAGS are scored as their BUBBLE, not as the text inside it (T6.16).
+  // This is not a detail, it is the difference between a search that reacts to the
+  // drawing and one that reacts to the draughtsman. 9.72 measured it: centring a
+  // tag block in its bubble moved the text 1.8mm, could not have moved a pipe, a
+  // bubble or a tap leader — and DID re-roll which of two near-tied candidates won,
+  // landing spike on a worse layout (crossings 9 -> 10, two new collinear tap/pipe
+  // overlaps). The score was reading a quantity that has no effect on the drawing.
+  // So: drop the in-bubble runs, add one box per instrument at the bubble's real
+  // drawn extent. The bubble is what occupies space, and it is placed by a
+  // mechanism (`passInstruments`'s keep-out) that already knows about labels.
   let labelCollisions = 0;
-  const textBoxes = pidTextBoxes(svg.innerHTML || '');
-  for (let i = 0; i < textBoxes.length; i++) {
-    for (let j = i + 1; j < textBoxes.length; j++) {
-      const a = textBoxes[i], b = textBoxes[j];
-      if (a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1) labelCollisions++;
+  {
+    const raw = pidTextBoxes(svg.innerHTML || '');
+    const seenBubble = new Set();
+    const boxes = [];
+    for (const b of raw) {
+      if (b.inst) { if (!seenBubble.has(b.inst)) { seenBubble.add(b.inst); boxes.push({ instBox: true, ...b }); } continue; }
+      boxes.push(b);
+    }
+    // replace each in-bubble run with the bubble's own square
+    for (let i = 0; i < boxes.length; i++) {
+      if (!boxes[i].instBox) continue;
+      const inst = instruments.find(q => q.tag === boxes[i].inst);
+      if (!inst || inst.x == null) continue;
+      const s = sizeOf(inst) / 2;
+      boxes[i] = { x0: inst.x - s, x1: inst.x + s, y0: inst.y - s, y1: inst.y + s };
+    }
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i], b = boxes[j];
+        if (a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1) labelCollisions++;
+      }
+    }
+    // published so a probe can see WHICH pairs collide. A count with no names
+    // attached is an unactionable total -- the audit learned that the hard way when
+    // a collision count went up and only the audit's names said "each list item
+    // collided with itself".
+    data.labelPairs = [];
+    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+      const a = boxes[i], b = boxes[j];
+      if (a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1) {
+        data.labelPairs.push([Math.round((a.x0 + a.x1) / 2), Math.round((a.y0 + a.y1) / 2)]);
+      }
     }
   }
   // instrument placement: tap reaches and signal runs (already warned on; quantified here)
@@ -2219,19 +2336,30 @@ svg.innerHTML = wrap + body + (wrap ? '</g>' : '') + annotationsSvg(data, W, H);
   const fillGap = entCount >= FILL_ENT_MIN
     ? Math.max(0, FILL_TARGET - utilArea) : 0;
   const fill = Math.round(fillGap * 100) / 100;
+  // ---- breach tier ------------------------------------------------------
+  // Violations the validator reports were invisible to the objective: a warning
+  // cost `SW.warn` (5), which is less than a fifth of a 24-point fill preference,
+  // so the search would keep a line with a 5.5mm port lead-in in preference to a
+  // slightly fuller sheet. `validateGeometry` now reports each layout-fixable
+  // breach with the distance it is short by, priced proportionally and capped so
+  // it can never dominate a preference. See the long note in PID_RULES.weights.
+  const breachList = lineIssues.breach || [];
+  const breachMm = breachList.reduce((s, b) => s + b.mm, 0);
+  const breach = Math.min(SW.breachCap, breachMm * SW.breachPerMm);
   const score = {
     total: Math.round(
-      SW.err * nErr + SW.nonOrtho * nonOrtho + SW.overlap * Math.min(lineIssues.overlaps, 5) +
+      SW.err * nErr +
+      SW.nonOrtho * nonOrtho + SW.overlap * Math.min(lineIssues.overlaps, 5) +
       SW.ungapped * lineIssues.ungapped +
       SW.pp * pp + SW.ps * ps + SW.ss * ss + SW.label * labelCollisions + SW.sheet * offSheet +
       SW.bend * bends + SW.len * length + SW.tap * tapReachTotal + SW.sig * maxSignalLen +
-      SW.warn * nWarn + SW.fill * fill),
+      SW.warn * nWarn + SW.fill * fill + breach),
     weights: SW,
     fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), gap: fill, entities: entCount },
     routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), nonOrtho },
     sheet: { offSheet },
     annotations: { labelCollisions },
-    lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups },
+    lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups, breach: Math.round(breach), breachMm: Math.round(breachMm * 10) / 10 },
     instruments: { tapReachTotal: Math.round(tapReachTotal), maxSignalLen: Math.round(maxSignalLen) },
     issues: { errors: nErr, warnings: nWarn }
   };
@@ -2282,17 +2410,24 @@ function annotationsSvg(data, W, H) {
     const right = W - pad - 12;
     // Same 5.5mm the equipment annotation uses between its tag and type lines.
 
-    // Anything tighter overlaps: textBox height is 1.15em, so 3.6mm collides by 0.9mm.
+    // Anything tighter overlaps. With the real metric an all-caps line is 0.718em
+    // tall, so 5.5mm of baseline separation at 4.0mm type leaves 2.6mm of clear
+    // air. The old note here ("textBox height is 1.15em, so 3.6mm collides by
+    // 0.9mm") was a consequence of the flat height guess, not of the geometry.
 
     const TYPE_OFF = 5.5;
 
     const GUT = 7;                           // gutter between items
-    // Uppercase serif advance averages ~0.62em. Over-estimate slightly: a list that
-    // overflows the frame is a defect, one 2mm narrower than it could be is not.
-    const adv = (s2, f) => String(s2 || '').length * f * 0.62;
+    // Real advance, from the same table the drawing is measured with, tag bold and
+    // type regular. Replaces `length * f * 0.62` ("uppercase serif advance averages
+    // ~0.62em, over-estimate slightly") -- an average that is 9% narrow on regular
+    // caps and was tuned by feel. A list that overflows the frame is a defect, so
+    // the error has to land on the safe side; with a real table that is a property
+    // of the table rather than of a fudge factor.
+    const adv = (s2, f, bold) => PIDText.widthMm(s2, f, !!bold);
     let x = lx, fit = 0;
     for (const row of el.rows) {
-      const w = Math.max(adv(row.tag, tm.eqTag), adv(row.type, tm.eqType));
+      const w = Math.max(adv(row.tag, tm.eqTag, true), adv(row.type, tm.eqType, false));
       // Never start an item that cannot finish inside the frame.
       if (x > lx && x + w > right) break;
       s += `<text x="${x}" y="${ty}" font-size="${tm.eqTag}" font-weight="bold" fill="#111" text-decoration="underline">${esc(row.tag)}</text>`;
@@ -2335,16 +2470,63 @@ function annotationsSvg(data, W, H) {
     });
   }
 
-  // title block, bottom-right inside the frame (compact)
+  // Title block, bottom-right inside the frame.
+  //
+  // Every line here is fitted to the block (T3.8). The block used to be 160mm wide
+  // and the strings were emitted at literal sizes with no measurement of any kind,
+  // so a long title simply ran out through the block and off the sheet edge: found
+  // 2026-09-26 on a fixture titled "Three-branch manifold with return header", and
+  // the audit does not look at the title block, so nothing reported it. The
+  // sequence is the one a CAD title block uses and the one the item asked for:
+  //
+  //   1. if it fits at the nominal size, use the nominal size;
+  //   2. otherwise shrink toward a floor, because a slightly small title is legible
+  //      and a clipped one is not;
+  //   3. if it still does not fit at the floor, truncate with an ellipsis AND say
+  //      so in the validator, because silently losing the end of a project name is
+  //      the failure mode a drawing tool must not have.
+  //
+  // Measured with `PIDText` — the same table the rest of the drawing uses, so a
+  // title cannot be "measured" one way and drawn another.
   if (v.title) {
     const bx = W - pad - 160, by = H - pad - 60, bw = 160, bh = 60;
+    const INSET = 8, AVAIL = bw - 2 * INSET;
+    const TITLE_MIN = 5.0;                 // below this a title is not a title
     s += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="white" stroke="#333" stroke-width="1.5"/>`;
     s += `<line x1="${bx}" y1="${by + 17}" x2="${bx + bw}" y2="${by + 17}" stroke="#333" stroke-width="1"/>`;
-    s += `<text x="${bx + 8}" y="${by + 12}" font-size="8" font-weight="bold" fill="#111">${esc(v.title)}</text>`;
-    if (v.project) s += `<text x="${bx + 8}" y="${by + 26}" font-size="6" fill="#333">Project: ${esc(v.project)}</text>`;
-    if (v.sheet) s += `<text x="${bx + 8}" y="${by + 35}" font-size="6" fill="#333">Sheet ${v.sheet}${v.sheetTotal !== v.sheet ? ' of ' + v.sheetTotal : ''}</text>`;
-    if (v.rev) s += `<text x="${bx + 8}" y="${by + 44}" font-size="6" fill="#333">Rev ${v.rev.mark} (${v.rev.date})${v.rev.desc ? ' - ' + v.rev.desc : ''}</text>`;
-    s += `<text x="${bx + 8}" y="${by + 54}" font-size="5" fill="#666">P&amp;ID Gen ${new Date().toISOString().slice(0, 10)}</text>`;
+    const fit = (str, nominal, bold, min) => {
+      const txt = String(str);
+      if (PIDText.widthMm(txt, nominal, bold) <= AVAIL) return { text: txt, size: nominal };
+      for (let f = nominal - 0.25; f >= min; f -= 0.25) {
+        if (PIDText.widthMm(txt, f, bold) <= AVAIL) return { text: txt, size: f };
+      }
+      for (let n = txt.length - 1; n > 1; n--) {
+        const t = txt.slice(0, n).replace(/[\s,;:.\-]+$/, '') + '...';
+        if (PIDText.widthMm(t, min, bold) <= AVAIL) return { text: t, size: min, truncated: true };
+      }
+      return { text: '...', size: min, truncated: true };
+    };
+    const title = fit(v.title, 8, true, TITLE_MIN);
+    s += `<text x="${bx + INSET}" y="${by + 12}" font-size="${title.size.toFixed(2)}" font-weight="bold" fill="#111">${esc(title.text)}</text>`;
+    if (title.truncated) {
+      (data.warnings || (data.warnings = [])).push(
+        `[PID-TBL-001] title "${v.title}" is longer than the title block (${AVAIL.toFixed(0)}mm at ${TITLE_MIN}mm type) and has been truncated to "${title.text}". Shorten the title, or widen the block.`);
+    } else if (title.size < 8) {
+      (data.warnings || (data.warnings = [])).push(
+        `[PID-TBL-002] title "${v.title}" needed ${title.size.toFixed(2)}mm type to fit the title block (nominal 8mm).`);
+    }
+    // The three metadata rows keep their own baselines; only their TYPE is fitted.
+    // (Collapsing them onto one baseline was the first cut here and produced three
+    // label collisions on every sheet with a title block — the collision metric
+    // caught a change I had not looked at, which is the metric working.)
+    const line2 = (str, y) => {
+      const f = fit(str, 6, false, 4.5);
+      return `<text x="${bx + INSET}" y="${by + y}" font-size="${f.size.toFixed(2)}" fill="#333">${esc(f.text)}</text>`;
+    };
+    if (v.project) s += line2('Project: ' + v.project, 26);
+    if (v.sheet) s += line2(`Sheet ${v.sheet}${v.sheetTotal !== v.sheet ? ' of ' + v.sheetTotal : ''}`, 35);
+    if (v.rev) s += line2(`Rev ${v.rev.mark} (${v.rev.date})${v.rev.desc ? ' - ' + v.rev.desc : ''}`, 44);
+    s += `<text x="${bx + INSET}" y="${by + 54}" font-size="5" fill="#666">P&amp;ID Gen ${new Date().toISOString().slice(0, 10)}</text>`;
   }
 
   return s;

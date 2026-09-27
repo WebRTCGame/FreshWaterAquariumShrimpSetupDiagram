@@ -77,7 +77,15 @@ var PIDEngine = {
   entitySize(e, sc) {
     const s = sc || 1;
     if (PIDEngine._isInst && PIDEngine._isInst(e)) {
-      return symbolSize('isa-5.1/instruments/field-instrument') * s;
+      // An instrument bubble grows to hold its tag (T6.15/T6.17), so the LAYOUT
+      // has to reserve the grown size, not the library's declared 10mm. This is the
+      // half of the fix that 9.67 was missing: it grew the circle in the drawing
+      // and left this returning 10, so the router reserved 10 while the drawing
+      // occupied 12 — and spike went 997 -> 1274. Solved once, in
+      // `instrumentBubbleSize`, and read by both.
+      const declared = symbolSize('isa-5.1/instruments/field-instrument') * s;
+      const need = instrumentBubbleSize(e, s);
+      return need && need > declared ? need : declared;
     }
     return (e.symbol ? symbolSize(e.symbol) : symbolSize(SYMBOL_KEYS[e.type] || 'pip/equipment/vessel-vertical'))
       * (e.scale || 1) * s;

@@ -3,6 +3,10 @@
 // See pid-schema.js for the full type hierarchy.
 function validateGeometry(data, geometries, pipes, tapGeos) {
   const w = data.warnings;
+  // Structured twin of every warning the objective is allowed to react to. See the
+  // long note at the `breach` declaration below: warnings are prose for a human and
+  // the score cannot price prose.
+  const breach = [];
   const SHEET_W = data.view.sheetW || 864, SHEET_H = data.view.sheetH || 559;
   for (const g of geometries) {
     const pts = g.pts;
@@ -11,6 +15,9 @@ function validateGeometry(data, geometries, pipes, tapGeos) {
       const dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
       if (dx > 0.5 && dy > 0.5) {
         w.push(`[PID-GEO-001] geometry "${g.p.from} -> ${g.p.to}": non-orthogonal segment (${dx.toFixed(1)}x${dy.toFixed(1)}mm) — lines must run at 0/90/180/270°`);
+        // magnitude = how far off orthogonal, in mm, so a 45° 20mm leg is not
+        // scored the same as a 45° 2mm one
+        breach.push({ code: 'PID-GEO-001', mm: Math.min(dx, dy) });
       }
     }
     if (g.signal) {
@@ -38,9 +45,11 @@ function validateGeometry(data, geometries, pipes, tapGeos) {
     // jogs under 5mm render as a straight line; flag only visible short lead-ins
     if (isStart && hasBend && d0 >= 5 && d0 < MIN_PORT_RUN - 0.5 && d0 + d1 > MIN_PORT_RUN * 2 + 4) {
       w.push(`[PID-GEO-002] geometry "${g.p.from} -> ${g.p.to}": port lead-in only ${d0.toFixed(1)}mm (< ${MIN_PORT_RUN}mm) — bend too close to the ${g.p.from} port`);
+      breach.push({ code: 'PID-GEO-002', mm: MIN_PORT_RUN - d0 });
     }
     if (!isStart && hasBend && dN >= 5 && dN < MIN_PORT_RUN - 0.5 && dN + dPrev > MIN_PORT_RUN * 2 + 4) {
       w.push(`[PID-GEO-002] geometry "${g.p.from} -> ${g.p.to}": port lead-in only ${dN.toFixed(1)}mm (< ${MIN_PORT_RUN}mm) — bend too close to the ${g.p.to} port`);
+      breach.push({ code: 'PID-GEO-002', mm: MIN_PORT_RUN - dN });
     }
   };
   for (const g of geometries) {
@@ -270,7 +279,7 @@ function validateGeometry(data, geometries, pipes, tapGeos) {
   // the routing pass resolves all resolvable ones, so any that remain are genuine.
   if (overlaps) data.errors.push({ code: 'COLLINEAR_OVERLAP', message: `line audit: ${overlaps} collinear overlap(s) â€” lines sharing a corridor (${overlapList.join('; ')})` });
   if (ungapped) w.push(`[PID-GEO-003] line audit: ${ungapped} crossing(s) without a gap break (too close to a bend; pass 3 skipped) (${ungappedList.join('; ')})`);
-  return { overlaps, ungapped };
+  return { overlaps, ungapped, breach };
 }
 
 /**

@@ -1,0 +1,1288 @@
+﻿[SELFTEST] ok ΓÇö 2 hand-counted bbox assertions pass
+
+SYMBOL AUDIT ΓÇö 201 symbols, 635 findings
+
+[SYM-PORT-DRIFT] 2
+   isa-5.1/valves/relief-safety
+      port "inlet" is drawn 2.41mm from where the engine puts it (viewBox 52x141.997 is not square -> letterboxed)
+   y32.11-1961/furnaces/box-furnace
+      port "inlet" is drawn 6.16mm from where the engine puts it (viewBox 112x110 is not square -> letterboxed)
+
+[SYM-BEHAVIOUR] 35
+   isa-5.1/valves/actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/diaphragm-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/electrohydraulic-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/hand-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/manual-reset-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/motor-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/piston-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/plug-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/solenoid-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   isa-5.1/valves/spring-loaded-actuator
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/ball-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/butterfly-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/check-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/control-valve-globe
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/diaphragm-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/gate-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/globe-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/needle-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/plug-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   pip/valves/relief-valve
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/compressors/centrifugal-compressor
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/compressors/reciprocating-compressor
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/compressors/rotary-compressor
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/heat-exchangers/air-cooled-exchanger
+      behavior.minProcessPorts=4 but only 0 process port(s) defined
+   y32.11-1961/heat-exchangers/double-pipe-exchanger
+      behavior.minProcessPorts=4 but only 0 process port(s) defined
+   y32.11-1961/heat-exchangers/kettle-reboiler
+      behavior.minProcessPorts=4 but only 3 process port(s) defined
+   y32.11-1961/heat-exchangers/plate-frame-exchanger
+      behavior.minProcessPorts=4 but only 0 process port(s) defined
+   y32.11-1961/heat-exchangers/shell-and-tube-exchanger
+      behavior.minProcessPorts=4 but only 0 process port(s) defined
+   y32.11-1961/tanks/atmospheric-tank
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/tanks/cone-roof-tank
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/tanks/floating-roof-tank
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/tanks/spherical-tank
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/vessels/horizontal-vessel
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/vessels/jacketed-vessel
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+   y32.11-1961/vessels/vertical-vessel
+      behavior.minProcessPorts=2 but only 0 process port(s) defined
+
+[SYM-EXTENTS] 56
+   isa-5.1/instruments/auxiliary-location
+      extents (19.8,19.8)-(63.5,63.5) vs measured (10,10)-(90,90) off by 27u
+   isa-5.1/instruments/inaccessible-instrument
+      extents (19.8,19.8)-(63.5,63.5) vs measured (10,10)-(90,90) off by 27u
+   isa-5.1/layout/off-page-connector
+      extents (29,34)-(76,76) vs measured (30,0)-(75,65) off by 34u
+   isa-5.1/measurement/diaphragm-seal
+      extents (24,34)-(66,66) vs measured (0,0)-(65,65) off by 34u
+   isa-5.1/measurement/level-gauge
+      extents (22.4,36.5)-(61.9,71.3) vs measured (23,0)-(70,56) off by 37u
+   isa-5.1/measurement/level-switch
+      extents (25.8,37.6)-(69.6,69.6) vs measured (0,0)-(100,100) off by 38u
+   isa-5.1/signals/binding-crossing-not-connected
+      extents (-1,-1)-(84,61) vs measured (10,0)-(150,60) off by 66u
+   isa-5.1/valves/actuator
+      extents (-1,-1)-(96,96) vs measured (25,15)-(95,90) off by 26u
+   isa-5.1/valves/check-valve-swing
+      extents (-1,-1)-(92.7,74.3) vs measured (8,18)-(92,63) off by 19u
+   isa-5.1/valves/control-valve
+      extents (-1,-1)-(84.3,84.3) vs measured (17,8)-(83,83) off by 18u
+   pip/equipment/agitator
+      extents (-1,-1)-(101,112.1) vs measured (33,11)-(100,111) off by 34u
+   pip/equipment/heat-exchanger-shell-tube
+      extents (-1,-1)-(116,116) vs measured (15,35)-(115,85) off by 36u
+   pip/equipment/vessel-horizontal
+      extents (-1,-1)-(116,116) vs measured (15,35)-(115,85) off by 36u
+   pip/equipment/vessel-vertical
+      extents (-1,-1)-(91,111) vs measured (30,20)-(90,110) off by 31u
+   pip/fittings/cap
+      extents (-1,-1)-(111,111) vs measured (15,22)-(110,58) off by 53u
+   pip/fittings/cross
+      extents (24,45)-(76,76) vs measured (0,0)-(75,75) off by 45u
+   pip/piping/expansion-joint
+      extents (19,34)-(71,81) vs measured (0,0)-(80,65) off by 34u
+   pip/piping/spectacle-blind
+      extents (19,42)-(63,81) vs measured (20,0)-(80,57) off by 42u
+   pip/valves/control-valve-globe
+      extents (-1,-1)-(101,101) vs measured (20,8)-(100,100) off by 21u
+   y32.11-1961/compressors/compressor-liquid-ring
+      extents (4,24)-(76,96) vs measured (5,0)-(95,75) off by 24u
+   y32.11-1961/compressors/rotary-compressor
+      extents (-1,-1)-(106,101) vs measured (15,20)-(105,100) off by 21u
+   y32.11-1961/furnaces/cylindrical-furnace
+      extents (-1,-1)-(91,106) vs measured (30,0)-(90,105) off by 31u
+   y32.11-1961/furnaces/fired-heater
+      extents (19,29)-(81,81) vs measured (20,0)-(80,80) off by 29u
+   y32.11-1961/heat-exchangers/kettle-reboiler
+      extents (9,37)-(81,91) vs measured (0,0)-(90,62) off by 37u
+   y32.11-1961/miscellaneous/ball-mill
+      extents (9,37)-(81,91) vs measured (10,0)-(90,62) off by 37u
+   y32.11-1961/miscellaneous/blower
+      extents (-1,-1)-(73.1,92.4) vs measured (5,0)-(91,72) off by 20u
+   y32.11-1961/miscellaneous/conveyor
+      extents (7,29)-(93,51) vs measured (8,0)-(92,50) off by 29u
+   y32.11-1961/miscellaneous/crusher
+      extents (4,4)-(96,96) vs measured (5,0)-(95,64) off by 32u
+   y32.11-1961/miscellaneous/ejector
+      extents (24,9)-(91,76) vs measured (0,0)-(90,75) off by 24u
+   y32.11-1961/miscellaneous/fan
+      extents (4.2,25)-(79.1,100) vs measured (5,0)-(99,78) off by 25u
+   y32.11-1961/miscellaneous/gas-cylinder
+      extents (27.1,19.6)-(55.4,76) vs measured (39,0)-(54,75) off by 20u
+   y32.11-1961/miscellaneous/silencer
+      extents (-1,-1)-(82.8,82.8) vs measured (36,18)-(82,64) off by 37u
+   y32.11-1961/miscellaneous/steam-trap
+      extents (24,37)-(63,76) vs measured (25,0)-(75,62) off by 37u
+   y32.11-1961/miscellaneous/turbine
+      extents (4.2,25)-(79.1,100) vs measured (5,0)-(99,78) off by 25u
+   y32.11-1961/process/baffle-plate
+      extents (19,29)-(46,76) vs measured (0,0)-(80,80) off by 34u
+   y32.11-1961/process/distributor-pipe
+      extents (19,29)-(66,76) vs measured (0,0)-(80,50) off by 29u
+   y32.11-1961/process/distributor-spray
+      extents (19,29)-(77,46) vs measured (20,0)-(80,45) off by 29u
+   y32.11-1961/process/mist-eliminator
+      extents (19,31)-(77,41) vs measured (20,0)-(80,40) off by 31u
+   y32.11-1961/process/packing-bed
+      extents (19,19)-(81,81) vs measured (20,0)-(80,75) off by 19u
+   y32.11-1961/process/tray
+      extents (19,39)-(76,53) vs measured (20,0)-(80,52) off by 39u
+   y32.11-1961/process/vortex-breaker
+      extents (19,51)-(57,71) vs measured (0,0)-(80,78) off by 51u
+   y32.11-1961/pumps/pump-screw
+      extents (3.6,21.7)-(69.2,87.4) vs measured (5,0)-(86,68) off by 22u
+   y32.11-1961/pumps/pump-vertical-turbine
+      extents (3.6,33.6)-(64.6,87.4) vs measured (0,0)-(86,75) off by 34u
+   y32.11-1961/pumps/vacuum-pump
+      extents (3.6,21.7)-(69.2,87.4) vs measured (5,0)-(86,68) off by 22u
+   y32.11-1961/separators/cyclone-separator
+      extents (-1,-1)-(111,61) vs measured (20,15)-(90,110) off by 49u
+   y32.11-1961/separators/horizontal-separator
+      extents (-1,-1)-(116,116) vs measured (15,40)-(115,85) off by 41u
+   y32.11-1961/separators/vertical-separator
+      extents (-1,-1)-(96,106) vs measured (35,15)-(95,105) off by 36u
+   y32.11-1961/tanks/floating-roof-tank
+      extents (-1,-1)-(116,106) vs measured (15,30)-(115,105) off by 31u
+   y32.11-1961/tanks/tank-dome-roof
+      extents (-1,-1)-(79,79) vs measured (22,38)-(78,75) off by 39u
+   y32.11-1961/tanks/tank-internal-floating-roof
+      extents (-1,-1)-(79,79) vs measured (22,0)-(78,75) off by 23u
+   y32.11-1961/vessels/drum
+      extents (9,31)-(81,91) vs measured (10,0)-(90,68) off by 31u
+   y32.11-1961/vessels/horizontal-vessel
+      extents (-1,-1)-(116,116) vs measured (15,10)-(115,85) off by 31u
+   y32.11-1961/vessels/jacketed-vessel
+      extents (-1,-1)-(104,111) vs measured (27,15)-(103,110) off by 28u
+   y32.11-1961/vessels/reactor-jacketed
+      extents (24,8)-(76,79) vs measured (0,0)-(75,78) off by 24u
+   y32.11-1961/vessels/reactor-stirred
+      extents (29,8)-(71,81) vs measured (0,9)-(70,80) off by 29u
+   y32.11-1961/vessels/vertical-vessel
+      extents (-1,-1)-(96,111) vs measured (35,15)-(95,110) off by 36u
+
+[SYM-ANCHOR] 101
+   isa-5.1/flow-elements/averaging-pitot
+      anchor (50,50) is 35u from the content centre (80,32)
+   isa-5.1/flow-elements/flow-nozzle
+      anchor (50,25) is 34u from the content centre (80,40)
+   isa-5.1/flow-elements/magnetic-flowmeter
+      anchor (50,45) is 30u from the content centre (80,40)
+   isa-5.1/flow-elements/orifice-plate
+      anchor (50,50) is 32u from the content centre (80,40)
+   isa-5.1/flow-elements/pitot-tube
+      anchor (50,50) is 42u from the content centre (80,20)
+   isa-5.1/flow-elements/target-flowmeter
+      anchor (50,50) is 48u from the content centre (80,13)
+   isa-5.1/flow-elements/thermal-flowmeter
+      anchor (50,50) is 36u from the content centre (80,31)
+   isa-5.1/flow-elements/turbine-flowmeter
+      anchor (50,45) is 30u from the content centre (80,40)
+   isa-5.1/flow-elements/venturi-tube
+      anchor (50,25) is 34u from the content centre (80,40)
+   isa-5.1/flow-elements/vortex-flowmeter
+      anchor (50,50) is 32u from the content centre (80,40)
+   isa-5.1/layout/off-page-connector
+      anchor (50,50) is 18u from the content centre (53,33)
+   isa-5.1/measurement/diaphragm-seal
+      anchor (50,50) is 25u from the content centre (33,33)
+   isa-5.1/measurement/level-gauge
+      anchor (50,50) is 22u from the content centre (47,28)
+   isa-5.1/signals/binding-crossing-not-connected
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/capillary-tube
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/connected-junction
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/digital
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/electrical
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/electromagnetic-sonic-guided
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/hydraulic
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/internal-system-link-software
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/mechanical-link
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/signals/pneumatic
+      anchor (50,50) is 36u from the content centre (80,30)
+   isa-5.1/valves/control-valve
+      anchor (50,100) is 54u from the content centre (50,46)
+   isa-5.1/valves/four-way-valve
+      anchor (60,60) is 14u from the content centre (50,50)
+   isa-5.1/valves/manual-reset-actuator
+      anchor (50,50) is 20u from the content centre (70,54)
+   isa-5.1/valves/motor-operated-gate
+      anchor (50,100) is 56u from the content centre (50,44)
+   isa-5.1/valves/relief-safety
+      anchor (60,70) is 35u from the content centre (50,36)
+   isa-5.1/valves/vacuum-relief-valve
+      anchor (60,75) is 24u from the content centre (50,53)
+   pip/equipment/agitator
+      anchor (50,50) is 20u from the content centre (67,61)
+   pip/equipment/column-tower
+      anchor (50,50) is 18u from the content centre (60,65)
+   pip/equipment/compressor
+      anchor (50,25) is 36u from the content centre (60,60)
+   pip/equipment/tank-cone-roof
+      anchor (50,50) is 24u from the content centre (70,63)
+   pip/equipment/vessel-horizontal
+      anchor (50,50) is 18u from the content centre (65,60)
+   pip/equipment/vessel-vertical
+      anchor (50,50) is 18u from the content centre (60,65)
+   pip/fittings/coupling
+      anchor (50,50) is 32u from the content centre (80,40)
+   pip/fittings/cross
+      anchor (50,50) is 18u from the content centre (38,38)
+   pip/fittings/elbow-45
+      anchor (50,50) is 39u from the content centre (75,20)
+   pip/fittings/elbow-90
+      anchor (50,50) is 41u from the content centre (60,10)
+   pip/fittings/flange
+      anchor (50,50) is 32u from the content centre (80,40)
+   pip/fittings/reducer-concentric
+      anchor (50,50) is 27u from the content centre (75,40)
+   pip/fittings/reducer-eccentric
+      anchor (50,50) is 27u from the content centre (75,40)
+   pip/fittings/tee-fitting
+      anchor (50,50) is 42u from the content centre (80,20)
+   pip/fittings/union
+      anchor (50,50) is 32u from the content centre (80,40)
+   pip/layout/equipment-tag
+      anchor (50,50) is 22u from the content centre (60,30)
+   pip/layout/line-number-tag
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/layout/match-line
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/layout/revision-cloud
+      anchor (50,50) is 16u from the content centre (63,40)
+   pip/piping/elbow
+      anchor (50,50) is 36u from the content centre (40,15)
+   pip/piping/electric-traced-pipe
+      anchor (50,50) is 39u from the content centre (80,25)
+   pip/piping/expansion-joint
+      anchor (50,50) is 20u from the content centre (40,33)
+   pip/piping/flanged-connection
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/insulated-pipe
+      anchor (50,50) is 42u from the content centre (80,20)
+   pip/piping/jacketed-pipe
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/pipe-crossing-connection
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/pipe-crossing-no-connection
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/process-line-primary
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/process-line-secondary
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/reducer
+      anchor (50,50) is 36u from the content centre (80,30)
+   pip/piping/spectacle-blind
+      anchor (50,50) is 22u from the content centre (50,29)
+   pip/piping/tee
+      anchor (50,50) is 46u from the content centre (80,15)
+   pip/piping/underground-pipe
+      anchor (50,50) is 36u from the content centre (80,30)
+   y32.11-1961/compressors/compressor-liquid-ring
+      anchor (50,50) is 13u from the content centre (50,38)
+   y32.11-1961/compressors/reciprocating-compressor
+      anchor (50,50) is 19u from the content centre (66,60)
+   y32.11-1961/furnaces/box-furnace
+      anchor (50,50) is 15u from the content centre (65,51)
+   y32.11-1961/heat-exchangers/double-pipe-exchanger
+      anchor (50,50) is 18u from the content centre (65,60)
+   y32.11-1961/heat-exchangers/kettle-reboiler
+      anchor (50,50) is 20u from the content centre (45,31)
+   y32.11-1961/heat-exchangers/plate-frame-exchanger
+      anchor (50,50) is 18u from the content centre (65,60)
+   y32.11-1961/heat-exchangers/shell-and-tube-exchanger
+      anchor (50,50) is 18u from the content centre (65,60)
+   y32.11-1961/miscellaneous/ball-mill
+      anchor (50,50) is 19u from the content centre (50,31)
+   y32.11-1961/miscellaneous/blower
+      anchor (50,50) is 14u from the content centre (48,36)
+   y32.11-1961/miscellaneous/conveyor
+      anchor (50,50) is 25u from the content centre (50,25)
+   y32.11-1961/miscellaneous/crusher
+      anchor (50,50) is 18u from the content centre (50,32)
+   y32.11-1961/miscellaneous/ejector
+      anchor (50,50) is 13u from the content centre (45,38)
+   y32.11-1961/miscellaneous/flame-arrestor
+      anchor (50,50) is 17u from the content centre (64,59)
+   y32.11-1961/miscellaneous/gas-cylinder
+      anchor (50,50) is 13u from the content centre (47,38)
+   y32.11-1961/miscellaneous/sight-glass
+      anchor (50,50) is 17u from the content centre (64,59)
+   y32.11-1961/miscellaneous/silencer
+      anchor (50,25) is 18u from the content centre (59,41)
+   y32.11-1961/miscellaneous/steam-trap
+      anchor (50,50) is 19u from the content centre (50,31)
+   y32.11-1961/process/baffle-plate
+      anchor (50,50) is 14u from the content centre (40,40)
+   y32.11-1961/process/distributor-pipe
+      anchor (50,50) is 27u from the content centre (40,25)
+   y32.11-1961/process/distributor-spray
+      anchor (50,50) is 28u from the content centre (50,23)
+   y32.11-1961/process/mist-eliminator
+      anchor (50,50) is 30u from the content centre (50,20)
+   y32.11-1961/process/packing-bed
+      anchor (50,50) is 13u from the content centre (50,38)
+   y32.11-1961/process/tray
+      anchor (50,50) is 24u from the content centre (50,26)
+   y32.11-1961/process/vortex-breaker
+      anchor (50,50) is 15u from the content centre (40,39)
+   y32.11-1961/pumps/pump-screw
+      anchor (50,50) is 17u from the content centre (45,34)
+   y32.11-1961/pumps/pump-vertical-turbine
+      anchor (50,50) is 14u from the content centre (43,37)
+   y32.11-1961/pumps/vacuum-pump
+      anchor (50,50) is 17u from the content centre (45,34)
+   y32.11-1961/separators/horizontal-separator
+      anchor (50,50) is 20u from the content centre (65,63)
+   y32.11-1961/separators/vertical-separator
+      anchor (50,50) is 18u from the content centre (65,60)
+   y32.11-1961/tanks/atmospheric-tank
+      anchor (50,50) is 23u from the content centre (65,68)
+   y32.11-1961/tanks/cone-roof-tank
+      anchor (50,50) is 17u from the content centre (65,59)
+   y32.11-1961/tanks/floating-roof-tank
+      anchor (50,50) is 23u from the content centre (65,68)
+   y32.11-1961/tanks/spherical-tank
+      anchor (50,50) is 27u from the content centre (65,73)
+   y32.11-1961/tanks/tank-internal-floating-roof
+      anchor (50,50) is 13u from the content centre (50,38)
+   y32.11-1961/vessels/drum
+      anchor (50,50) is 16u from the content centre (50,34)
+   y32.11-1961/vessels/jacketed-vessel
+      anchor (50,50) is 20u from the content centre (65,63)
+   y32.11-1961/vessels/reactor-jacketed
+      anchor (50,50) is 17u from the content centre (38,39)
+   y32.11-1961/vessels/reactor-stirred
+      anchor (50,50) is 16u from the content centre (35,45)
+   y32.11-1961/vessels/vertical-vessel
+      anchor (50,50) is 20u from the content centre (65,63)
+
+[SYM-ASPECT] 123
+   isa-5.1/flow-elements/averaging-pitot
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/flow-nozzle
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/magnetic-flowmeter
+      viewBox 160.0x90.0 letterboxed into a 100mm box: drawn 100.0x56.3mm, not 100x100
+   isa-5.1/flow-elements/orifice-plate
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/pitot-tube
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/rotameter
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/flow-elements/target-flowmeter
+      viewBox 160.0x114.0 letterboxed into a 100mm box: drawn 100.0x71.3mm, not 100x100
+   isa-5.1/flow-elements/thermal-flowmeter
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/turbine-flowmeter
+      viewBox 160.0x90.0 letterboxed into a 100mm box: drawn 100.0x56.3mm, not 100x100
+   isa-5.1/flow-elements/venturi-tube
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/flow-elements/vortex-flowmeter
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   isa-5.1/logic/and
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/logic/nand
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/logic/nor
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/logic/not
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/logic/or
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/logic/xor
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   isa-5.1/signals/binding-crossing-not-connected
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/capillary-tube
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/connected-junction
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/digital
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/electrical
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/electromagnetic-sonic-guided
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/hydraulic
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/internal-system-link-software
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/mechanical-link
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/signals/pneumatic
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   isa-5.1/valves/actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/ball
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/butterfly
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/check-valve-lift
+      viewBox 100.0x75.0 letterboxed into a 10mm box: drawn 10.0x7.5mm, not 10x10
+   isa-5.1/valves/check-valve-swing
+      viewBox 100.0x75.0 letterboxed into a 10mm box: drawn 10.0x7.5mm, not 10x10
+   isa-5.1/valves/check-valve
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/control-valve
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/diaphragm-valve
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/electrohydraulic-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/gate
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/globe
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/hand-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/manual-reset-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/motor-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/motor-operated-gate
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/needle-valve
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/piston-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/plug-valve
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/relief-safety
+      viewBox 52.0x142.0 letterboxed into a 10mm box: drawn 3.7x10.0mm, not 10x10
+   isa-5.1/valves/solenoid-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/spring-loaded-actuator
+      viewBox 120.0x100.0 letterboxed into a 100mm box: drawn 100.0x83.3mm, not 100x100
+   isa-5.1/valves/three-way
+      viewBox 100.0x83.3 letterboxed into a 10mm box: drawn 10.0x8.3mm, not 10x10
+   isa-5.1/valves/vacuum-relief-valve
+      viewBox 100.0x125.0 letterboxed into a 10mm box: drawn 8.0x10.0mm, not 10x10
+   pip/equipment/agitator
+      viewBox 144.4x133.3 letterboxed into a 20mm box: drawn 20.0x18.5mm, not 20x20
+   pip/equipment/column-tower
+      viewBox 130.0x120.0 letterboxed into a 45mm box: drawn 45.0x41.5mm, not 45x45
+   pip/equipment/compressor
+      viewBox 130.0x120.0 letterboxed into a 30mm box: drawn 30.0x27.7mm, not 30x30
+   pip/equipment/filter
+      viewBox 130.0x120.0 letterboxed into a 20mm box: drawn 20.0x18.5mm, not 20x20
+   pip/equipment/heat-exchanger-shell-tube
+      viewBox 130.0x120.0 letterboxed into a 70mm box: drawn 70.0x64.6mm, not 70x70
+   pip/equipment/pump-centrifugal
+      viewBox 125.0x115.4 letterboxed into a 25mm box: drawn 25.0x23.1mm, not 25x25
+   pip/equipment/tank-cone-roof
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   pip/equipment/vessel-horizontal
+      viewBox 130.0x120.0 letterboxed into a 70mm box: drawn 70.0x64.6mm, not 70x70
+   pip/equipment/vessel-vertical
+      viewBox 130.0x120.0 letterboxed into a 60mm box: drawn 60.0x55.4mm, not 60x60
+   pip/fittings/cap
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/coupling
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/elbow-45
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/elbow-90
+      viewBox 82.0x62.0 letterboxed into a 100mm box: drawn 100.0x75.6mm, not 100x100
+   pip/fittings/flange
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/reducer-concentric
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/reducer-eccentric
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/tee-fitting
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/fittings/union
+      viewBox 160.0x80.0 letterboxed into a 100mm box: drawn 100.0x50.0mm, not 100x100
+   pip/layout/drawing-note-flag
+      viewBox 120.0x90.0 letterboxed into a 100mm box: drawn 100.0x75.0mm, not 100x100
+   pip/layout/equipment-tag
+      viewBox 120.0x90.0 letterboxed into a 100mm box: drawn 100.0x75.0mm, not 100x100
+   pip/layout/line-number-tag
+      viewBox 160.0x90.0 letterboxed into a 100mm box: drawn 100.0x56.3mm, not 100x100
+   pip/layout/match-line
+      viewBox 160.0x90.0 letterboxed into a 100mm box: drawn 100.0x56.3mm, not 100x100
+   pip/layout/north-arrow
+      viewBox 160.0x90.0 letterboxed into a 100mm box: drawn 100.0x56.3mm, not 100x100
+   pip/layout/revision-cloud
+      viewBox 120.0x90.0 letterboxed into a 100mm box: drawn 100.0x75.0mm, not 100x100
+   pip/piping/elbow
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/electric-traced-pipe
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/flanged-connection
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/insulated-pipe
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/jacketed-pipe
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/pipe-crossing-connection
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/pipe-crossing-no-connection
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/process-line-primary
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/process-line-secondary
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/reducer
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/tee
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/piping/underground-pipe
+      viewBox 160.0x60.0 letterboxed into a 100mm box: drawn 100.0x37.5mm, not 100x100
+   pip/valves/ball-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/butterfly-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/check-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/control-valve-globe
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/diaphragm-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/gate-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/globe-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/needle-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/plug-valve
+      viewBox 120.0x110.0 letterboxed into a 100mm box: drawn 100.0x91.7mm, not 100x100
+   pip/valves/relief-valve
+      viewBox 62.0x145.0 letterboxed into a 100mm box: drawn 42.8x100.0mm, not 100x100
+   y32.11-1961/compressors/centrifugal-compressor
+      viewBox 130.0x120.0 letterboxed into a 30mm box: drawn 30.0x27.7mm, not 30x30
+   y32.11-1961/compressors/reciprocating-compressor
+      viewBox 130.0x120.0 letterboxed into a 30mm box: drawn 30.0x27.7mm, not 30x30
+   y32.11-1961/compressors/rotary-compressor
+      viewBox 130.0x120.0 letterboxed into a 30mm box: drawn 30.0x27.7mm, not 30x30
+   y32.11-1961/furnaces/box-furnace
+      viewBox 112.0x110.0 letterboxed into a 70mm box: drawn 70.0x68.8mm, not 70x70
+   y32.11-1961/furnaces/cylindrical-furnace
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/heat-exchangers/air-cooled-exchanger
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/heat-exchangers/double-pipe-exchanger
+      viewBox 130.0x120.0 letterboxed into a 60mm box: drawn 60.0x55.4mm, not 60x60
+   y32.11-1961/heat-exchangers/plate-frame-exchanger
+      viewBox 130.0x120.0 letterboxed into a 60mm box: drawn 60.0x55.4mm, not 60x60
+   y32.11-1961/heat-exchangers/shell-and-tube-exchanger
+      viewBox 140.0x42.0 letterboxed into a 70mm box: drawn 70.0x21.0mm, not 70x70
+   y32.11-1961/miscellaneous/flame-arrestor
+      viewBox 139.3x128.6 letterboxed into a 15mm box: drawn 15.0x13.8mm, not 15x15
+   y32.11-1961/miscellaneous/motor
+      viewBox 121.9x112.5 letterboxed into a 15mm box: drawn 15.0x13.8mm, not 15x15
+   y32.11-1961/miscellaneous/sight-glass
+      viewBox 139.3x128.6 letterboxed into a 15mm box: drawn 15.0x13.8mm, not 15x15
+   y32.11-1961/miscellaneous/silencer
+      viewBox 118.2x109.1 letterboxed into a 20mm box: drawn 20.0x18.5mm, not 20x20
+   y32.11-1961/miscellaneous/strainer
+      viewBox 108.3x100.0 letterboxed into a 10mm box: drawn 10.0x9.2mm, not 10x10
+   y32.11-1961/pumps/centrifugal-pump
+      viewBox 125.0x115.4 letterboxed into a 25mm box: drawn 25.0x23.1mm, not 25x25
+   y32.11-1961/pumps/gear-pump
+      viewBox 118.2x109.1 letterboxed into a 20mm box: drawn 20.0x18.5mm, not 20x20
+   y32.11-1961/pumps/reciprocating-pump
+      viewBox 118.2x109.1 letterboxed into a 20mm box: drawn 20.0x18.5mm, not 20x20
+   y32.11-1961/separators/cyclone-separator
+      viewBox 130.0x120.0 letterboxed into a 45mm box: drawn 45.0x41.5mm, not 45x45
+   y32.11-1961/separators/horizontal-separator
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/separators/vertical-separator
+      viewBox 130.0x120.0 letterboxed into a 55mm box: drawn 55.0x50.8mm, not 55x55
+   y32.11-1961/tanks/atmospheric-tank
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/tanks/cone-roof-tank
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/tanks/floating-roof-tank
+      viewBox 130.0x120.0 letterboxed into a 65mm box: drawn 65.0x60.0mm, not 65x65
+   y32.11-1961/tanks/spherical-tank
+      viewBox 102.0x117.0 letterboxed into a 65mm box: drawn 56.7x65.0mm, not 65x65
+   y32.11-1961/vessels/horizontal-vessel
+      viewBox 130.0x120.0 letterboxed into a 70mm box: drawn 70.0x64.6mm, not 70x70
+   y32.11-1961/vessels/jacketed-vessel
+      viewBox 130.0x120.0 letterboxed into a 60mm box: drawn 60.0x55.4mm, not 60x60
+   y32.11-1961/vessels/vertical-vessel
+      viewBox 130.0x120.0 letterboxed into a 60mm box: drawn 60.0x55.4mm, not 60x60
+
+[SYM-LABELANCHOR] 195
+   isa-5.1/flow-elements/averaging-pitot
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/flow-nozzle
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/magnetic-flowmeter
+      labelAnchor (80,96) is outside viewBox 0,0,160,90 ΓÇö not usable as-is
+   isa-5.1/flow-elements/orifice-plate
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/pitot-tube
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/rotameter
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/flow-elements/target-flowmeter
+      labelAnchor (80,86) is outside viewBox 0,0,160,114 ΓÇö not usable as-is
+   isa-5.1/flow-elements/thermal-flowmeter
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/turbine-flowmeter
+      labelAnchor (80,96) is outside viewBox 0,0,160,90 ΓÇö not usable as-is
+   isa-5.1/flow-elements/venturi-tube
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/flow-elements/vortex-flowmeter
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   isa-5.1/instruments/auxiliary-location
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/computer-function
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/controller
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/field-instrument
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/final-control-element-logic
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/inaccessible-instrument
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/indicating-controller
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/indicator
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/instrument-bubble
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/panel-instrument-auxiliary
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/panel-instrument
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/plc-function
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/primary-element
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/recorder
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/shared-display-panel-aux
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/shared-display-panel-front
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/shared-display
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/switch
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/transducer
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/instruments/transmitter
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/layout/off-page-connector
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/logic/and
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/logic/nand
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/logic/nor
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/logic/not
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/logic/or
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/logic/xor
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   isa-5.1/measurement/analysis
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/density
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/diaphragm-seal
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/flow-orifice
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/flow
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/level-differential
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/level-gauge
+      labelAnchor (50,106) is outside viewBox 0,0,93.75,93.75 ΓÇö not usable as-is
+   isa-5.1/measurement/level
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/multivariable
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/position
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/pressure-differential
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/pressure
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/speed
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/temperature
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/vibration
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/measurement/weight
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/signals/binding-crossing-not-connected
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/capillary-tube
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/connected-junction
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/digital
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/electrical
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/electromagnetic-sonic-guided
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/hydraulic
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/internal-system-link-software
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/mechanical-link
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/signals/pneumatic
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   isa-5.1/valves/actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/angle-valve
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/valves/ball
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/butterfly
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/check-valve-lift
+      labelAnchor (60,96) is outside viewBox 0,0,100,75 ΓÇö not usable as-is
+   isa-5.1/valves/check-valve-swing
+      labelAnchor (60,96) is outside viewBox 0,0,100,75 ΓÇö not usable as-is
+   isa-5.1/valves/check-valve
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/control-valve
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/diaphragm-valve
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/electrohydraulic-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/four-way-valve
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/valves/gate
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/globe
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/hand-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/manual-reset-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/motor-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/motor-operated-gate
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/needle-valve
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/piston-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/plug-valve
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/relief-safety
+      labelAnchor (60,146) is outside viewBox 0,0,52,141.997 ΓÇö not usable as-is
+   isa-5.1/valves/rupture-disc
+      labelAnchor (60,126) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   isa-5.1/valves/solenoid-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/spring-loaded-actuator
+      labelAnchor (60,106) is outside viewBox 0,0,120,100 ΓÇö not usable as-is
+   isa-5.1/valves/three-way
+      labelAnchor (60,106) is outside viewBox 0,0,100,83.33333333333334 ΓÇö not usable as-is
+   isa-5.1/valves/vacuum-relief-valve
+      labelAnchor (60,156) is outside viewBox 0,0,100,125 ΓÇö not usable as-is
+   pip/equipment/column-tower
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/compressor
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/filter
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/heat-exchanger-shell-tube
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/pump-centrifugal
+      labelAnchor (65,126) is outside viewBox 0,0,125,115.38461538461539 ΓÇö not usable as-is
+   pip/equipment/tank-cone-roof
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/vessel-horizontal
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/equipment/vessel-vertical
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   pip/fittings/cap
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/coupling
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/cross
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   pip/fittings/elbow-45
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/elbow-90
+      labelAnchor (80,86) is outside viewBox 0,0,82,62 ΓÇö not usable as-is
+   pip/fittings/flange
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/reducer-concentric
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/reducer-eccentric
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/tee-fitting
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/fittings/union
+      labelAnchor (80,86) is outside viewBox 0,0,160,80 ΓÇö not usable as-is
+   pip/layout/drawing-note-flag
+      labelAnchor (60,96) is outside viewBox 0,0,120,90 ΓÇö not usable as-is
+   pip/layout/equipment-tag
+      labelAnchor (60,96) is outside viewBox 0,0,120,90 ΓÇö not usable as-is
+   pip/layout/line-number-tag
+      labelAnchor (80,96) is outside viewBox 0,0,160,90 ΓÇö not usable as-is
+   pip/layout/match-line
+      labelAnchor (80,96) is outside viewBox 0,0,160,90 ΓÇö not usable as-is
+   pip/layout/north-arrow
+      labelAnchor (80,96) is outside viewBox 0,0,160,90 ΓÇö not usable as-is
+   pip/layout/revision-cloud
+      labelAnchor (60,96) is outside viewBox 0,0,120,90 ΓÇö not usable as-is
+   pip/piping/elbow
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/electric-traced-pipe
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/expansion-joint
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   pip/piping/flanged-connection
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/flexible-hose
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   pip/piping/insulated-pipe
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/jacketed-pipe
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/pipe-crossing-connection
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/pipe-crossing-no-connection
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/process-line-primary
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/process-line-secondary
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/reducer
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/spectacle-blind
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   pip/piping/tee
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/piping/underground-pipe
+      labelAnchor (80,66) is outside viewBox 0,0,160,60 ΓÇö not usable as-is
+   pip/valves/ball-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/butterfly-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/check-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/control-valve-globe
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/diaphragm-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/gate-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/globe-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/needle-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/plug-valve
+      labelAnchor (60,116) is outside viewBox 0,0,120,110 ΓÇö not usable as-is
+   pip/valves/relief-valve
+      labelAnchor (60,156) is outside viewBox 0,0,62,145 ΓÇö not usable as-is
+   y32.11-1961/compressors/centrifugal-compressor
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/compressors/compressor-liquid-ring
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/compressors/reciprocating-compressor
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/compressors/rotary-compressor
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/furnaces/boiler
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/furnaces/box-furnace
+      labelAnchor (65,126) is outside viewBox 0,0,112,110 ΓÇö not usable as-is
+   y32.11-1961/furnaces/cylindrical-furnace
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/furnaces/electric-heater
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/furnaces/fired-heater
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/heat-exchangers/air-cooled-exchanger
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/heat-exchangers/double-pipe-exchanger
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/heat-exchangers/kettle-reboiler
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/heat-exchangers/plate-frame-exchanger
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/heat-exchangers/shell-and-tube-exchanger
+      labelAnchor (65,126) is outside viewBox 0,0,140,42 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/ball-mill
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/blower
+      labelAnchor (50,106) is outside viewBox 0,0,96.15384615384616,96.15384615384616 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/conveyor
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/crusher
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/dryer
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/ejector
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/fan
+      labelAnchor (50,106) is outside viewBox 0,0,104.16666666666667,104.16666666666667 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/gas-cylinder
+      labelAnchor (50,106) is outside viewBox 0,0,93.75,93.75 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/motor
+      labelAnchor (65,126) is outside viewBox 0,0,121.875,112.5 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/silencer
+      labelAnchor (65,126) is outside viewBox 0,0,118.18181818181817,109.0909090909091 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/steam-trap
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/strainer
+      labelAnchor (65,126) is outside viewBox 0,0,108.33333333333334,100 ΓÇö not usable as-is
+   y32.11-1961/miscellaneous/turbine
+      labelAnchor (50,106) is outside viewBox 0,0,104.16666666666667,104.16666666666667 ΓÇö not usable as-is
+   y32.11-1961/process/baffle-plate
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/distributor-pipe
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/distributor-spray
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/mist-eliminator
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/packing-bed
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/tray
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/process/vortex-breaker
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/pumps/centrifugal-pump
+      labelAnchor (65,126) is outside viewBox 0,0,125,115.38461538461539 ΓÇö not usable as-is
+   y32.11-1961/pumps/gear-pump
+      labelAnchor (65,126) is outside viewBox 0,0,118.18181818181817,109.0909090909091 ΓÇö not usable as-is
+   y32.11-1961/pumps/pump-screw
+      labelAnchor (50,106) is outside viewBox 0,0,90.9090909090909,90.9090909090909 ΓÇö not usable as-is
+   y32.11-1961/pumps/pump-vertical-turbine
+      labelAnchor (50,106) is outside viewBox 0,0,90.9090909090909,90.9090909090909 ΓÇö not usable as-is
+   y32.11-1961/pumps/reciprocating-pump
+      labelAnchor (65,126) is outside viewBox 0,0,118.18181818181817,109.0909090909091 ΓÇö not usable as-is
+   y32.11-1961/pumps/vacuum-pump
+      labelAnchor (50,106) is outside viewBox 0,0,90.9090909090909,90.9090909090909 ΓÇö not usable as-is
+   y32.11-1961/separators/cyclone-separator
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/separators/gravity-separator
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/separators/horizontal-separator
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/separators/vertical-separator
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/tanks/atmospheric-tank
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/tanks/cone-roof-tank
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/tanks/floating-roof-tank
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/tanks/tank-dome-roof
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/tanks/tank-internal-floating-roof
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/vessels/drum
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/vessels/horizontal-vessel
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/vessels/jacketed-vessel
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+   y32.11-1961/vessels/knockout-drum
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/vessels/reactor-jacketed
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/vessels/reactor-stirred
+      labelAnchor (50,106) is outside viewBox 0,0,100,100 ΓÇö not usable as-is
+   y32.11-1961/vessels/vertical-vessel
+      labelAnchor (65,126) is outside viewBox 0,0,130,120 ΓÇö not usable as-is
+
+[SYM-GRID-PORT] 123
+   isa-5.1/measurement/level-gauge
+      port "left" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   isa-5.1/measurement/level-gauge
+      port "right" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   isa-5.1/measurement/level-switch
+      port "left" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   isa-5.1/measurement/level-switch
+      port "right" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   isa-5.1/valves/angle-valve
+      port "inlet" sits 2.50mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/angle-valve
+      port "outlet" sits 4.17mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/ball
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/ball
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/butterfly
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/butterfly
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve-lift
+      port "left" sits 1.67mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve-lift
+      port "right" sits 1.67mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve-swing
+      port "left" sits 1.67mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve-swing
+      port "right" sits 1.67mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/check-valve
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/control-valve
+      port "left" sits 3.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/control-valve
+      port "right" sits 3.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/control-valve
+      port "actuator" sits 4.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/gate
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/gate
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/globe
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/globe
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/motor-operated-gate
+      port "left" sits 3.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/motor-operated-gate
+      port "right" sits 3.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/needle-valve
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/needle-valve
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/relief-safety
+      port "inlet" sits 4.93mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/relief-safety
+      port "discharge" sits 3.29mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/three-way
+      port "left" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   isa-5.1/valves/three-way
+      port "right" sits 1.00mm off centre ΓÇö not on the 5mm drafting grid (size=10)
+   pip/equipment/column-tower
+      port "top" sits 20.25mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "bottom" sits 20.25mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "left" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "right" sits 4.50mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "overhead" sits 20.25mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "bottoms" sits 20.25mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "feed" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/column-tower
+      port "reflux" sits 4.50mm off centre ΓÇö not on the 5mm drafting grid (size=45)
+   pip/equipment/compressor
+      port "suction" sits 4.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   pip/equipment/compressor
+      port "discharge" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   pip/equipment/heat-exchanger-shell-tube
+      port "tube_in" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "tube_in" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "tube_out" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "tube_out" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "shell_in" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "shell_in" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "shell_out" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/heat-exchanger-shell-tube
+      port "shell_out" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/tank-cone-roof
+      port "inlet" sits 19.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   pip/equipment/tank-cone-roof
+      port "inlet" sits 9.75mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   pip/equipment/tank-cone-roof
+      port "outlet" sits 26.00mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   pip/equipment/tank-cone-roof
+      port "outlet" sits 9.75mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   pip/equipment/tank-cone-roof
+      port "top" sits 10.00mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   pip/equipment/vessel-horizontal
+      port "left" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/vessel-horizontal
+      port "right" sits 24.50mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/vessel-horizontal
+      port "top" sits 14.00mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/vessel-horizontal
+      port "bottom" sits 14.00mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   pip/equipment/vessel-vertical
+      port "top" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   pip/equipment/vessel-vertical
+      port "bottom" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   pip/equipment/vessel-vertical
+      port "left" sits 6.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   pip/equipment/vessel-vertical
+      port "right" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   pip/equipment/vessel-vertical
+      port "right" sits 6.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/compressors/compressor-liquid-ring
+      port "suction" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/compressors/compressor-liquid-ring
+      port "discharge" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/furnaces/boiler
+      port "feedwater" sits 26.00mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/furnaces/boiler
+      port "feedwater" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/furnaces/boiler
+      port "steam" sits 26.00mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/furnaces/boiler
+      port "steam" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/furnaces/boiler
+      port "fuel" sits 26.00mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/furnaces/box-furnace
+      port "inlet" sits 28.44mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   y32.11-1961/furnaces/box-furnace
+      port "inlet" sits 5.73mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   y32.11-1961/furnaces/box-furnace
+      port "outlet" sits 28.44mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   y32.11-1961/furnaces/box-furnace
+      port "outlet" sits 5.73mm off centre ΓÇö not on the 5mm drafting grid (size=70)
+   y32.11-1961/furnaces/electric-heater
+      port "inlet" sits 14.00mm off centre ΓÇö not on the 5mm drafting grid (size=40)
+   y32.11-1961/furnaces/electric-heater
+      port "outlet" sits 16.00mm off centre ΓÇö not on the 5mm drafting grid (size=40)
+   y32.11-1961/furnaces/fired-heater
+      port "feed" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/furnaces/fired-heater
+      port "product" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/furnaces/fired-heater
+      port "burner" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/heat-exchangers/kettle-reboiler
+      port "top" sits 26.25mm off centre ΓÇö not on the 5mm drafting grid (size=75)
+   y32.11-1961/miscellaneous/ball-mill
+      port "inlet" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/miscellaneous/ball-mill
+      port "outlet" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/miscellaneous/conveyor
+      port "inlet" sits 14.00mm off centre ΓÇö not on the 5mm drafting grid (size=40)
+   y32.11-1961/miscellaneous/conveyor
+      port "outlet" sits 16.00mm off centre ΓÇö not on the 5mm drafting grid (size=40)
+   y32.11-1961/miscellaneous/crusher
+      port "inlet" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/miscellaneous/crusher
+      port "outlet" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/miscellaneous/dryer
+      port "inlet" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/miscellaneous/dryer
+      port "outlet" sits 10.50mm off centre ΓÇö not on the 5mm drafting grid (size=30)
+   y32.11-1961/miscellaneous/gas-cylinder
+      port "top" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   y32.11-1961/miscellaneous/sight-glass
+      port "inlet" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   y32.11-1961/miscellaneous/sight-glass
+      port "outlet" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   y32.11-1961/pumps/pump-vertical-turbine
+      port "inlet" sits 1.60mm off centre ΓÇö not on the 5mm drafting grid (size=20)
+   y32.11-1961/pumps/pump-vertical-turbine
+      port "outlet" sits 1.60mm off centre ΓÇö not on the 5mm drafting grid (size=20)
+   y32.11-1961/separators/gravity-separator
+      port "inlet" sits 19.25mm off centre ΓÇö not on the 5mm drafting grid (size=55)
+   y32.11-1961/separators/gravity-separator
+      port "inlet" sits 5.50mm off centre ΓÇö not on the 5mm drafting grid (size=55)
+   y32.11-1961/separators/gravity-separator
+      port "gas_out" sits 19.25mm off centre ΓÇö not on the 5mm drafting grid (size=55)
+   y32.11-1961/separators/gravity-separator
+      port "liquid_out" sits 19.25mm off centre ΓÇö not on the 5mm drafting grid (size=55)
+   y32.11-1961/tanks/tank-dome-roof
+      port "inlet" sits 19.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-dome-roof
+      port "inlet" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-dome-roof
+      port "outlet" sits 19.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-dome-roof
+      port "outlet" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-internal-floating-roof
+      port "inlet" sits 19.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-internal-floating-roof
+      port "inlet" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-internal-floating-roof
+      port "outlet" sits 19.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/tanks/tank-internal-floating-roof
+      port "outlet" sits 6.50mm off centre ΓÇö not on the 5mm drafting grid (size=65)
+   y32.11-1961/vessels/drum
+      port "inlet" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/drum
+      port "outlet" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/drum
+      port "vent" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/knockout-drum
+      port "inlet" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/knockout-drum
+      port "inlet" sits 6.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/knockout-drum
+      port "gas_out" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/knockout-drum
+      port "gas_out" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/knockout-drum
+      port "liquid_out" sits 24.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-jacketed
+      port "top" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-jacketed
+      port "bottom" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-jacketed
+      port "left" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-jacketed
+      port "right" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-stirred
+      port "top" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-stirred
+      port "bottom" sits 21.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-stirred
+      port "left" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   y32.11-1961/vessels/reactor-stirred
+      port "right" sits 9.00mm off centre ΓÇö not on the 5mm drafting grid (size=60)
+   nozzle/weld-neck-flange
+      port "base" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+   nozzle/weld-neck-flange
+      port "tip" sits 5.25mm off centre ΓÇö not on the 5mm drafting grid (size=15)
+

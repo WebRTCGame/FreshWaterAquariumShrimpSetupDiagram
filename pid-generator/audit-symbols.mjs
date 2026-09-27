@@ -141,8 +141,17 @@ for (const [key, sym] of Object.entries(symbols)) {
   for (const p of (sym.ports || [])) {
     const vx = (p.x / 100) * vb.w, vy = (p.y / 100) * vb.h;
     const ax = ox + vx * s, ay = oy + vy * s;            // actual, relative to box top-left
-    const ex = size / 2 + ((p.x - 50) / 100) * size;      // engine, relative to box top-left
-    const ey = size / 2 + ((p.y - 50) / 100) * size;
+    // Where the ENGINE puts it. This must be portOffset()'s formula, not the naive
+    // ((p-50)/100)*size: that one is only right for a SQUARE viewBox, and portOffset has
+    // been letterbox-aware since it was adopted -- deliberately, together with the grid
+    // and lead-in re-tuning, and never in isolation (see the note above portOffset in
+    // pid-parser.js). Grading the engine against the formula it abandoned reported 26
+    // SYM-PORT-DRIFT findings that were all artefacts of the stale check. Every one of
+    // them said "viewBox is not square -> letterboxed", i.e. the finding was describing
+    // the very condition the engine already handles.
+    // Note the vb.x / vb.y terms: portOffset includes them, the old check did not.
+    const evx = vb.x + (p.x / 100) * vb.w, evy = vb.y + (p.y / 100) * vb.h;
+    const ex = ox + evx * s, ey = oy + evy * s;   // ENGINE port formula, not the naive one
     const err = Math.hypot(ax - ex, ay - ey);
     if (err > worstPort) { worstPort = err; worstPortId = p.id; }
     if (p.x < 0 || p.x > 100 || p.y < 0 || p.y > 100)

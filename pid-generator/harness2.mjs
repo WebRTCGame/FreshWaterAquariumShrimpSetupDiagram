@@ -42,7 +42,11 @@ globalThis.document = {
   },
 };
 
-eval(GEN);
+// PID_RULE_INJECT (set by measure.mjs) is evaluated inside this scope so a rule can
+// be overridden for one run without touching the file on disk. It arrives as JS
+// source because the rules registry is a lexical binding, not a global.
+const ruleInject = process.env.PID_RULE_INJECT || '';
+eval(GEN + ruleInject);
 const t0 = Date.now();
 // --candidates=N --layouts=N --optimize=N --seedbase=S : multi-start search
 const candArg = process.argv.find((a) => a.startsWith('--candidates='));

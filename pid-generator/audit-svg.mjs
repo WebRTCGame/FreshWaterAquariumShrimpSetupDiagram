@@ -503,19 +503,64 @@ for (const t of texts) grow(t.x, t.y);
 const contentW = Math.max(c1x - c0x, 0), contentH = Math.max(c1y - c0y, 0);
 const fillW = contentW / zW, fillH = contentH / zH;
 const fillArea = (contentW * contentH) / (zW * zH);
+// INK, independently of the engine's own number. A bounding box cannot tell a
+// drawing that FILLS its box from a drawing that IS its box: an L, a ring or a U
+// reaches 90% of the zone in extent and puts a fraction of that area on the sheet,
+// and 9.70 recorded exactly that as the reason the demo read as a third of a sheet
+// while scoring clean on every dimension.
+//
+// Not a new numbered check — it is the same question as [11] asked a second way, and
+// the fix for a bad shape is the layout's, which [11] already routes to [13]. It goes
+// on the [11] detail line and into [13]'s text, where a drafter looking at a "clean"
+// 40% sheet will find it.
+const PW_INK = { process: 1.4, nozzle: 1.4, tap: 0.7, signal: 0.35 };
+let inkArea = 0;
+for (const p of pipes) {
+  let L = 0;
+  for (const sp of p.subs) for (let i = 1; i < sp.length; i++) L += Math.hypot(sp[i].x - sp[i - 1].x, sp[i].y - sp[i - 1].y);
+  inkArea += L * (PW_INK[p.cls] ?? 1.4);
+}
+for (const b of boxes) inkArea += Math.max(0, b.x1 - b.x0) * Math.max(0, b.y1 - b.y0);
+for (const t of texts) inkArea += (t.x1 - t.x0) * (t.y1 - t.y0) * 0.6;   // caps fill ~60% of the em box
+const inkPct = inkArea / (zW * zH);
 // [11] is emitted with the integer area-% LAST so regress.mjs's count regex
 // (`^\[(\d+)\] .*?: (\d+)\s*(\(|$)`) captures it like every other check, and the
 // human-readable detail lands on the indented line below as its list entry.
 console.log(`\n[11] SHEET UTILISATION (area % of drawable, 0-100): ${Math.round(fillArea * 100)}`);
-console.log(`  content ${Math.round(contentW)}x${Math.round(contentH)}mm bbox (${Math.round(c0x)},${Math.round(c0y)})->(${Math.round(c1x)},${Math.round(c1y)}) | ${(100 * fillW).toFixed(0)}% W x ${(100 * fillH).toFixed(0)}% H | drawable ${Math.round(zW)}x${Math.round(zH)}mm | sheet ${sheetW}x${sheetH}mm`);
+console.log(`  content ${Math.round(contentW)}x${Math.round(contentH)}mm bbox (${Math.round(c0x)},${Math.round(c0y)})->(${Math.round(c1x)},${Math.round(c1y)}) | ${(100 * fillW).toFixed(0)}% W x ${(100 * fillH).toFixed(0)}% H | drawable ${Math.round(zW)}x${Math.round(zH)}mm | sheet ${sheetW}x${sheetH}mm | INK ${(inkPct * 100).toFixed(0)}% of zone`);
 
 // [13] a permissive FLOOR on fill — a "look at this sheet" prompt, not a defect.
 const FILL_FLOOR = 0.45;
+// The SHAPE trap, which the extent floor cannot see and which is the more useful of
+// the two. A drawing can clear 45% on both axes and still read as a third of a sheet,
+// because the third of a sheet it occupies is the inside of a U.
+//
+// The signal is a RATIO, ink to the area the ink's own bounding box claims, and it has
+// to be a ratio: an absolute ink floor of 10% fires on five of the six corpus sheets,
+// all of them good drawings, because a P&ID is mostly white paper and no correct one
+// puts 10% of the zone in ink. The ratio is scale-free and separates cleanly —
+//
+//   case       ink/bbox
+//   demo          0.08     <- 78% W x 48% H, 3% ink: wide and shallow
+//   manifold      0.07     <- 86% W, 6% ink: the header row, then a thin manifold
+//   dense         0.16
+//   split         0.15
+//   min           0.20
+//   spike         0.21
+//
+// which is a 0.10-0.11 threshold firing on exactly the two sheets that do look
+// like they have a shape problem, and on nothing else. Measured, not guessed.
+const FILL_SHAPE_INK = 0.11;
+const shapeRatio = fillArea > 0.01 ? inkPct / fillArea : 0;
 const sparse = [];
 if (Number.isFinite(c0x) && Math.min(fillW, fillH) < FILL_FLOOR) {
   const worst = fillH < fillW ? 'height' : 'width';
   sparse.push(`fills only ${(100 * Math.min(fillW, fillH)).toFixed(0)}% of drawable ${worst} (< ${(100 * FILL_FLOOR).toFixed(0)}%) — ` +
     `content is ${(100 * fillW).toFixed(0)}% W x ${(100 * fillH).toFixed(0)}% H; consider splitting the sheet or adding scope`);
+}
+if (Number.isFinite(c0x) && Math.min(fillW, fillH) >= FILL_FLOOR && shapeRatio < FILL_SHAPE_INK) {
+  sparse.push(`spans ${(100 * Math.min(fillW, fillH)).toFixed(0)}% of the drawable but fills only ${(shapeRatio * 100).toFixed(0)}% of its own bounding box with ink — ` +
+    `the drawing is the shape of its box (L, U or ring); re-flow the depth ranks rather than scaling the sheet`);
 }
 console.log(`\n[13] SPARSE SHEET (fill floor ${(100 * FILL_FLOOR).toFixed(0)}%): ${sparse.length}`);
 for (const sp2 of sparse) console.log(`  ${sp2}`);

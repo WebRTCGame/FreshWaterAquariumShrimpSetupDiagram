@@ -2504,8 +2504,14 @@ const shiftFor = (lineIdx, x) => {
   // drawn extent. The bubble is what occupies space, and it is placed by a
   // mechanism (`passInstruments`'s keep-out) that already knows about labels.
   let labelCollisions = 0;
+  // Every text box on the finished sheet, kept for the fill term's ink estimate
+  // below. Declared here rather than inside the block because the two consumers are
+  // fifty lines apart and re-parsing the markup for a second purpose would be the
+  // kind of second answer this project keeps having to unpick.
+  let textBoxes = [];
   {
     const raw = pidTextBoxes(svg.innerHTML || '');
+    textBoxes = raw;
     const seenBubble = new Set();
     const boxes = [];
     for (const b of raw) {
@@ -2596,7 +2602,7 @@ const shiftFor = (lineIdx, x) => {
   //
   // Prices ASPECT MISMATCH, not absolute area. The render-time fit scale already
   // handles size; it cannot fix shape, because uniform scale preserves aspect.
-  let fillW = 0, fillH = 0;
+  let fillW = 0, fillH = 0, fillInk = 0;
   {
     const ents = [...equipment, ...valves, ...instruments].filter((e) => e.x != null);
     let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
@@ -2605,15 +2611,56 @@ const shiftFor = (lineIdx, x) => {
       if (x < x0) x0 = x; if (x > x1) x1 = x;
       if (y < y0) y0 = y; if (y > y1) y1 = y;
     };
+    // INK, not bounding box — and this is a DIAGNOSTIC, not a target. The bbox of a
+    // drawing can be the right SHAPE and still be almost empty, and 9.70 recorded
+    // that as the reason the demo looked sparse: an L-shaped drawing fills its
+    // bounding box by definition and reads as a third of a sheet. So the third
+    // number here is the area the drawing actually OCCUPIES — symbol boxes, label
+    // boxes and pipe ink — as a fraction of the zone.
+    //
+    // MEASURED AND NOT USED AS A PENALTY. Ink coverage is 2-16% on the corpus, an
+    // order of magnitude below `fillTarget`, so a penalty on it is a large near-
+    // constant that swamps every preference term: the search chases a number nothing
+    // can move, and the corpus went 2019 -> 2589. What the number is FOR is that it
+    // ranks candidates completely differently from the bounding box —
+    //
+    //   case      bbox      ink
+    //   dense       19%      6%
+    //   manifold    86%      6%
+    //   spike       73%     16%
+    //
+    // — i.e. it is the difference between a drawing that FILLS its box and a drawing
+    // that is a ring or an L, and a reader cannot get that from the bbox. Published
+    // in `score.fill.ink` and reported by audit [11].
+    let ink = 0;
     for (const e of ents) {
-      const hs = (e.symbolSize || e.size || 30) / 2;
-      eat(e.x - hs, e.y - hs); eat(e.x + hs, e.y + hs);
-    };
-    for (const g of geometries) for (const q of (g.pts || [])) eat(q.x, q.y);
-    const FW = (view.sheetW || 864) - 36, FH = (view.sheetH || 559) - 36;
+      const s = sizeOf(e);
+      ink += s * s;
+      eat(e.x - s / 2, e.y - s / 2); eat(e.x + s / 2, e.y + s / 2);
+    }
+    const pw = ruleParam('routing.processWidth', 1.4), sw = ruleParam('routing.signalWidth', 0.35);
+    for (const g of geometries) {
+      let len = 0;
+      for (let i = 1; i < g.pts.length; i++) len += Math.abs(g.pts[i].x - g.pts[i - 1].x) + Math.abs(g.pts[i].y - g.pts[i - 1].y);
+      ink += len * (g.signal ? sw : pw);
+      for (const q of (g.pts || [])) eat(q.x, q.y);
+    }
+    for (const b of textBoxes) ink += (b.x1 - b.x0) * (b.y1 - b.y0) * 0.6;   // caps are ~60% of the em box
+    // The zone, not the sheet. `(sheetW - 36) x (sheetH - 36)` is the FRAME, and
+    // the drawing does not live there: the equipment schedule owns a band across the
+    // top and the title block a band along the bottom, which is exactly what
+    // `data.drawZone` already encodes for the centring pass and the fit. Measuring
+    // sheet use against a rectangle the drawing is not allowed to use understated it
+    // by 12% of area on every sheet, and a term that is uniformly 12% off is a term
+    // that never reaches its target. Both numbers are reported so the ratio is
+    // visible rather than implied.
+    const Z = data.drawZone;
+    const FW = Z ? Z.x1 - Z.x0 : (view.sheetW || 864) - 36;
+    const FH = Z ? Z.y1 - Z.y0 : (view.sheetH || 559) - 36;
     if (x1 > x0 && y1 > y0) {
       fillW = Math.min(1, (x1 - x0) / FW);
       fillH = Math.min(1, (y1 - y0) / FH);
+      fillInk = Math.min(0.95, ink / (FW * FH));
     }
   }
   // UTILISATION, not bounding-box aspect. The first attempt used aspect mismatch and
@@ -2699,7 +2746,7 @@ const shiftFor = (lineIdx, x) => {
       SW.bend * bends + SW.len * length + SW.tap * tapReachTotal + SW.sig * maxSignalLen +
       SW.warn * nWarn + SW.fill * fill + breach),
     weights: SW,
-    fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), gap: fill, entities: entCount },
+    fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), ink: Math.round(fillInk * 100), gap: fill, entities: entCount },
     routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), nonOrtho },
     sheet: { offSheet },
     annotations: { labelCollisions },

@@ -2747,7 +2747,16 @@ const shiftFor = (lineIdx, x) => {
       SW.warn * nWarn + SW.fill * fill + breach),
     weights: SW,
     fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), ink: Math.round(fillInk * 100), gap: fill, entities: entCount },
-    routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), nonOrtho },
+    // `k` is published so the relationship with `length` is visible rather than
+    // implied. `length` is deliberately NOT multiplied by it, and 9.75.1 has the
+    // measurement: `length` in layout units is pipe length measured in SYMBOL-WIDTHS,
+    // which is scale-invariant and therefore the only reading in which "this process
+    // has twice as much pipe per unit of equipment as that one" means anything. `k`
+    // scales the symbols by the same factor, so `length * k` is absolute ink on paper
+    // and charges a small well-proportioned drawing for being drawn large — measured
+    // 1827 -> 1904, with the whole loss on the high-`k` sheets (split 45 -> 69, min
+    // 65 -> 82). Every other term in this score is in layout units too.
+    routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), k: Math.round(k * 1000) / 1000, nonOrtho },
     sheet: { offSheet },
     annotations: { labelCollisions },
     lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups, breach: Math.round(breach), breachMm: Math.round(breachMm * 10) / 10, leadInShort: lineIssues.leadInShort || 0 },

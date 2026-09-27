@@ -4222,3 +4222,114 @@ The shape problem is NOT solved: the demo's ink/bbox ratio is 0.08 and manifold'
 margins to an L with a long diagonal tail to the battery limit. Score, extent and
 crossings all improved; the shape did not. That is filed, not fixed, and the check that
 found it is the one that will keep saying so.
+
+---
+
+## 9.75 Two measurement corrections, and one that turned out not to be a defect
+
+### 9.75.1 `routing.length` is in symbol units, and must not be multiplied by `k`
+
+`routing.length` accumulates in layout millimetres, and the drawing is then scaled by
+`k` to fill the drawable zone. The obvious objection is that this scores two layouts
+that print identically as different. Scoring `length * k` instead:
+
+```
+  case       k      layout     printed    sum with k   sum as-is
+  demo     1.21      1606        1943         336          319
+  spike    0.94      6474        6082         769          789
+  dense    1.26      3079        3863         424          384
+  min      1.66       507         839          82           65
+  split    1.78       609        1081          69           45
+  manifold 0.99      2463        2435         224          225
+                              sum        1904         1827
+```
+
+The damage is entirely on the sheets with the **largest** `k`, which is the tell. `k`
+scales the SYMBOLS by exactly the same factor as the pipe, so `length` in layout units
+is already pipe length measured in symbol-widths — a scale-invariant quantity, and the
+only one in which "this process has twice as much pipe per unit of equipment as that
+one" means anything. `length * k` replaces it with absolute ink on paper, which
+charges a small, well-proportioned drawing for being drawn large: split 45 -> 69, min
+65 -> 82, both of them sheets where the engine deliberately chose a big `k` because
+the drawing is simple and deserves the room.
+
+It also breaks the score's internal consistency. Crossings, label collisions, bend
+counts and every avoid-margin are in layout units too; `k` is the one factor that
+belongs in none of them. `routing.k` is now published so the relationship is visible
+rather than implied, and `routing.length` keeps its meaning.
+
+### 9.75.2 "A bend was tested with an unnormalised dot product" — and it was not a defect
+
+This one is worth the space because **I was wrong, and the way I was wrong is the
+lesson.**
+
+The test is:
+
+```js
+if (Math.abs((p1.x-p0.x)*(p2.x-p1.x) + (p1.y-p0.y)*(p2.y-p1.y)) < 0.5) bends++;
+```
+
+That quantity is `la * lb * cos(turn)`, so it is not a test of angle at all — its
+sensitivity scales with the product of the two leg lengths. It looks like a bug. I
+measured the emitted markup to try to convict it, and got what looked damning:
+
+```
+  89 paths, 294 vertices, 2 real U-turns
+  by turn angle:  <5deg: 69   5-90deg: 0   90-170deg: 224   >170deg: 2
+```
+
+A perfect bimodal split with an **empty band from 5 to 90 degrees** on every sheet,
+and 23% of all bend counts turning by less than 5 degrees. That is a beautiful
+measurement and it says the threshold should be 15 degrees.
+
+So I built it: a shared `isBend` predicate on the normalised cosine, a new `routing.jogs`
+count, and a `bendJog` weight. And then the jog counts came out **1456 on spike and 276
+on the demo**, against 69 sub-5-degree vertices in the emitted markup. A 20x
+discrepancy is the clue, and it is this: **`bends` is counted on `geometries[].pts`,
+the raw A* grid path, and the drawing is `cleanPoly`'d.** The internal polyline carries
+every grid step; `cleanPoly` collapses collinear runs and 2014 sub-threshold internal
+vertices become 69 in the markup.
+
+Which means the 69 I measured were never what the metric was scoring. `la*lb*cos(turn)
+< 0.5` fires only when `cos(turn)` is near zero — i.e. only on near-90-degree turns —
+and that is true *regardless of leg length*, because the length factor is a positive
+multiplier on both sides. The length dependence is a wart, and the threshold of 0.5 is
+scale-dependent in principle, but in practice the test was already behaving as a
+"sharp corner" test. Measured directly: the new predicate gave corners of
+48/91/36/8/6/38 against the old 48/88/35/8/5/34 — within 1-4 on every sheet, and the
+corpus moved 1827 -> 1845 on pure re-roll.
+
+**Reverted.** The indictment was correct about the formula and wrong about the
+consequence, because I measured a different polyline from the one being scored. The
+general form of the mistake, and this project has now collected several of them: the
+audit reads the emitted SVG and the engine reads the model, and they are not the same
+object. Every previous time (§9.73's nozzle-tag count, §9.74.4's rotated designations)
+the engine and the audit disagreeing was the signal. This time I took the audit's
+number as indicting the engine's and they were measuring different things.
+
+### 9.75.3 And the same trap a third time: a per-jog price destabilises the search
+
+Worth recording even though the feature is reverted, because it is the third
+instance of one pattern and the pattern is now unmistakable.
+
+With the corrected angle predicate and `bendJog = 0`, jogs are free — and the router
+immediately buys straight-line distance with them. Bends went **up**: spike 88 -> 91,
+manifold 34 -> 38, split 5 -> 6. The corpus went 1827 -> 1845.
+
+Pricing a jog at a quarter of a corner (0.5 vs 2) is far worse: corpus **1827 -> 2617**,
+spike **789 -> 1328**, crossings 7 -> 17, 1200mm of extra pipe. The router cannot
+satisfy a per-jog price — it responds by taking longer, more-crossing routes to avoid
+nicking a vertex.
+
+That is 9.23's `astarGiveups` and 9.74.3's `PID-GEO-002` exactly, and the rule
+generalises: **a constraint the engine cannot meet makes it trade a visible defect for
+an invisible one.** The lever here is not the weight, it is `cleanPoly` — the only
+place a jog can actually be removed from the geometry — and that is a geometry change,
+not an objective change. Not attempted; the emitted markup is already down to 69 jogs
+from 2014 internal ones, so the drawing is in better shape than the raw path and the
+remaining 14 on the demo are all at lead-ins, which are protected on purpose.
+
+### Net
+
+No score change. `routing.k` published; `routing.length` confirmed correct. Two
+negative results recorded, one of them about my own reasoning.

@@ -58,6 +58,7 @@
      "ss": 1,
      "bends": 88,
      "length": 6474,
+     "k": 0.94,
      "nonOrtho": 0
     },
     "sheet": {
@@ -205,6 +206,7 @@
      "ss": 0,
      "bends": 8,
      "length": 507,
+     "k": 1.655,
      "nonOrtho": 0
     },
     "sheet": {
@@ -324,6 +326,7 @@
      "ss": 0,
      "bends": 35,
      "length": 3079,
+     "k": 1.255,
      "nonOrtho": 0
     },
     "sheet": {
@@ -447,6 +450,7 @@
      "ss": 0,
      "bends": 5,
      "length": 609,
+     "k": 1.776,
      "nonOrtho": 0
     },
     "sheet": {
@@ -561,6 +565,7 @@
      "ss": 0,
      "bends": 34,
      "length": 2463,
+     "k": 0.989,
      "nonOrtho": 0
     },
     "sheet": {

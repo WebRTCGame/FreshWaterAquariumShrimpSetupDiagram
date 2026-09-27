@@ -130,6 +130,31 @@ for (const m of R(/<text\b([^>]*)>([^<]*)<\/text>/g, s)) {
   texts.push({ t: content.slice(0, 28), x, y, fs: fsRaw, fsEff: fs, x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y + ex.y0 * fs, y1: y + ex.y1 * fs });
 }
 const hit = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+// Segment vs axis-aligned box, shrunk by `pad`. Local on purpose: this file is the
+// INDEPENDENT check, and the one thing it must not do is call the engine's own
+// collision code — a check that shares an implementation with the thing it checks
+// cannot disagree with it, and disagreement is the whole value here.
+const segHitsRect = (sg, r, pad) => {
+  const p = pad || 0;
+  const x0 = r.x0 + p, x1 = r.x1 - p, y0 = r.y0 + p, y1 = r.y1 - p;
+  if (x1 <= x0 || y1 <= y0) return false;
+  const [a, b] = sg;
+  // every segment here is orthogonal, so a slab test in each axis is exact
+  if (Math.abs(a.x - b.x) < 0.01) return a.x > x0 && a.x < x1 && Math.max(a.y, b.y) > y0 && Math.min(a.y, b.y) < y1;
+  if (Math.abs(a.y - b.y) < 0.01) return a.y > y0 && a.y < y1 && Math.max(a.x, b.x) > x0 && Math.min(a.x, b.x) < x1;
+  // a diagonal: sample it, which is what [0] exists to tell us should not happen
+  const steps = Math.ceil(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)));
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps, x = a.x + (b.x - a.x) * t, y = a.y + (b.y - a.y) * t;
+    if (x > x0 && x < x1 && y > y0 && y < y1) return true;
+  }
+  return false;
+};
+// Every routed segment, in content coordinates, for the linework checks below.
+// NOZZLE leaders are excluded: a nozzle tag is SUPPOSED to sit on its own nozzle
+// stub, and counting the leader would report every correctly-placed nozzle tag in
+// the drawing. The engine's placer makes the same exclusion, for the same reason.
+const segsAll = pipes.filter((p) => p.cls !== 'nozzle').flatMap(segsOf);
 
 // ---- report ----
 console.log(`== SVG layout audit: ${file} ==`);
@@ -375,6 +400,54 @@ for (const c of uncovered.slice(0, 20)) console.log(`  ${c.a} X ${c.b} @(${c.x},
   console.log(`
 [14] TAG INSIDE BUBBLE (tag ink within its circle): ${spills.length}`);
   for (const sp3 of spills) console.log(`  ${sp3}`);
+
+// [15] LABEL OVER LINEWORK — the class of defect that had NO check at all.
+//
+// [7] compares text with text. [3]/[5] compare lines with lines and with symbol
+// boxes. Nothing compared text with LINEWORK, so a P&ID could print an equipment
+// tag or a valve label stack straight through a process line — one of the most
+// obvious things a drawing can get wrong — and both the score and this audit would
+// report a clean sheet. Measured on dense before the placers learned to test for
+// it: C-1's tag sat on the vertical run off the reboiler, and FV-1's "CONTROL
+// VALVE" stack ran down the P-1 discharge riser.
+//
+// The engine's own counter is PID-ANN-001; this is the same question asked of the
+// emitted markup by a tool that shares no code with the renderer beyond the text
+// metric, which is the point of having it. Only the three annotation roles that
+// carry a tag are tested — line designations are meant to sit beside their line
+// with a leader, and nozzle tags are meant to sit on their nozzle.
+const LBL_TOL = 0.75;   // a leader arriving at a label is not a line drawn through it
+const onLine = [];
+for (const b of texts) {
+  let n = 0;
+  for (const seg of segsAll) {
+    if (!segHitsRect(seg, b, -LBL_TOL)) continue;
+    n++;
+  }
+  if (n) onLine.push(`"${b.t}" on ${n} segment(s) @(${Math.round(b.x)},${Math.round(b.y)})`);
+}
+console.log(`
+[15] LABEL OVER LINEWORK: ${onLine.length}`);
+for (const o of onLine.slice(0, 14)) console.log(`  ${o}`);
+
+// [16] EQUIPMENT / VALVE ANNOTATION CLEARANCE — did the placers find room?
+//
+// Independent of [15]: this asks whether anything at all crossed anything, without
+// caring which label it was, and it exists so a regression in the placement ladder
+// shows up as a count rather than as a picture somebody had to look at.
+const ANN_TOL = 0.25;
+const annHit = [];
+for (const b of texts) {
+  let n = 0;
+  for (const o of texts) {
+    if (o === b) continue;
+    if (b.x0 < o.x1 && o.x0 < b.x1 && b.y0 < o.y1 && o.y0 < b.y1) n++;
+  }
+  if (n) annHit.push(`"${b.t}" x${n}`);
+}
+console.log(`
+[16] LABEL STACKS OVERLAPPING (any text, any other text): ${annHit.length}`);
+for (const a of annHit.slice(0, 14)) console.log(`  ${a}`);
 
 // [11] SHEET UTILISATION  +  [13] SPARSE SHEET
 //

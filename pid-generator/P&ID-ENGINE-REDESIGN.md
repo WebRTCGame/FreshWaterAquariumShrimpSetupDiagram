@@ -278,6 +278,14 @@ or unaffordable without it.
 - [ ] **T2.6** **Add `layout.rowSpacing` to the layout search as a dimension.**
   Found 2026-09-26 (log 9.66). The search renders 3 orders x 2 sweeps and keeps the
   lowest score; adding row pitch makes it evaluate the height/length trade *per sheet*.
+  — **DONE, and extended.** 9.68 added three row pitches. 2026-09-27 added
+  `layout.colMax` / `layout.colMaxAlt` as a **fourth** axis (§9.73), because the
+  earlier refutation of the pitch cap was measured while the fit was broken: the fit
+  included the origin in the content box, so a capped chain came out smaller rather
+  than larger and the cap had nothing to buy. With the fit fixed the cap is a genuine
+  per-sheet trade — `spike` 943 → 838 (crossings 18 → 10, labels 1 → 0) at 110mm,
+  `manifold` 324 → 373, and the corpus splits — so the engine tries both and scores
+  them. Cost is render time: two axes now, so roughly double.
 
   - **Do NOT add a fill or composition score term.** Measured: the demo has a 93%-height
     candidate that the score rejects, and it is right to — that candidate costs **2.5x the
@@ -509,13 +517,26 @@ consumption across the five live engine files: of the symbol metadata, only
   first time. One junction-heavy sheet is enough to *see* the problem; designing a
   constraint against it still wants a few more. `min` and `split` have zero
   fan-out pairs, which is why they were not the sample.
-- [ ] **T3.8** **A long title is clipped at the sheet edge, silently.** Found 2026-09-26
-  while building the manifold fixture (9.63). A title of "Three-branch manifold with
-  return header" overran the title block and was cut off by the sheet boundary: no
-  truncation, no wrap, no warning, and the audit does not look at the title block. Any
-  project with a long name hits this. Needs a width-aware fit (shrink, then ellipsis,
-  then warn) — and the same treatment for the other title-block lines, which are
-  currently literal font sizes with no measurement at all.
+- [ ] **T3.8** **A long title is clipped at the sheet edge, silently.** — **FIXED
+  2026-09-27.** Every title-block line is now width-fitted with the real advance
+  table: nominal size, else shrink toward a 5mm floor, else truncate with an
+  ellipsis **and warn** (`PID-TBL-001` / `PID-TBL-002`, both new). The other four
+  lines — project, sheet, rev, generator date — were literal sizes with no
+  measurement at all and are now fitted the same way. See §9.73 and the 1.35 GB
+  commit. Note the cost: the demo's own title now reports `PID-TBL-002` every run,
+  because `TK-101 Pump-Out to Battery Limit` is genuinely 2% too wide for a 160mm
+  block at 8mm type. That is the check working.
+- [ ] **T3.10** **Nozzle tags and line designations are drawn on linework.** NEW,
+  found 2026-09-27 by `audit [15]`, which did not exist before. Census: dense 4,
+  spike 23, manifold 5, min 0, split 0. The equipment tags and valve stacks were
+  taught to avoid linework in the same pass (and dense's C-1 tag, which was sitting
+  on the vertical run off the reboiler, is fixed); nothing places a nozzle tag or a
+  line designation against anything, and both already have a placement decision of
+  their own to extend — a nozzle tag picks its clear side, a line designation slides
+  along its run and stands off by `annotation.labelOffset`. The engine's own count
+  and the audit's differ (14 against 23 on `spike`) because their segment sets
+  differ at the nozzle leaders; **do not reconcile them by sharing code** — the
+  disagreement is the check's value. §9.73.
 
 - [ ] **T3.9** **Does an explicit DSL description beat `TYPE_LABELS`?** Open question,
   not a finding. `equipment T-1 tank "Branch 1 vessel"` renders as `CONE ROOF TANK` in
@@ -668,22 +689,79 @@ title. T3.6 is now closed and its six open questions are answered in place.
   *Deviation:* it renders **below** the valve, not above as asked — it is a fourth row
   of the existing label stack, so it inherits the above/below flip and the collision
   test instead of reimplementing them. Flagged rather than quietly claimed as done.
-- [ ] **T4.4** **The label-collision metric counts characters, so it cannot be
-  case-sensitive.** Re-diagnosed 2026-09-26 (log 9.60); the original wording was wrong.
+- [x] **T4.4** **The width model — CLOSED 2026-09-27, and the diagnosis was wrong
+  twice over.** Re-diagnosed 2026-09-26 (log 9.60); the original wording was wrong.
   It did NOT measure "the authored string" in any meaningful sense — it counts
   `str.length * fnt * 0.55`, and `toUpperCase()` does not change `.length` for ordinary
   text, so uppercasing before counting is a no-op. Measured: routing all four width
   estimators through an uppercasing helper moved **nothing** on any of the four corpus
   sheets, so that fix was reverted as dead code.
 
-  The real defect: a flat 0.55em average advance **cannot express case**, because real
-  uppercase is wider than mixed case at equal character count (`M W L C` vs `i l t`).
-  *Fix worth doing:* stop estimating. The project already drives headless Chrome, so
-  `getComputedTextLength()` on the live text node gives the true advance for the real
-  font and the real string after the CSS transform — exact, case-correct, and it also
-  retires the 0.55em and 1.15em guesses. A per-character table is the alternative and is
-  worse, because the font is a CSS stack and the table would only be valid for the
-  resolved face.
+  The real defect was **bigger than case**, and it is now `pid-textmetrics.js`: a
+  per-character table of Adobe Core **Helvetica** metrics — the metric model of the
+  CSS generic `sans-serif` this drawing uses — folded to uppercase to match the CSS
+  that actually does the transform. `0.55em` is the average advance of MIXED-CASE
+  text and **every glyph this project draws is uppercase**, so the metric
+  under-measured every annotation on every sheet by about 35%, and the layout had no
+  reason to avoid overlaps the eye can see.
+
+  `getComputedTextLength()` was the other candidate and is genuinely unusable: the
+  score runs for every candidate while the SVG is detached, so there is nothing to
+  measure. The table also answers the *vertical* guess — an all-caps line runs
+  cap-top to baseline (0.718em), not the flat `1.15em` that claimed 0.43em of empty
+  space below the baseline.
+
+  It is now **one** model with four consumers (renderer, router, audit, title block)
+  and a 13-case self-test that `regress.mjs` gates. The router and the renderer
+  sharing it is load-bearing: they must agree, because the router reserves the space
+  the renderer then has to fit into, and 9.67's spike 997 → 1274 was exactly that
+  disagreement.
+
+  Yield, measured on all six sheets: audit `[14] TAG INSIDE BUBBLE` **0 everywhere**
+  (was demo 1, spike 6, manifold 1), all six `PID-INS-020` warnings gone, and
+  **T6.15 / T6.17 closed** — with a real ruler a 3-letter tag needs 4.4mm of bubble,
+  not the 4.93mm the flat 0.68em factor claimed, and the remedy is the bubble (grown
+  in one solver both the layout and the drawing read) rather than the letters.
+- [x] **T6.15** / **T6.17** **Instrument tag vs its bubble — CLOSED 2026-09-27.**
+  Both were the same decision deferred: the tag was too large for the bubble, and
+  the item refused to guess whether the fix was bigger bubbles or smaller letters.
+  Two measured facts settled it. (1) The requirement is **4.4mm, not 4.93mm** — the
+  0.68em factor over-reserved any tag of narrow capitals (`FIC` is 0.537em/char). (2)
+  The **loop-number line**, not the letters, sets the height: a two-line tag needs
+  `CAP*fL + gap + DESC*fN` and that is the whole of it. So the letters are right and
+  the bubble grows — via `instrumentBubbleSize` in `pid-rules.js`, read by BOTH the
+  renderer's `sizeOf` and `PIDEngine.entitySize`, because growing it in the drawing
+  alone is what made 9.67's spike 997 → 1274. The annotation type-size formula moved
+  into `PID_RULES` for the same reason: the router needs it and cannot reach into the
+  renderer's closure.
+- [x] **T6.16** **The candidate score must not depend on where a tag sits inside its
+  own bubble — CLOSED 2026-09-27.** Tag runs now carry `data-pid-inst` and the score
+  substitutes the **bubble box** for them, so re-centring the text inside a bubble
+  that did not move cannot re-roll which candidate wins. 9.72 measured the cost of
+  not doing it: an 1.8mm cosmetic move broke a near-tie and landed spike on a worse
+  layout (crossings 9 → 10, two new collinear tap/pipe overlaps). The same principle
+  now governs the whole sheet — see §9.73, where the fit solves against the drawn
+  extent and the drawing zone, both of which had been a second, different answer to
+  "where does the drawing go".
+- [x] **T0.3** **`checkCandidates` compared two incomparable searches — CLOSED
+  2026-09-27.** The gate now compares like with like, on the **preference** part of
+  the total (`total - lines.breach`, because the breach term is a constant on small
+  sheets and putting it on both sides made the relative tolerance meaningless exactly
+  where the constant dominates), with a stated 15% tolerance and the deltas printed
+  on every run. Two things were added alongside it: a **determinism** assertion,
+  which is a property that can be checked exactly and was documented but never
+  checked; and the removal of a "must not add warnings" assertion, which turned out
+  to punish the search for finding a better layout — on `spike` the perturbed
+  multi-start returned 919 against the blessed 938 with 9 warnings against 11.
+
+  The gap it exposed was real and is now fixed at the source: the objective could
+  not see a drafting-rule violation, so `validateGeometry` reports each
+  layout-fixable breach **structured, with the distance it is short by** and
+  `weights.breachPerMm: 6` (capped at 200) prices it. Priced proportionally and
+  bounded, NOT as a lexicographic cliff — a cliff was built first and measured, and
+  it swung the demo from 359 with 2 crossings and 0 label collisions to 732 with 8
+  crossings and 6, i.e. it bought a subtle tight bend at a nozzle with six glaring
+  overlaps.
 - [x] **T3.7** **Routing margins — NOT A DEFECT. Premise and remedy both wrong.**
   Closed 2026-09-26 (log 9.61), **no code change; the tree is byte-identical.**
 
@@ -736,7 +814,31 @@ title. T3.6 is now closed and its six open questions are answered in place.
   Fix the check, not the layout: compare like with like, or demote it from a pass/fail
   gate to a reported diagnostic. One REGRESS line is red because of this and is left
   visible rather than suppressed.
+<!-- T0.3 moved UP into the correctness-defects block, closed 2026-09-27. -->
+
 ## Sequenced recommendation
+
+**Updated 2026-09-27.** Stages 1 and 2 are still the durable work, and the
+measurement discipline this plan is built on is intact. What changed is that four of
+the items on this list turned out to be *measurement* defects rather than capability
+gaps, and closing them moved the corpus from 2292 to **2235** with `REGRESS OK` for
+the first time in weeks:
+
+| closed | what it actually was |
+|---|---|
+| **T4.4** | the width model measured MIXED CASE for text that is drawn entirely in uppercase — one table, four consumers |
+| **T6.15 / T6.17** | the same decision twice; a real ruler made the requirement 11% smaller than filed and the remedy unambiguous |
+| **T6.16** | the score read a quantity (text inside a bubble) that cannot affect the drawing |
+| **T0.3** | a gate asserting a property no engine can have, which had been red for weeks |
+| **T3.8** | a title block with no measurement of any kind on any of its five lines |
+
+The lesson worth carrying into Stage 1: **a defect that no metric can see is
+indistinguishable from a defect that does not exist**, and this project had four of
+them plus a fifth (`audit [15]`: a label drawn on a process line — a check that had
+never been written, reporting 23 findings on the densest sheet). Two more pass-
+discovery bugs of the same family — the fit discarding the centring, and the
+equipment tags unable to see the valve stacks — were also invisible until something
+compared two pieces of the drawing that had never been compared.
 
 If only three things get done, do these:
 
@@ -791,9 +893,20 @@ Kept here so the todo list is not read as "nothing has shipped":
 | `T7.5` duplicate connection source | synced; `SYM-META-CONFLICT` 4 → 0 |
 | `T7.8` bbox extractor self-test | added, and verified it *fails* on the original bug |
 | `preview.mjs` | one-command visual review, incl. mm-coordinate zoom (§9.35) |
+| **`measure.mjs`** | one table of every machine-checked fact for all six sheets (§9.73) |
+| **`pid-textmetrics.js`** | per-character advance table; ONE model for four consumers (§9.73) |
+| **T4.4** | the width model measured mixed case for all-caps text — closed |
+| **T6.15 / T6.17** | instrument tag vs bubble — closed; the bubble grows, in one solver |
+| **T6.16** | score the bubble, not the text inside it — closed |
+| **T0.3** | the mis-specified candidates gate — closed, plus a determinism assertion |
+| **T3.8** | long titles clipped at the sheet edge — closed, every title line fitted |
+| **Fit / drawing zone** | the fit was scaling to a box a third bigger than the drawing, and solving before the drawing existed (§9.73) |
+| **Label over linework** | nothing in the objective or the audit compared text against lines; `audit [15]` now does, and reports 4/23/5/0/0 |
 
 Session totals: regression sheets **3150 → 1337**, demo **335 → 199**, with
-**0 errors and 0 label collisions on all five sheets**.
+**0 errors and 0 label collisions on all five sheets**. After the 2026-09-27 pass:
+**2235** across six sheets (the corpus grew by `manifold` and by a breach term that
+did not exist before), `REGRESS OK`, 0 errors everywhere.
 
 ---
 

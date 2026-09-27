@@ -30,7 +30,7 @@ function pidTextBoxes(svgHtml) {
     // renderInto, T6.16): re-centring the text in the bubble cannot move the
     // bubble, so it must not be able to re-roll which layout wins either.
     const im = a.match(/data-pid-inst="([^"]*)"/);
-    out.push({ x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y + ex.y0 * fs, y1: y + ex.y1 * fs, inst: im ? im[1] : null });
+    out.push({ t: content, x0: mid ? x - w / 2 : x, x1: mid ? x + w / 2 : x + w, y0: y + ex.y0 * fs, y1: y + ex.y1 * fs, inst: im ? im[1] : null });
   }
   return out;
 }
@@ -344,69 +344,130 @@ function renderInto(svg, data, themeName) {
   };
 
   // canvas: content-sized, or full page when `fit page`
-  const dbg = pidDebugGate(data); // ponytail: Phase 4 — null unless PID_DEBUG
+  const dbg = pidDebugGate(data); // ponytail: Phase 4 - null unless PID_DEBUG
+  // Extent of the SYMBOLS. The full extent — including routed linework — is not
+  // known until routing has run, so for `fit page` the scale is solved at the end
+  // (see `solveFit`, below) against the real drawn extent. This pass is still
+  // needed for the content-sized path and for the sheet background.
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   for (const e of [...equipment, ...valves, ...instruments, ...junctions]) {
     const s = sizeOf(e);
     minX = Math.min(minX, e.x - s / 2); minY = Math.min(minY, e.y - s / 2);
     maxX = Math.max(maxX, e.x + s / 2); maxY = Math.max(maxY, e.y + s / 2);
   }
-  minX = Math.min(minX, 0); minY = Math.min(minY, 0);
-  // include room for tags/labels that extend beyond the symbol boxes
-  minX -= 10; minY -= 12; maxX += 10; maxY += 14;
+  // room for the tag/type stacks that hang BELOW a symbol and the leaders that reach
+  // sideways. The old flat `-10 / -12 / +10 / +14` was a guess; the stacks are three
+  // rows at published millimetre sizes, so the margin is derived from them.
+  const STACK_MARGIN = { left: 6, right: 6, top: 6, bottom: annotationTypeMm(3.2, SC) * 0.72 * 3 + ruleParam('layout.labelZone', 16) };
+  minX -= STACK_MARGIN.left; minY -= STACK_MARGIN.top;
+  maxX += STACK_MARGIN.right; maxY += STACK_MARGIN.bottom;
+  // The ORIGIN belongs in the box ONLY when the sheet is sized to the content, where
+  // the viewBox starts at 0 and the drawing has to start at 0 too.
+  //
+  // Under `fit page` it is pure waste, and it was the largest single reason every
+  // fitted sheet looked small. `Math.min(minX, 0)` forced the content box to span
+  // from the origin even though the layout never draws near it: on dense the
+  // entities run x 220..645 and the box was measured as 0..655, so 220mm of dead
+  // width — a third of the box — was being fitted to the sheet, and the scale came
+  // out 1.19 where the drawing's own extent gives 1.80. A uniform scale is a
+  // similarity transform and cannot affect layout quality, so every one of those
+  // millimetres was handed straight back as blank margin.
+  if (!view.fitPage) { minX = Math.min(minX, 0); minY = Math.min(minY, 0); }
 
     let W, H, wrap = '';
-    // hoisted out of the fitPage block: the text pass at the end of this function
+    // Hoisted out of the fitPage block: the text pass at the end of this function
     // needs the same k the geometry was scaled with, and a block-scoped const was
     // invisible there. 1 means "no scaling", which is the correct default for the
     // non-fitPage path where the sheet is sized to the content anyway.
     let k = 1;
+    // The fit is a FUNCTION OF THE EXTENT, and the extent is only final once routing
+    // has run, so it is a function and it is called at the end with the drawn
+    // geometry in hand. Solving it inline measured only the symbol boxes and left the
+    // routed linework outside the box entirely -- a line runs a hundred millimetres
+    // past the last nozzle it serves, and on a `fit page` sheet that overflow is
+    // invisible right up until it crosses the frame line.
+    let fitWarned = false;
+    const solveFit = (x0, y0, x1, y1) => {
+      // The DRAWABLE RECTANGLE, not the whole frame. `autoLayout` publishes
+      // `data.drawZone` — frame inset, the equipment schedule's band at the top, the
+      // title block's band at the bottom, the sheet margins at the sides — and the
+      // centring pass already works inside it. The fit used to re-centre across the
+      // whole frame instead, which is a second, different answer to the same
+      // question: it scaled a correctly-placed drawing and then pushed line labels
+      // up into the equipment schedule and the right-hand edge down into the title
+      // block. Measured on dense: the topmost run label printed inside the
+      // "P-1 CENTRIFUGAL PUMP" row of the schedule.
+      //
+      // Falls back to the frame if the zone is absent (a sheet that skipped
+      // `autoLayout` entirely), so this can never be the reason a sheet is empty.
+      const pad = 18;                    // == annotationsSvg frame inset
+      const Z = data.drawZone;
+      const rx0 = Z ? Z.x0 : pad, ry0 = Z ? Z.y0 : pad;
+      const rx1 = Z ? Z.x1 : W - pad, ry1 = Z ? Z.y1 : H - pad;
+      const dw = Math.max(rx1 - rx0, 1), dh = Math.max(ry1 - ry0, 1);
+      const cw = Math.max(x1 - x0, 1), ch = Math.max(y1 - y0, 1);
+      // One warning per render, and it names the dimension that is over. A sheet that
+      // is 4mm past a soft target and a sheet that is 200mm past the frame are not
+      // the same event and must not print the same sentence.
+      if (!fitWarned && (cw > dw || ch > dh)) {
+        fitWarned = true;
+        const over = [];
+        if (cw > dw) over.push(`width ${Math.round(cw)} > ${Math.round(dw)}`);
+        if (ch > dh) over.push(`height ${Math.round(ch)} > ${Math.round(dh)}`);
+        data.warnings.push(`[PID-LAY-001] drawing exceeds the drawable zone (${over.join(', ')}mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead`);
+      }
+      // Fill the zone in BOTH directions. The old `Math.min(1, ...)` meant a small
+      // drawing was never scaled up, so it sat at 63% W x 38% H forever while the
+      // sheet stayed blank around it -- every small sheet was under-filled by
+      // construction. Only overflow ever shrank, so `k <= 1` was the rule.
+      //
+      // Uniform scale is a SIMILARITY transform: it cannot create a collision or a
+      // crossing, only scale existing ones, so filling costs nothing in layout
+      // quality. Measured: unclamping moves the score by 0 on all six corpus cases.
+      //
+      // The clamp existed to stop TYPE inflating past its print size, and that
+      // concern is real -- but drawing scale and text height are independent in P&ID
+      // practice (ISO 5457: a 1:2 drawing with 2.5mm text is normal). So the geometry
+      // scales and `denormaliseText` below puts the type back to its nominal
+      // millimetres, which satisfies the print-size rule rather than trading it away.
+      //
+      // Sheet furniture is NOT affected: annotationsSvg() is emitted OUTSIDE this
+      // group (see the assembly), so the frame, title block, north arrow, legend and
+      // the equipment tag list all stay at 1:1 as intended.
+      //
+      // The two bounds are NOT the same rectangle, and that asymmetry is deliberate.
+      // VERTICALLY the zone is hard: the equipment schedule is a band across the top
+      // of the sheet and the title block a band along the bottom, and a drawing that
+      // runs under either is unreadable. HORIZONTALLY the zone is a preference and
+      // the frame is the bound: the extra 30mm a side is air, so a drawing too wide
+      // for the zone is better drawn 7% larger and centred into the side margins
+      // than shrunk to fit a target that is only a target. (9.61 already settled that
+      // the zone is a soft target for centring and not a hard bound; `manifold` is
+      // 836mm of content against a 768mm zone and shrinking it to fit cost a label
+      // collision for nothing.)
+      k = Math.min((W - 2 * pad) / cw, dh / ch);
+      // Centre the scaled content in the zone, do not anchor its top-left.
+      //
+      // This was throwing away the slack in one direction. `pad - minX*k` puts the
+      // content's minimum at the frame corner, so any drawing shorter than the sheet
+      // sat hard against the TOP with every spare millimetre dumped below it -- the
+      // demo had ~158mm of dead space along the bottom edge and a completely empty
+      // lower-left quadrant. It also silently discarded the centring `autoLayout`
+      // had already done, since that works in layout coordinates and the wrap
+      // re-anchors afterwards.
+      //
+      // Centring splits the slack evenly, which is what a drafter does by eye.
+      const tx = rx0 + (dw - cw * k) / 2 - x0 * k;
+      const ty = ry0 + (dh - ch * k) / 2 - y0 * k;
+      return `<g transform="translate(${tx} ${ty}) scale(${k})">`;
+    };
     if (view.fitPage) {
       // the sheet is a fixed 22x34in (559x864mm) drawing; content is laid out
       // inside it, and the whole sheet maps to the window
       W = view.sheetW || 864; H = view.sheetH || 559;
-      // MUST match the border frame inset that annotationsSvg draws (18). These were
-    // 10 and 18, which was invisible while k was clamped to <= 1 because the layout
-    // already held geometry inside SHEET (26). With k free to exceed 1 the content
-    // stretches to this inset, and at 10 it crossed the frame line. Fit to the frame.
-    const pad = 18;                    // == annotationsSvg frame inset
-      const cw = Math.max(maxX - minX, 1), ch = Math.max(maxY - minY, 1);
-      if (cw > W - 2 * pad || ch > H - 2 * pad) {
-        data.warnings.push(`[PID-LAY-001] content (${Math.round(cw)}x${Math.round(ch)}mm) exceeds sheet (${W}x${H}mm) — reduce scale or layout`);
-      }
-      // Fill the sheet in BOTH directions. The old `Math.min(1, ...)` meant a small
-// drawing was never scaled up, so it sat at 63% W x 38% H forever while the sheet
-// stayed blank around it -- every small sheet was under-filled by construction.
-// Only overflow ever shrank, so `k <= 1` was the rule and filling was not on the table.
-//
-// Uniform scale is a SIMILARITY transform: it cannot create a collision or a
-// crossing, only scale existing ones, so filling costs nothing in layout quality.
-// Measured: unclamping moves the score by 0 on all six corpus cases.
-//
-// The clamp existed to stop TYPE inflating past its print size, and that concern is
-// real -- but drawing scale and text height are independent in P&ID practice
-// (ISO 5457: a 1:2 drawing with 2.5mm text is normal). So the geometry scales and
-// `denormaliseText` below puts the type back to its nominal millimetres, which
-// satisfies the print-size rule rather than trading it away.
-//
-// Sheet furniture is NOT affected: annotationsSvg() is emitted OUTSIDE this group
-// (see the assembly), so the frame, title block, north arrow, legend and the
-// equipment tag list all stay at 1:1 as intended.
-k = Math.min((W - 2 * pad) / cw, (H - 2 * pad) / ch);
-      // Centre the scaled content in the drawable area, do not anchor its top-left.
-    //
-    // This was throwing away the slack in one direction. `pad - minX*k` puts the
-    // content's minimum at the frame corner, so any drawing shorter than the sheet sat
-    // hard against the TOP with every spare millimetre dumped below it -- the demo had
-    // ~158mm of dead space along the bottom edge and a completely empty lower-left
-    // quadrant. It also silently discarded the centring `autoLayout` had already done,
-    // since that works in layout coordinates and the wrap re-anchors afterwards.
-    //
-    // Centring splits the slack evenly, which is what a drafter does by eye.
-    const dw = W - 2 * pad, dh = H - 2 * pad;
-    const tx = pad + (dw - cw * k) / 2 - minX * k;
-    const ty = pad + (dh - ch * k) / 2 - minY * k;
-    wrap = `<g transform="translate(${tx} ${ty}) scale(${k})">`;
+      // provisional, so anything that needs `k` before routing finishes has a value;
+      // the post-routing call below overwrites it with the real one
+      wrap = solveFit(minX, minY, maxX, maxY);
     } else {
       W = maxX + 20; H = maxY + 20;
     }
@@ -1644,6 +1705,9 @@ const shiftFor = (lineIdx, x) => {
     const tagLineSegs = [];
     for (const gg of geometries) for (const sgm of PIDEngine.segs(gg.pts)) tagLineSegs.push({ sgm, gg });
     for (const t of tapGeos) for (const sgm of PIDEngine.segs(t.pts)) tagLineSegs.push({ sgm });
+    // Boxes for the line designations this pass just placed, so the equipment-tag
+    // placer below can avoid them. Empty until the loop above has run.
+    const lineLabelBoxes = [];
     for (const nz of (data.nozzles || [])) {
       if (!nz.tipPosition) continue;
       const orient = nz.orientation || 0;
@@ -1800,16 +1864,103 @@ const shiftFor = (lineIdx, x) => {
         if (!anchor) anchor = { x: lm.x, y: lm.y - off }; // crowded span: audit reports it
       }
       placedLabels.push(anchor);
+      // Recorded so equipment-tag placement below can see it. The line designation
+      // is drawn in this pass, before equipment, and a tag that lands on top of one
+      // is a collision the equipment placer would otherwise walk into blindly —
+      // measured on manifold, where P-1's "CENTRIFUGAL PUMP" ended up on the `4"`
+      // of the supply header.
+      lineLabelBoxes.push(ang
+        ? { x0: anchor.x - fs(2.6) * 0.718, x1: anchor.x + fs(2.6) * 0.718, y0: anchor.y - PIDText.widthMm(g.label, fs(2.6), false) / 2, y1: anchor.y + PIDText.widthMm(g.label, fs(2.6), false) / 2 }
+        : textBox(anchor.x, anchor.y, g.label, fs(2.6)));
       const lead = (Math.abs(anchor.x - lm.x) > 1 || Math.abs(anchor.y - lm.y) > 1)
         ? `<line x1="${lm.x}" y1="${lm.y}" x2="${anchor.x}" y2="${anchor.y}" stroke="#0D47A1" stroke-width="0.3" stroke-dasharray="2 2"/>` : '';
       pipesSvg += lead + `<text x="${anchor.x}" y="${anchor.y}" text-anchor="middle" font-size="${fs(2.6)}" font-style="italic" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3"${ang ? ` transform="rotate(${ang} ${anchor.x} ${anchor.y})"` : ''}>${esc(g.label)}</text>`;
     }
 
     // entity groups (chips optional; pipes are drawn above everything)
-    // ponytail: L2+L6 — nozzle boxes collected at emission (final tag coords),
+    // ponytail: L2+L6 - nozzle boxes collected at emission (final tag coords),
     // consumed by valve-stack flip below
     const nozzleBoxes = [];
     const eqBoxes = [];
+    // Nozzle tag boxes are needed BEFORE the equipment loop, because equipment
+    // placement tests its candidates against them (see `boxClutter`). The emission
+    // loop below fills the same array from the same expression, so the two cannot
+    // disagree — the coordinates come from the pre-pass that already ran
+    // (`nz.tagX` / `nz.tagY`), and this only records where the ink will land.
+    for (const nz of (data.nozzles || [])) {
+      if (view.hideLabels || !nz.id || !nz.tipPosition) continue;
+      const tagX = nz.tagX !== undefined ? nz.tagX : nz.tipPosition.x;
+      const tagY = nz.tagY !== undefined ? nz.tagY : nz.tipPosition.y;
+      nozzleBoxes.push(textBox(tagX, tagY, nz.id, fs(2.2)));
+      if (nz.size) nozzleBoxes.push(textBox(tagX, tagY + 4.5, nz.size, fs(1.8)));
+    }
+    const NOZZEL_BOXES_PRE = nozzleBoxes.length;
+    // ---- equipment annotation placement (new) -------------------------------
+    //
+    // The equipment tag used to be pinned at `e.y + s/2 + 3.5` — always directly
+    // under the symbol, always centred. That is exactly where a process line leaving
+    // a BOTTOM nozzle goes, so the tag was printed straight through the pipe. It is
+    // visible on the dense sheet at C-1 (the vertical run off the reboiler passes
+    // vertically through "C-1 / COLUMN"), and NOTHING reported it: the collision
+    // metric compares text with text, and the audit's line checks compare lines with
+    // symbol boxes. Label-over-linework had no check and no term, so the layout had
+    // no reason to avoid it and the drawing had no way to say so.
+    //
+    // Five candidate placements, in a drafter's order of preference, and the first
+    // one whose two text boxes are clear of every routed segment. Below is still
+    // first, so a sheet with no vertical run under a vessel is unchanged; what
+    // changes is that the tag now goes ABOVE or BESIDE the symbol instead of on top
+    // of the pipe. `hits` is the number of segments crossing a box, so a candidate
+    // that is nearly clear loses to one that is completely clear, and if nothing is
+    // clear the least-bad placement wins rather than an arbitrary one.
+    const lineSegs = [];
+    for (const gg of geometries) for (const sg of PIDEngine.segs(gg.pts)) lineSegs.push(sg);
+    for (const t of tapGeos) for (const sg of PIDEngine.segs(t.pts)) lineSegs.push(sg);
+    const boxLineHits = (b) => {
+      let n = 0;
+      for (const sg of lineSegs) {
+        // a hair of tolerance: a line that stops exactly on the box edge is a
+        // leader arriving at the label, not a line drawn through it
+        if (collide.segHitsRect(sg, b, -0.75)) n++;
+      }
+      return n;
+    };
+    // Clutter = linework PLUS the labels already placed PLUS the annotation ZONES of
+    // everything placed later. Testing only what has been emitted is not enough and
+    // the order of emission is arbitrary: the valve label stacks are drawn after the
+    // equipment tags, so an equipment tag has no way to see them, and measured on
+    // manifold, P-1's "CENTRIFUGAL PUMP" landed on the derived valve size `4"` of
+    // V-4, 1.8mm away. So the zones are declared up front — a valve's keep-out is its
+    // symbol plus the label stack that hangs below it, which is the same rule
+    // `passDecrowd` and `passInstruments` already use in the router. Order-independent
+    // beats order-correct, and this is the third time in this project that a pass
+    // discovered the previous pass's work and could not see it.
+    const LABEL_ZONE = ruleParam('layout.labelZone', 16);
+    const zones = [];
+    for (const v of valves) {
+      if (v.x == null) continue;
+      const h = PIDEngine.entitySize(v, SC) / 2;
+      zones.push({ x0: v.x - h, x1: v.x + h, y0: v.y - h, y1: v.y + h + LABEL_ZONE });
+    }
+    for (const i2 of instruments) {
+      if (i2.x == null) continue;
+      const h = sizeOf(i2) / 2;
+      zones.push({ x0: i2.x - h, x1: i2.x + h, y0: i2.y - h, y1: i2.y + h + LABEL_ZONE * ruleParam('layout.instLabelZone', 1) });
+    }
+    const boxClutter = (b) => {
+      let n = boxLineHits(b);
+      for (let i = 0; i < NOZZEL_BOXES_PRE; i++) if (collide.rectsHit(b, nozzleBoxes[i])) n++;
+      for (const q of eqBoxes) if (collide.rectsHit(b, q)) n++;
+      for (const q of lineLabelBoxes) if (collide.rectsHit(b, q)) n++;
+      for (const z of zones) if (collide.rectsHit(b, z)) n++;
+      return n;
+    };
+    const EQ_ANNOT = [
+      { side: 'below' }, { side: 'above' }, { side: 'left' }, { side: 'right' },
+      { side: 'below', far: true },
+    ];
+    const equipTagOnLine = [];
+    const valveStackOnLine = [];
     for (const e of equipment) {
       if (!shown(e, 'equipment')) continue;
       const s = sizeOf(e);
@@ -1818,12 +1969,47 @@ const shiftFor = (lineIdx, x) => {
       g += embedSymbol(glyphKeyOf(e), e.x, e.y, s, e.rotation);
       if (!view.hideLabels) {
         const tag = e.tag || e.id;
-        // tag below the equipment, close to the symbol
-        const ty = e.y + s / 2 + 3.5;
-        g += `<text x="${e.x}" y="${ty}" text-anchor="middle" font-size="${fs(3.2)}" font-weight="bold" fill="#111" text-decoration="underline" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-        eqBoxes.push(textBox(e.x, ty, tag, fs(3.2), true, true));
-        if (!e.noTypeLabel) g += `<text x="${e.x}" y="${ty + 5.5}" text-anchor="middle" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(TYPE_LABELS[e.type] || e.type)}</text>`;
-        if (!e.noTypeLabel) eqBoxes.push(textBox(e.x, ty + 5.5, TYPE_LABELS[e.type] || e.type, fs(2.8)));
+        const typeStr = e.noTypeLabel ? '' : (TYPE_LABELS[e.type] || e.type);
+        const fTag = fs(3.2), fType = fs(2.8);
+        const TYPE_OFF = 5.5;
+        // Every candidate returns `ty` = the TAG baseline and the two boxes, so the
+        // emission below is identical for all of them and only the placement varies.
+        const place = (c) => {
+          let cx = e.x, ty;
+          if (c.side === 'below') {
+            ty = e.y + s / 2 + 3.5 + (c.far ? ruleParam('layout.equipTagFar', 26) : 0);
+          } else if (c.side === 'above') {
+            // the TYPE line is the one nearest the symbol when the block hangs above
+            ty = e.y - s / 2 - 3.5 - (typeStr ? TYPE_OFF : 0);
+          } else {
+            const halfTag = tag ? textBox(0, 0, tag, fTag, true, true).x1 : 0;
+            const halfType = typeStr ? textBox(0, 0, typeStr, fType, true).x1 : 0;
+            const off = s / 2 + Math.max(halfTag, halfType) + 4;
+            cx = c.side === 'left' ? e.x - off : e.x + off;
+            ty = e.y - (typeStr ? TYPE_OFF / 2 : 0);
+          }
+          return {
+            cx, ty,
+            tag: textBox(cx, ty, tag, fTag, true, true),
+            type: typeStr ? textBox(cx, ty + TYPE_OFF, typeStr, fType) : null,
+          };
+        };
+        let best = null, bestHits = Infinity;
+        for (const c of EQ_ANNOT) {
+          const p = place(c);
+          const hits = boxClutter(p.tag) + (p.type ? boxClutter(p.type) : 0);
+          if (hits < bestHits) { bestHits = hits; best = p; }
+          if (hits === 0) break;             // preference order wins ties
+        }
+        const ty = best.ty, cx = best.cx;
+        g += `<text x="${cx}" y="${ty}" text-anchor="middle" font-size="${fTag}" font-weight="bold" fill="#111" text-decoration="underline" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
+        eqBoxes.push(best.tag);
+        if (typeStr) g += `<text x="${cx}" y="${ty + TYPE_OFF}" text-anchor="middle" font-size="${fType}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeStr)}</text>`;
+        if (best.type) eqBoxes.push(best.type);
+        // counted, not just avoided: a sheet where nothing fits is worth saying out loud
+        if (bestHits > 0) {
+          equipTagOnLine.push(`${e.id} (${bestHits})`);
+        }
       }
       body += `<g data-pid-id="${e.id}" class="ly-equipment">${g}</g>`;
     }
@@ -1860,9 +2046,10 @@ const shiftFor = (lineIdx, x) => {
           const tagX = nz.tagX !== undefined ? nz.tagX : nz.tipPosition.x;
           const tagY = nz.tagY !== undefined ? nz.tagY : nz.tipPosition.y;
           body += `<text x="${tagX}" y="${tagY}" text-anchor="middle" font-size="${fs(2.2)}" fill="#444" paint-order="stroke" stroke="white" stroke-width="2">${esc(nz.id)}</text>`;
-          nozzleBoxes.push(textBox(tagX, tagY, nz.id, fs(2.2)));
+          // boxes already recorded in the pre-pass above (equipment placement needs
+          // them before this loop runs); pushing again would double them and make
+          // every nozzle box "clutter" for the next tag
           if (nz.size) body += `<text x="${tagX}" y="${tagY + 4.5}" text-anchor="middle" font-size="${fs(1.8)}" fill="#888" paint-order="stroke" stroke="white" stroke-width="2">${esc(nz.size)}</text>`;
-          if (nz.size) nozzleBoxes.push(textBox(tagX, tagY + 4.5, nz.size, fs(1.8)));
         }
       }
     }
@@ -1906,35 +2093,71 @@ const shiftFor = (lineIdx, x) => {
             ? { x0: fx - w, x1: fx, y0: b.y0, y1: b.y1 }
             : { x0: fx, x1: fx + w, y0: b.y0, y1: b.y1 };
         });
-        const zones = [...nozzleBoxes, ...eqBoxes];
-        const hits = (boxes) => boxes.reduce((n, b) => n + zones.filter(z => collide.rectsHit(b, z)).length, 0);
-        // ponytail: L2 — flip only into something clearer (below is legacy;
-        // above must strictly win, else the flip just moves the pile)
-        let flip = false;
-        if (!vertical) {
-          const ty2 = v.y - s / 2 - 3.5;
-          flip = hits(stackBoxes(tx, ty, true, 1)) > 0 && hits(stackBoxes(tx, ty2, true, -1)) < hits(stackBoxes(tx, ty, true, 1));
-        } else {
-          const tx2 = v.x - s / 2 - 3;
-          flip = hits(stackBoxes(tx, ty, false, 1)) > 0 && hits(stackBoxes(tx2, ty, false, -1)) < hits(stackBoxes(tx, ty, false, 1));
+        // A valve stack competes for the same paper as everything else, and for a
+        // long time it only competed with NOZZLE and EQUIPMENT boxes — never with
+        // linework. So a valve on a riser printed "CONTROL VALVE" straight through
+        // the process line it sits on, and the flip had nothing to flip away from:
+        // measured on dense, FV-1's stack runs down the P-1 discharge riser.
+        // Linework is in the test now.
+        //
+        // Four candidates rather than two, in a drafter's order — the legacy
+        // position FIRST, so an uncluttered sheet is byte-identical — and the first
+        // with ZERO hits wins. Two positions were never enough: a valve below a
+        // valve and a valve above a valve can both be blocked while left and right
+        // are free, and the old code had no way to say so.
+        //
+        // The sideways pair is a LAST resort and it is not free. Measured on the
+        // demo: letting a stack move sideways cleared enough label collisions for a
+        // much emptier layout (util 48% -> 28%) to win the search, because the fill
+        // term buys sheet area with crossings and this removed the crossings that
+        // were paying for it. So it is a rule, and the rule is off by default:
+        // `annotation.valveStackSides`. Turn it on for a sheet where two labels
+        // genuinely cannot stack, and the log's own argument applies — the score
+        // will trade the fill it should have had for labels it should not have had.
+        //
+        // One emitter for all candidates. There were four near-identical copies of
+        // this block, and they had already drifted: the vertical "flip" case computed
+        // its collision boxes with the rows going UP (`dir: -1`) and then DREW them
+        // going down (`ty + 5.5`), so the flip was chosen against a box the text
+        // never occupied. `dir` now means the same thing to the box and the emitter.
+        const stackZones = [...nozzleBoxes, ...eqBoxes, ...lineLabelBoxes, ...zones];
+        const stackHits = (boxes) => {
+          let n = 0;
+          for (const b of boxes) {
+            n += boxLineHits(b);
+            for (const z of stackZones) if (collide.rectsHit(b, z)) n++;
+          }
+          return n;
+        };
+        const cands = vertical
+          ? [{ fx: v.x + s / 2 + 3, fy: v.y + 1, mid: false, dir: 1 },
+             { fx: v.x - s / 2 - 3, fy: v.y + 1, mid: false, dir: -1 }]
+          : (ruleParam('annotation.valveStackSides', 1)
+            ? [{ fx: v.x, fy: v.y + s / 2 + 3.5, mid: true, dir: 1 },
+               { fx: v.x, fy: v.y - s / 2 - 3.5, mid: true, dir: -1 },
+               { fx: v.x + s / 2 + 3, fy: v.y, mid: false, dir: 1 },
+               { fx: v.x - s / 2 - 3, fy: v.y, mid: false, dir: -1 }]
+            : [{ fx: v.x, fy: v.y + s / 2 + 3.5, mid: true, dir: 1 },
+               { fx: v.x, fy: v.y - s / 2 - 3.5, mid: true, dir: -1 }]);
+        let chosen = cands[0], chosenHits = Infinity;
+        for (const c of cands) {
+          const h = stackHits(stackBoxes(c.fx, c.fy, c.mid, c.dir));
+          if (h < chosenHits) { chosenHits = h; chosen = c; }
+          if (h === 0) break;
         }
-        if (!vertical && flip) {
-          const ty2 = v.y - s / 2 - 3.5;
-          g += `<text x="${tx}" y="${ty2}" text-anchor="middle" font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-          if (!v.noTypeLabel) g += `<text x="${tx}" y="${ty2 - 5.5}" text-anchor="middle" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
-          if (state) g += `<text x="${tx}" y="${ty2 - 10.5}" text-anchor="middle" font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
-          if (sizeLabel) g += `<text x="${tx}" y="${ty2 - 15.5}" text-anchor="middle" font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
-        } else if (vertical && flip) {
-          const tx2 = v.x - s / 2 - 3;
-          g += `<text x="${tx2}" y="${ty}" text-anchor="end" font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-          if (!v.noTypeLabel) g += `<text x="${tx2}" y="${ty + 5.5}" text-anchor="end" font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
-          if (state) g += `<text x="${tx2}" y="${ty + 10.5}" text-anchor="end" font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
-          if (sizeLabel) g += `<text x="${tx2}" y="${ty + 15.5}" text-anchor="end" font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
-        } else {
-          g += `<text x="${tx}" y="${ty}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(3.0)}" font-weight="bold" fill="#111" paint-order="stroke" stroke="white" stroke-width="3">${esc(tag)}</text>`;
-          if (!v.noTypeLabel) g += `<text x="${tx}" y="${ty + 5.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.8)}" fill="#666" paint-order="stroke" stroke="white" stroke-width="3">${esc(typeLabel)}</text>`;
-          if (state) g += `<text x="${tx}" y="${ty + 10.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.3)}" fill="#555" paint-order="stroke" stroke="white" stroke-width="3">${esc(state)}</text>`;
-          if (sizeLabel) g += `<text x="${tx}" y="${ty + 15.5}" ${vertical ? '' : 'text-anchor="middle"'} font-size="${fs(2.3)}" fill="#0D47A1" paint-order="stroke" stroke="white" stroke-width="3">${esc(sizeLabel)}</text>`;
+        if (chosenHits > 0) valveStackOnLine.push(`${v.id} (${chosenHits})`);
+        // ONE emitter, driven by the same (fx, fy, mid, dir) the boxes were built
+        // from, so the tested box and the drawn text cannot disagree.
+        {
+          const { fx, fy, mid, dir } = chosen;
+          const anchor = mid ? ' text-anchor="middle"' : ' text-anchor="end"';
+          const row = (o, str, size, fill) => str
+            ? `<text x="${fx}" y="${(fy + dir * o).toFixed(2)}"${anchor} font-size="${size}"${fill === 'b' ? ' font-weight="bold"' : ''} fill="${fill === 'b' ? '#111' : fill === 's' ? '#555' : fill === 'z' ? '#0D47A1' : '#666'}" paint-order="stroke" stroke="white" stroke-width="3">${esc(str)}</text>`
+            : '';
+          g += row(0, tag, fs(3.0), 'b');
+          if (!v.noTypeLabel) g += row(5.5, typeLabel, fs(2.8), 'g');
+          if (state) g += row(10.5, state, fs(2.3), 's');
+          if (sizeLabel) g += row(15.5, sizeLabel, fs(2.3), 'z');
         }
       }
       body += `<g data-pid-id="${v.id}" class="ly-valve">${g}</g>`;
@@ -2108,7 +2331,40 @@ const shiftFor = (lineIdx, x) => {
     }
   }
 
-    // put the type back to nominal size now that the geometry has been scaled to fill
+  // Re-solve the fit now that the ROUTES and the ANNOTATIONS exist. `solveFit` is
+  // called a second time here, against the union of the symbol extent, every routed
+  // vertex and every annotation box, and the wrap is replaced.
+  //
+  // This is the difference between "the symbols fit" and "the drawing fits". A line
+  // leaves the last nozzle on the sheet and runs to a partner; a tap leader reaches
+  // sideways to find a bubble; a line designation stands 14mm off its run. None of
+  // that is inside a symbol box, and on `fit page` the old inline solve never saw any
+  // of it, so the sheet was scaled to the symbols and everything else was allowed to
+  // walk out — in one measured case a line designation printed inside the equipment
+  // schedule along the top edge, because the fit had no idea the annotation existed.
+  //
+  // The routes and the boxes are in content coordinates, unscaled, so this is the
+  // same space the provisional solve used. Re-solving is exact, not iterative: `k`
+  // is a similarity and uniform scaling does not change which points are extreme.
+  if (view.fitPage) {
+    let rx0 = minX, ry0 = minY, rx1 = maxX, ry1 = maxY;
+    const eat = (x, y) => {
+      if (x == null || y == null) return;
+      if (x < rx0) rx0 = x; if (x > rx1) rx1 = x;
+      if (y < ry0) ry0 = y; if (y > ry1) ry1 = y;
+    };
+    const eatBox = (b) => { if (b) { eat(b.x0, b.y0); eat(b.x1, b.y1); } };
+    for (const g of geometries) for (const q of (g.pts || [])) eat(q.x, q.y);
+    for (const t of tapGeos) for (const q of (t.pts || [])) eat(q.x, q.y);
+    for (const b of lineLabelBoxes) eatBox(b);
+    for (const b of nozzleBoxes) eatBox(b);
+    for (const b of eqBoxes) eatBox(b);
+    // a pipe stroke is 1.4mm and a leader 2.5mm; half of the widest, so the ink is
+    // inside the box rather than its centreline
+    const hw = ruleParam('routing.processWidth', 1.4) / 2;
+    wrap = solveFit(rx0 - hw, ry0 - hw, rx1 + hw, ry1 + hw);
+  }
+  // put the type back to nominal size now that the geometry has been scaled to fill
   const dn = denormaliseText(body, k);
   body = dn.body;
   if (dn.n || dn.skipped) {
@@ -2336,6 +2592,42 @@ const shiftFor = (lineIdx, x) => {
   const fillGap = entCount >= FILL_ENT_MIN
     ? Math.max(0, FILL_TARGET - utilArea) : 0;
   const fill = Math.round(fillGap * 100) / 100;
+  // ---- label-over-linework: the check that was missing entirely -------------
+  //
+  // An equipment tag, a valve label stack, a nozzle tag or a line designation
+  // printed straight through a process line is one of the most obvious things a
+  // P&ID can get wrong, and this project had no metric and no check for it: the
+  // collision term compares text with TEXT, and the audit's line checks compare
+  // lines with SYMBOL BOXES. Nothing looked at text against linework, so the drawing
+  // could do it silently and the score could not see it. Measured on the dense
+  // sheet before this pass: C-1's tag sat on the vertical run off the reboiler and
+  // FV-1's "CONTROL VALVE" stack ran down the P-1 discharge riser.
+  //
+  // Counted over EVERY text run in the finished sheet, not just the two placers that
+  // were taught to avoid it, because the two numbers disagreed and the honest answer
+  // is the larger one: the audit's independent item [15] found 23 on spike where the
+  // placers reported 1. A guard that only knows about the cases it was written for
+  // is not a guard, and the difference between 1 and 23 is exactly the size of that
+  // blind spot.
+  //
+  // Measured once, from the same boxes the collision term uses, so the engine and the
+  // audit answer the same question. `audit [15]` is the independent check and
+  // excludes nozzle leaders (a nozzle tag belongs on its own nozzle).
+  {
+    const all = pidTextBoxes(svg.innerHTML || '');
+    const hits = [];
+    for (const b of all) {
+      let n = 0;
+      for (const sg of lineSegs) if (collide.segHitsRect(sg, b, -ruleParam('annotation.labelOnLineTol', 0.75))) n++;
+      if (n) hits.push(`${b.t} x${n}`);
+    }
+    data.labelOnLine = hits.length;
+    if (hits.length) {
+      data.warnings.push(
+        `[PID-ANN-001] ${hits.length} label(s) are drawn over process linework: ${hits.slice(0, 6).join(', ')}${hits.length > 6 ? `, +${hits.length - 6} more` : ''}. A label on a pipe is unreadable; audit item [15] names all of them.`);
+    }
+  }
+
   // ---- breach tier ------------------------------------------------------
   // Violations the validator reports were invisible to the objective: a warning
   // cost `SW.warn` (5), which is less than a fifth of a 24-point fill preference,
@@ -2727,6 +3019,22 @@ window.PIDGenerator = {
       const rowsAlt = ruleParam('layout.rowSpacingAlt', 220);
       const rowsAlt2 = ruleParam('layout.rowSpacingAlt2', 300);
       const rowSeps = [...new Set([rowsBase, rowsAlt, rowsAlt2])].sort((a, b) => a - b);
+      // Column-pitch cap as a fourth search dimension. `COL = availW/numCols`
+      // always spreads the chain across the full sheet, so the drawing is as WIDE as
+      // the sheet allows and as SHORT as the topology allows -- the aspect is a
+      // property of the process, not a choice. Capping the pitch trades width for
+      // height and lets the fit scale enlarge the result, which is how a drafter
+      // uses a big sheet: draw bigger, not stretch.
+      //
+      // It was refuted once (9.68) and the refutation was correct AT THE TIME: with
+      // the fit broken, a capped chain came out smaller overall rather than larger.
+      // The fit no longer includes the origin in the content box and solves against
+      // the routed geometry, so "smaller" and "larger" now mean what they say. It is
+      // a CANDIDATE and not a new score term, for the reason 9.66 established: the
+      // corpus genuinely splits on it (spike 943 -> 838 at 110mm, manifold
+      // 324 -> 373; at 90mm the reverse), and no single value is right for both.
+      const colBase = ruleParam('layout.colMax', 0), colAlt = ruleParam('layout.colMaxAlt', 110);
+      const colCaps = doCoord && colAlt !== colBase ? [colBase, colAlt] : [colBase];
 
       const orders = ruleParam('layout.orderSearch', 1)
         ? PID_LAYOUT_ORDERS.slice(0, Math.max(1, ruleParam('layout.orderCandidates', 3)))
@@ -2736,7 +3044,8 @@ window.PIDGenerator = {
         for (const sw of sweeps) {
           for (const sep of seps) {
             for (const rs of rowSeps) {
-            const data = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep, rowSpacing: rs });
+            for (const cm of colCaps) {
+            const data = PID_PARSER.parse(source, { layoutOrder: ord, coordIters: sw, minSep: sep, rowSpacing: rs, colMax: cm });
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('id', containerId + '-svg');
             svg.setAttribute('role', 'img');
@@ -2745,9 +3054,10 @@ window.PIDGenerator = {
             // restored below (see the note at the restore site)
             const geo = window.__pidGeo;
             if (!bestOrder || score.total < bestOrder.score.total) {
-              bestOrder = { ord, sw, sep, rs, svg, data, score, geo };
+              bestOrder = { ord, sw, sep, rs, cm, svg, data, score, geo };
             }
             }
+          }
           }
         }
       }
@@ -2985,7 +3295,78 @@ window.PIDGenerator = {
       lines.push(l);
     }
     return lines.join('\n');
-  }
+  },
+
+    // ---- symbol test surface ------------------------------------------------
+    // Exposes the geometry the SHEET RENDERER actually uses, so a test page can draw
+    // symbols through the real path instead of re-implementing it.
+    //
+    // This exists because of a specific failure. audit-symbols.mjs re-derived the port
+    // mapping by hand, used a formula valid only for a square viewBox, and reported 26
+    // confident phantom findings -- and separately omitted the viewBox origin on both
+    // sides of a comparison. Two copies of the geometry, two wrong answers. A test page
+    // with its own drawing code would have been a third copy, and it would have graded
+    // itself. So the page asks the renderer what it does rather than guessing.
+    //
+    // Returns the drawn markup plus every derived position IN RENDER UNITS (1 unit =
+    // 1mm), centred on (0,0) so the caller can place it wherever it likes. Overlays --
+    // extents, labelAnchor, the 5mm grid -- are deliberately NOT drawn here: those are
+    // the test page's business, and mixing them in here would make this a second audit.
+    symbolGeometry(key, size) {
+      const sym = (typeof window !== 'undefined' && window.PID_SYMBOLS && window.PID_SYMBOLS[key]) || {};
+      const vb = PIDEngine.symbolViewBox(key);
+      // No SC here: sizeOf() closed over it from inside the render function, so it is
+      // not visible at module level. Default to the NOMINAL size and let the caller
+      // pass the scale it wants.
+      const s = size || sym.size;
+      const off = (conn) => {
+        const o = PIDEngine.portOffset(key, conn, s);
+        return { x: o.x, y: o.y };
+      };
+      const glyph = typeof glyphSvg === 'function' ? glyphSvg(key) : '';
+      return {
+        key,
+        size: s,
+        viewBox: vb || null,
+        markup: glyph ? embedSymbolRaw(glyph, 0, 0, s, 0) : '',
+        // dx/dy are the offset in RENDER mm from the placed centre; pctX/pctY are the
+        // declared percentage in the glyph. Deliberately NOT merged: they are different
+        // quantities, and overwriting one with the other loses the declaration entirely.
+        ports: (sym.ports || []).map((p) => {
+          const o = off(p);
+          return Object.assign({}, p, { pctX: p.x, pctY: p.y, dx: o.x, dy: o.y });
+        }),
+        anchor: sym.anchor ? (() => {
+          const o = off(sym.anchor);
+          return { pctX: sym.anchor.x, pctY: sym.anchor.y, dx: o.x, dy: o.y };
+        })() : null,
+        extents: sym.extents || null,
+        labelAnchor: sym.labelAnchor || null,
+        flowAxis: sym.flowAxis == null ? null : sym.flowAxis,
+        behavior: sym.behavior || null,
+        standard: sym.standard || null,
+      };
+    },
+
+    // Drawn size of a glyph once the uniform scale and letterbox centring are applied.
+    // SYM-ASPECT is really a question about this number: a non-square viewBox is not
+    // distorted, it just does not fill its nominal box.
+    symbolDrawnSize(key, size) {
+      const sym = (typeof window !== 'undefined' && window.PID_SYMBOLS && window.PID_SYMBOLS[key]) || {};
+      const vb = PIDEngine.symbolViewBox(key);
+      // No SC here: sizeOf() closed over it from inside the render function, so it is
+      // not visible at module level. Default to the NOMINAL size and let the caller
+      // pass the scale it wants.
+      const s = size || sym.size;
+      if (!vb) return { w: s, h: s, fill: 1, letterboxed: false };
+      const k = Math.min(s / vb.w, s / vb.h);
+      const w = vb.w * k, h = vb.h * k;
+      return {
+        w, h,
+        fill: (w * h) / (s * s),
+        letterboxed: Math.abs(vb.w - vb.h) > 0.01,
+      };
+    },
 };
 
 

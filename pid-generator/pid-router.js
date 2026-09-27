@@ -130,7 +130,7 @@ function autoLayout(data) {
   // Without the cap COL = availW/numCols always spreads to the FULL width, which is
   // exactly why `layout.colSpacing` was a dead rule (9.66: byte-identical over a
   // 140->40mm sweep). BASE_COL was only ever a floor for the wrapped case.
-  const colMaxRule = ruleParam('layout.colMax', 0);
+  const colMaxRule = PID_COL_MAX !== null && PID_COL_MAX !== undefined ? PID_COL_MAX : ruleParam('layout.colMax', 0);
   const colSpread = availW / Math.max(numCols, 1);
   const COL = colMaxRule > 0
     ? Math.min(colSpread, colMaxRule)
@@ -954,18 +954,41 @@ function autoLayout(data) {
   })();
   data.equipList = eqList;
 
-  if (ruleParam('layout.centre', 1)) {
-    const FRAME = 18;                 // border frame inset
-    const BOT_RESERVE = ruleParam('layout.centreBottomReserve', 60); // title block band
-    // Target zone, shared by centring and the fill scale below. Declared out here
-    // so both blocks can use it.
-    const SW = data.view.sheetW || 864, SH = data.view.sheetH || 559;
-    const zx0 = FRAME + ruleParam('layout.xMargin', 60) * 0.5;
-    const zx1 = SW - FRAME - ruleParam('layout.xMargin', 60) * 0.5;
+  data.equipList = eqList;
+
+  // ---- the drawing zone: ONE rectangle, published for every consumer ---------
+  //
+  // "Where does the drawing go on this sheet" has to have exactly one answer. The
+  // frame inset, the equipment schedule's band across the top, the title block's
+  // band along the bottom and the sheet margins at the sides all reduce to a
+  // rectangle, and three passes were each computing a different version of it.
+  //
+  // The one that hurt was the render-time fit, which knew only about the frame and
+  // re-centred the content across the WHOLE of it. So a drawing could sit correctly
+  // inside the layout's zone and then be scaled and re-anchored straight through
+  // the equipment schedule at the top, with a line designation landing in the list
+  // (measured: dense's topmost run label printed inside the "P-1 CENTRIFUGAL PUMP"
+  // row), and the title block at the bottom. 9.70 fixed the anchor direction and
+  // said the right thing in passing — "it also silently discards the centring
+  // autoLayout had already done" — and this is the rest of that sentence.
+  //
+  // Published unconditionally, before the `centre` check, because the fit needs it
+  // on sheets where centring is skipped (pinned placements) just as much.
+  const FRAME = 18;                 // border frame inset == annotationsSvg's
+  const BOT_RESERVE = ruleParam('layout.centreBottomReserve', 60); // title block band
+  const ZSW = data.view.sheetW || 864, ZSH = data.view.sheetH || 559;
+  data.drawZone = {
+    x0: FRAME + ruleParam('layout.xMargin', 60) * 0.5,
+    x1: ZSW - FRAME - ruleParam('layout.xMargin', 60) * 0.5,
     // headroom for the instrument tier, PLUS whatever the equipment schedule reserves.
     // Without this the list and the drawing would share the same band.
-    const zy0 = FRAME + 24 + (eqList ? eqList.height : 0);
-    const zy1 = SH - FRAME - BOT_RESERVE;      // clear of the title block
+    y0: FRAME + 24 + (eqList ? eqList.height : 0),
+    y1: ZSH - FRAME - BOT_RESERVE,      // clear of the title block
+    frame: FRAME, bottomReserve: BOT_RESERVE, equipListH: eqList ? eqList.height : 0,
+  };
+
+  if (ruleParam('layout.centre', 1)) {
+    const { x0: zx0, x1: zx1, y0: zy0, y1: zy1 } = data.drawZone;
     // Absolute `at` coordinates are the drafter's layout, not the engine's.
     // Centring would fight them — and worse, if only the auto items moved, it
     // would tear valves and instruments away from the equipment they were placed

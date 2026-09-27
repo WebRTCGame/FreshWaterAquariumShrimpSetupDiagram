@@ -14,6 +14,11 @@
 // opts block only creates the global lazily -- after the set site has already run.
 // The router reads this in preference to ruleParam('layout.rowSpacing').
 var PID_ROW_SPACING = null;
+// Per-candidate column-pitch cap, same shape and same reason as PID_ROW_SPACING: a
+// bare assignment in the opts block would only create the global lazily, after the
+// set site has already run. The router reads this in preference to
+// ruleParam('layout.colMax').
+var PID_COL_MAX = null;
 
 var PIDEngine = {
   /** Distance between two {x,y} points. */
@@ -161,7 +166,25 @@ var PIDEngine = {
     const s = Math.min(size / vb.w, size / vb.h);
     if (!isFinite(s) || s <= 0) return naive;
     const ox = (size - vb.w * s) / 2, oy = (size - vb.h * s) / 2;
-    const vx = vb.x + (conn.x / 100) * vb.w, vy = vb.y + (conn.y / 100) * vb.h;
+    // The viewBox origin is CANCELLED by the viewport mapping, not carried through it.
+    // A glyph drawn as <svg x=cx-s/2 y=cy-s/2 width=s height=s viewBox="X Y W H"> maps a
+    // viewBox point (vx,vy) to ox + (vx - X)*s -- so the term is (vx - vb.x)*s, and adding
+    // vb.x as well displaces every port and the anchor by (vb.x*s, vb.y*s).
+    //
+    // It was written with `ox + vx * s`, which double-counts the origin. The visible cost
+    // looked near-zero because 199 of 201 symbols have a viewBox at the origin, so the term
+    // vanishes -- and because audit-symbols.mjs, the check that tracks this, was itself
+    // mis-specified and could not see it. The two symbols that do carry an origin were
+    // displaced by the full amount:
+    //   isa-5.1/valves/relief-safety      2.41mm  (viewBox 24 -24.33 52x141.997)
+    //   y32.11-1961/furnaces/box-furnace  6.16mm  (viewBox 9 -4 112x110)
+    //
+    // The note above warned this correction must not be made in isolation, alongside
+    // re-tuning the grid and lead-in constants. That warning was about coupling: those
+    // constants were calibrated against the WRONG port positions, so they are now
+    // calibrated against a bug and will need revisiting. With only 2 symbols affected the
+    // coupling is small and measurable, which is the condition the note asked for.
+    const vx = (conn.x / 100) * vb.w, vy = (conn.y / 100) * vb.h;
     return { x: ox + vx * s - size / 2, y: oy + vy * s - size / 2 };
   },
 
@@ -567,10 +590,12 @@ throw new Error(`pid parser: unrecognized line "${line}"`);
   // router needs a per-candidate value and ruleParam is global, so the option is
   // carried on a module-level override the router reads in preference to the rule.
     if (opts && opts.rowSpacing !== undefined) PID_ROW_SPACING = opts.rowSpacing;
+    if (opts && opts.colMax !== undefined) PID_COL_MAX = opts.colMax;
       autoLayout(data);
       PID_COORD_ITERS = null;
       PID_MIN_SEP = null;
   PID_ROW_SPACING = null;   // per-candidate row pitch override; see the note at the set site
+  PID_COL_MAX = null;       // per-candidate column-pitch cap; same
     }
     // sheet clamp: nothing may sit outside the drawn border (runs after autoLayout,
     // which re-resolves relative placements)

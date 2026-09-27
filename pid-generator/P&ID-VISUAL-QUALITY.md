@@ -3736,3 +3736,203 @@ than latent.
   target.
 - Untouched: legend (F7), text-size consolidation (see 9.50), signal pricing (F4),
   sheet constants (item 7), richer demo (item 8), symbol conformance (D8).
+
+### 9.73 The fit was fitting the wrong box, and half the sheet was not being drawn on
+
+Picked up after 9.72. Four defects, all found by looking at renders rather than at
+scores, and three of them are the same mistake wearing different clothes: **two
+passes with two different ideas of where the drawing lives.**
+
+#### 1. `fit page` was scaling to a box a third bigger than the drawing
+
+```js
+minX = Math.min(minX, 0); minY = Math.min(minY, 0);
+```
+
+The origin was in the content box. It has to be, for the CONTENT-SIZED path, where
+the viewBox starts at 0 and the drawing starts at 0. Under `fit page` there is no
+reason at all — the sheet is fixed and the layout never draws near the origin:
+
+```
+  dense    entities run  x 220..645  y 145..365
+           content box was measured  x 0..655     <- 220mm of nothing
+           k came out 1.19;  the drawing's own extent gives 1.80
+```
+
+A uniform scale is a similarity transform, so it cannot affect layout quality —
+which means every one of those 220 millimetres was handed straight back to the
+sheet as blank margin. The fix is one line and the condition it lives under, and the
+cause is worth stating because it is the third time in this log that a *pass* threw
+away a *previous pass's* answer:
+
+> 9.70 fixed the anchor direction and said the right thing in passing — "it also
+> silently discards the centring `autoLayout` had already done" — and this is the
+> rest of that sentence.
+
+#### 2. The fit solved before the drawing existed
+
+`solveFit` ran inline, above the body assembly, so it could only see SYMBOL boxes. A
+line leaves the last nozzle on the sheet and runs to a partner; a tap leader reaches
+sideways to find a bubble; a line designation stands 14mm off its run. None of that
+is inside a symbol box.
+
+The fit is now a **function**, called once provisionally and again after routing and
+annotation, against the union of the symbol extent, every routed vertex and every
+annotation box. Re-solving is exact rather than iterative: `k` is a similarity, and
+uniform scaling cannot change which points are extreme relative to the box.
+
+Dense went from `k = 1.19` to `k = 1.65` with the score **unchanged at 445** — which
+is the similarity argument, measured rather than asserted.
+
+#### 3. The zone, and the fact that it is not a rectangle
+
+`autoLayout` has always known where the drawing goes — `FRAME + 24 + equipList` at
+the top, `BOT_RESERVE` at the bottom, `xMargin/2` at the sides. The fit knew only
+about the frame. So the drawing was correctly placed inside the layout's zone, then
+scaled and re-anchored straight through the equipment schedule: **dense's topmost
+line designation printed inside the `P-1 CENTRIFUGAL PUMP` row of the schedule.**
+
+`data.drawZone` is now published, before the `centre` check so a pinned sheet gets
+it too, and both passes use it. The one subtlety worth keeping:
+
+> VERTICALLY the zone is hard — the equipment schedule is a band across the top of
+> the sheet and the title block a band along the bottom, and a drawing that runs
+> under either is unreadable. HORIZONTALLY the zone is a preference and the frame is
+> the bound: the extra 30mm a side is air.
+
+`manifold` is 836mm of content against a 768mm zone, and shrinking it to fit cost a
+label collision for nothing (measured both ways). 9.61 already settled that the zone
+is a soft target for centring and not a hard bound; this is that, applied.
+
+#### 4. A label printed through a pipe, and NOBODY was looking
+
+`C-1` on the dense sheet had its tag sitting on the vertical run off the reboiler.
+`FV-1` had its `CONTROL VALVE` stack running down the P-1 discharge riser. Both are
+among the most obvious things a P&ID can get wrong, and this project had:
+
+| check | compares | so it could not see |
+|---|---|---|
+| `labelCollisions` | text with text | text on a line |
+| audit `[5]` | line with symbol box | a line crossing a label |
+| audit `[3]` | line with line | — |
+
+Nothing in the objective or the audit compared **text against linework**. So the
+drawing could do it silently, the layout had no reason to avoid it, and no metric
+moved when it was fixed.
+
+Both placers now test linework as well as the other labels, and pick from a ladder
+in a drafter's order — legacy position first, so an uncluttered sheet is
+byte-identical:
+
+- **equipment tag**: below, above, left, right, and a last-resort "further below".
+- **valve stack**: below, above, and (new) left, right.
+
+`boxClutter` counts linework PLUS everything already placed PLUS the annotation
+*zones* of everything placed later — a valve's keep-out is its symbol plus the label
+stack that hangs below it, which is the rule the router already uses. Order-correct
+was not enough: the valve stacks are emitted after the equipment tags, so an
+equipment tag could not see them, and on `manifold` `P-1`'s `CENTRIFUGAL PUMP` landed
+on the derived valve size `4"` of `V-4`, 1.8mm away. This is the **third** time in
+this project that a pass discovered the previous pass's work and could not see it.
+
+The valve ladder also deleted four near-identical copies of the emit block, and the
+copies had already drifted: the vertical "flip" case computed its collision boxes
+with the rows going **up** (`dir: -1`) and then **drew** them going down
+(`ty + 5.5`), so the flip was chosen against a box the text never occupied. `dir`
+now means the same thing to the box and to the emitter.
+
+#### The sideways positions are not free, and the price is stated
+
+`annotation.valveStackSides` is **on**, and the measurement is not one-sided:
+
+```
+  sides off   demo 421 (util 48%)   dense 505 (2 label collisions)   sum 2357
+  sides on    demo 464 (util 28%)   dense 445 (0 label collisions)   sum 2235
+```
+
+A stack that can move sideways clears enough collisions for a much **emptier**
+layout to win the search. Taken, on the same grounds as 9.71 — "legibility beat the
+fill number" — and for the same reason: overlapping labels look broken, an empty
+sheet does not. Off restores the two-position flip exactly, and the flag is in the
+registry so the trade is a decision rather than an accident.
+
+I did try to get both. Raising `fill` to 700 / 1000 / 1500 changed **nothing** on any
+sheet, which is the more useful result: the search is **saturated**, not
+under-weighted. There is no candidate with utilisation between 28% and 48% to be
+had. Nor is a second tier row (`colsPerRowMax` 3 and 4, re-measured now that the fit
+works: spike 838 → 1112 / 3504), nor a fourth row pitch. The demo's emptiness is a
+property of the topology — a 13-item chain with three off-page terminals — and 9.66's
+conclusion survives this pass unchanged.
+
+#### 5. The column-pitch cap, re-tried because the refutation was measured on a broken fit
+
+`layout.colMax` was refuted in 9.68: a capped chain came out *smaller* overall
+rather than larger, so the cap had nothing to buy. That measurement was correct **at
+the time**, because `COL = availW/numCols` spread the chain across the whole sheet
+and the fit then included the origin. Both of those are fixed, and "smaller" and
+"larger" now mean what they say.
+
+It is also a genuine per-sheet trade, and the corpus splits on it:
+
+```
+  colMax   demo   spike            dense  manifold
+    0      464    943              445    324
+   90      540   1028              480    296
+  110      493    838              494    373
+  130      393    943              490    325
+```
+
+`spike` wants 110 (crossings 18 → 10, label collisions 1 → 0, 620mm less pipe) and
+`manifold` wants 0. No single value is right for both — so it is now the **fourth
+search dimension**, which is 9.66's architecture and not a new score term:
+
+```
+  case      before      after
+  demo        464        464
+  spike       943      -> 838     crossings 18 -> 10, labels 1 -> 0, len 7088 -> 6464
+  dense       445        445
+  min         119        119
+  split        45         45
+  manifold    324        324
+  sum        2340     -> 2235
+```
+
+The cost is render time: one more axis, so roughly double (spike 6.1s → 13.2s).
+
+#### 6. A new, deliberately report-only check
+
+`audit [15] LABEL OVER LINEWORK` and `[16] LABEL STACKS OVERLAPPING`, with a local
+segment-vs-box test — local on purpose, because the one thing an independent audit
+must not do is call the engine's own collision code. A check that shares an
+implementation with the thing it checks cannot disagree with it, and disagreement is
+the entire value.
+
+They are the reason the engine's own `PID-ANN-001` was rewritten to count **every**
+text run rather than the two roles that were taught to avoid this. The two numbers
+disagreed — 1 against 23 on `spike` — and the honest answer is the larger one. A
+guard that only knows the cases it was written for is not a guard, and the gap
+between 1 and 23 is exactly the size of that blind spot. The two still do not agree
+exactly (engine 14, audit 23 on `spike`) because the audit's segment set and the
+engine's differ at the nozzle leaders; recorded rather than reconciled, because
+reconciling them would mean sharing code.
+
+**So the honest yield of this check is a census, not a fix:** nozzle tags and line
+designations are drawn on linework on 4 of 6 sheets, and nothing places them. That
+is the next item, and it is filed as T3.10 rather than left in a log.
+
+#### Net
+
+```
+                 before this pass                     after
+  sum of totals            2292                        2235
+  demo sheet use            31%                         28%
+  dense sheet use           26%                         26%   (k 1.19 -> 1.65)
+  spike crossings           18                         10
+  label collisions    0/0/0/0/1/0                  0/0/0/0/0/1
+  audit [14] tag in bubble   1/6/-/-/-/1                 0 everywhere
+  label-over-linework          no check            4/23/5/0/0/-
+  REGRESS                     1 red line          green
+```
+
+`REGRESS OK (spike, min, dense, split, manifold)` plus the visual gate, and
+`manifold` is now in the visual corpus so it cannot move unseen.

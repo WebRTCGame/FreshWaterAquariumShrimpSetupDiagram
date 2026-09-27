@@ -55,11 +55,27 @@ function actual(name) {
 
 // ponytail: Phase 4 gate — PID_DEBUG run must report zero invariant failures
 // on every canonical sheet (guilty stage named, LOUD via PID-DBG-* errors).
-function checkDebug(name, problems) {
+//
+// This also carries the DEFAULT-PATH determinism assertion, for free. `PID_DEBUG`
+// adds invariant checks and changes no geometry, so this second render of the same
+// sheet must produce the same score as the first. That is a property that can be
+// checked exactly, the engine documents "no RNG, so a sheet always reproduces", and
+// nothing was checking it on the default path — `checkCandidates` only checks the
+// `--candidates` run.
+//
+// It is not a hypothetical. Blessing and then verifying in the same command produced
+// spike 838 and then 837, and the only explanation was that a file changed between
+// the two renders without anyone noticing which one was current. This assertion
+// names that instead of leaving it as a mystery.
+function checkDebug(name, problems, exp) {
   const d = sh('harness2.mjs', [`regress/_dbg-${name}.svg`, `--src=regress/${name}.dsl`, '--debug']);
   const H = parseHarness(d.out);
   const fails = H.errors.filter((e) => e.startsWith('PID-DBG-'));
   if (fails.length) problems.push(`${name}: PID_DEBUG failures ${JSON.stringify(fails.slice(0, 6))}${fails.length > 6 ? ` +${fails.length - 6} more` : ''}`);
+  const E = exp && exp.harness && exp.harness.score;
+  if (E && H.score && H.score.total !== E.total) {
+    problems.push(`${name}: default render is NOT deterministic (${E.total} normally, ${H.score.total} with --debug)`);
+  }
 }
 
 // ponytail: Phase 3 gate — best-of(legacy + 8 seeds) must not lose to the
@@ -174,7 +190,7 @@ for (const name of cases) {
   diff(name, expected[name], got, problems);
   const d = checkCandidates(name, expected[name], problems);
   if (d) deltas.push([name, d.blessed, d.cand, d.delta]);
-  checkDebug(name, problems);
+  checkDebug(name, problems, expected[name]);
 }
 if (deltas.length) {
   console.log('candidates vs blessed (perturbed multi-start vs noise-free default; breach term shown separately, see T0.3):');

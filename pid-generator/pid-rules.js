@@ -211,6 +211,8 @@ const PID_RULES = {
       // one flat horizontal band with the bottom of the sheet empty.
       colsPerRowMax: { value: 99, min: 0, max: null, unit: 'count', desc: 'max columns per tier row; 0 = auto-fit to the sheet aspect. 2 gives a vertical column layout that fills the height', noScale: true },
       colSpacing:   { value: 140, min: 40, max: null, unit: 'mm', desc: 'auto-layout column pitch' },
+      colMax:       { value: 0, min: 0, max: null, unit: 'mm', desc: 'cap the column pitch so the chain stays COMPACT and the fit scale enlarges it, instead of stretching it across the full sheet width. 0 = uncapped' },
+      colMaxAlt:    { value: 110, min: 0, max: null, unit: 'mm', noScale: true, desc: 'second column-pitch candidate for the layout search. Capping the pitch is a real per-sheet trade and the corpus splits on it: at 110 spike goes 943 -> 838 (crossings 18 -> 10, label collisions 1 -> 0, 620mm less pipe) while manifold goes 324 -> 373; at 90 the reverse. No single value is right for both, so the engine tries both and scores them -- a candidate, not a score term (9.68)' },
       rowSpacing:   { value: 145, min: 40, max: null, unit: 'mm', desc: 'auto-layout row pitch' },
       rowSpacingAlt: { value: 220, min: 40, max: null, unit: 'mm', noScale: true, desc: 'second row-pitch candidate for the layout search. There is no single best value across sheets: demo and dense want 260mm (util 38% -> 61%), spike and manifold want 145mm, so the engine tries both and scores them (9.68)' },
       rowSpacingAlt2: { value: 300, min: 40, max: null, unit: 'mm', noScale: true, desc: 'third row-pitch search candidate. With only two, the search became seed-sensitive once the fill term existed (default seed found dense at 462, seedbase=1 at 473); three pitches take that dependence out' },
@@ -282,6 +284,12 @@ const PID_RULES = {
 equipListPad:  { value: 4, min: 0, max: null, unit: 'mm', desc: 'clear space between the tag list and the drawing below it' },
       labelOffset:  { value: 14, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff' },
       labelOffsetWide: { value: 28, min: 8, max: null, unit: 'mm', desc: 'line-label fallback standoff' },
+      // Annotation PLACEMENT. Both of these exist because a label printed on top of
+      // a process line was invisible to the score and to the audit alike: the
+      // collision term compares text with text, and the line checks compare lines
+      // with symbol boxes. Nothing looked at text against linework.
+      equipTagFar: { value: 26, min: 8, max: null, unit: 'mm', desc: 'how far below the symbol the LAST-RESORT equipment tag sits, after below / above / left / right have all been tried' },
+      valveStackSides: { value: 1, min: 0, max: 1, unit: 'bool', noScale: true, desc: 'let a valve label stack move BESIDE the valve as well as above or below it. Measured: on takes the corpus from 2 label collisions to 0 and costs the demo 43 points of score and 20 points of sheet use (48% -> 28%), because a cleaner label set makes a more compact layout win the search. Taken on the same grounds as 9.71: overlapping labels look broken, an empty sheet does not. Off restores the two-position flip exactly.' },
     },
     taps: {
       dropSep:      { value: 2, min: 0, max: null, unit: 'mm', desc: 'tap drop separation from bubble and landing' },

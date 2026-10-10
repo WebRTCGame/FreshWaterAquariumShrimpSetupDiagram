@@ -648,12 +648,11 @@ specified), not by measure alone:
    corpus total is **+105**. The blocker is architectural: a constraint applied
    after the coordinate solve cannot pay for its knock-on effects. Re-attempt
    inside the solve, not after it.
-2. **`heater-beside-vessel`** — 4 violations, 248 mm, and it is the defect I
-   could see in `dense.png` before writing any of this. Needs a **proximity**
-   constraint — nothing in the engine currently expresses "keep these two
-   close" — so it is a new shape of target, not just a new rule. A proximity
-   target has to pull in **x** as well as y, and the current `constrainTargets`
-   only edits y; that extension is the work.
+2. ~~**`heater-beside-vessel`**~~ — **SHIPPED 2026-10-10 via `affinityRehome`
+   (W5 §5.2), dense 384 -> 369.** It needed a new shape of target — a
+   *proximity* constraint, which the placer could not express because x is
+   rigid per rank-column — so it became a roster re-home rather than a y-target.
+   4 violations / 248mm -> 3 / 115mm on the audit.
 3. **`overhead-return-level`** — 2 violations, 125 mm. Same shape as rule 1
    (single-axis y ordering), so it can be written as a `target` immediately.
 4. **`orphan-co-location`** — reports 0 while the `dense` stranding is visibly
@@ -675,14 +674,18 @@ specified), not by measure alone:
 | `tryMove` | `placement-rules.js` | 1-D slide; `sign` = +1 below / −1 above; rolls back on failure |
 | `isClear` | `placement-rules.js` | axis-aware clearance; `minSep` 0 = rely on `passDecrowd` |
 | **`constrainTargets`** | `placement-rules.js` | **the in-solve form — use this.** Returns a preferred y per entity; the packer still decides |
+| **`affinityPlan`** | `placement-rules.js` | **the 2-D form (W5).** Pure planner returning roster re-homes for proximity rules; the router splices `column[depth]` before the barycentre sweeps |
 | `enforce` | `placement-rules.js` | post-hoc form; **measured +105 vs +20 — do not build new rules on this** |
-| `assertGates` | `placement-rules.js` | every solver rule must name a live registry key |
+| `assertGates` | `placement-rules.js` | every solver **or target** rule must name a live registry key |
 | `--selftest` / `--gates` | `placement-audit.mjs` | run both before trusting any number here |
+| **`probe-fire.mjs`** | repo root | **the cross-check.** Fire/move/score-diff per sheet, `--shot` for before/after PNGs. A rule that changed nothing looks like a rule that never ran; this is what tells them apart |
 
 **When adding a rule, in this order:** declare `gate` → write `applies` and
 `check` → run `--gates` → measure the audit baseline → only then write
-`target` → measure it on alone → enable. Two of those steps exist because
-skipping them produced silent no-ops.
+`target` **and `enabled`** → measure it on alone → enable. Three of those steps
+exist because skipping them produced silent no-ops: the derived-gate bug (W4),
+the missing-`enabled` throw inside constrainTargets (W5), and a rule that
+shipped dead with `moves: 0` reading as success.
 
 **Write `target`, not `solve`.** The `solve` form exists only so the +105/+20
 comparison stays reproducible. A new rule written against it inherits the
@@ -691,14 +694,147 @@ wrong architecture.
 Each rule must be measured alone before any is enabled, and a rule that ships
 enabled needs a corpus row proving it. `--case=<n> -v` gives per-sheet detail.
 
-Status: W1 landed. W2/W3 landed as diagnostics. W4 is the next unit of work. — and the measurement above
-says start with `heater-beside-vessel` (clear visual defect, 4 violations, and
-the fix is a constraint the placer can satisfy without new ports) and
-`suction-source-above` (5 violations, and the fix is a single y-ordering
-constraint). `flow-direction-consistent` is largest by measure but is the most
-likely to be a **bad rule** — left-to-right is a preference, not a correctness
-rule, and `dense` legitimately returns to `C-1` on reflux. It should probably
-be demoted to a soft preference. Do not implement it as a hard constraint.
+Status: W1 landed. W2/W3 landed as diagnostics. W4 shipped the rule layer and
+disabled its only enabled rule on measurement. W5 (below) shipped the 2-D
+capability and fixed the diagnostic noise that had contaminated every rule
+measurement taken with the master switch on.
+
+### W5 — the 2-D capability, a diagnostic bug, and the first shipped rule
+
+2026-10-10. Three results, in the order they were found, and the middle one is
+the reason the other two are trustworthy.
+
+#### 5.0 First: a diagnostic that lied, which contaminated every rule measurement
+
+With the master switch `layout.placementRules:1` on and **no rule keys at
+all**, the corpus moved:
+
+```
+demo 344 -> 349   spike 789 -> 794   dense 384 -> 389   manifold 225 -> 230
+```
+
++5 per sheet, byte-identical geometry on every sub-metric. Cause: `enforce()`'s
+post-solve audit (`rep.post = audit(data)`) scores **every rule regardless of
+enablement**, and the `PID-LAY-003` emission walked a hardcoded `ENFORCEABLE`
+list without consulting the per-rule gate — so `suction-source-above`'s
+baseline violation was reported as *"still violated after layout"* on sheets
+where the solver was never allowed to touch it. One warn = 5 points, and the
+warning was pure fiction.
+
+Fix: gate the emission on `ruleParam(en.gate, 0)` and derive `ENFORCEABLE`
+from `RULES` instead of a hand-kept list. After the fix, `placementRules:1`
+alone reproduces the baseline **exactly** (344 / 789 / 384 / 65 / 45 / 225).
+
+This is not a cosmetic bug. **Every per-rule measurement ever taken with the
+master switch on carried +5/sheet of noise**, including the W4 in-solve row
+that shipped `suction-source-above` disabled. The rule's own verdict survives
+re-measurement (see 5.3), but any near-threshold measurement made before this
+fix was unreadable.
+
+#### 5.1 `heater-beside-vessel` needed a capability the placer does not have
+
+The rule is a PROXIMITY rule, and proximity is not expressible as a y-target:
+x is rigid per rank-column (`e.x = XMARGIN + colX * COL`), and a reboiler's
+rank is always its vessel's rank + 1, so it lands one full column pitch to the
+right. Measured on `dense`: E-1 **210mm from C-1** (dx=185, dy=100) — a
+horizontal gap no y-target can close.
+
+The mechanism that fixes it is a **roster decision, not a coordinate
+decision**: re-home the heater into the vessel's rank-column before the
+barycentre sweeps. `placement-rules.js` gained `affinityPlan()`, a pure planner
+returning moves the router applies as a `column[depth]` splice, and the router
+pass sits between the rank rosters and the sweeps. The sweeps then do the
+drafting work for free: `belowFlag` already sorts bottoms-fed entities into
+the lower rows of their column, so a bottoms-fed heater lands **below** its
+vessel with no new ordering code.
+
+Conservative by construction — an ambiguous peer set abstains, an authored
+peer abstains, a target column at its cap abstains. The self-test asserts
+purity (the router hands the planner its live rosters) and the exact pairing
+on `dense` (E-1 -> column(C-1)).
+
+#### 5.2 SHIPPED: `layout.affinityRehome` default 1
+
+Measured alone, then both changed sheets looked at (`probe-fire.mjs --shot`):
+
+| sheet | before | after | Δ |
+|---|---|---|---|
+| demo | 344 | 344 | 0 (no heaters on this sheet) |
+| spike | 789 | 787 | **−2** |
+| dense | 384 | 369 | **−15** |
+| min | 65 | 65 | 0 |
+| split | 45 | 45 | 0 |
+| manifold | 225 | 225 | 0 |
+| **total** | **1852** | **1835** | **−17** |
+
+`dense` is the headline: `fill.util` **45 → 63**, `fill.gap` 0.17 → 0. That is
+the first mechanism in this project to fill the vertical void §0a root cause
+2 diagnosed — the reboiler drops to one row below its column instead of a
+stranded column to its right, and the drawing reaches the bottom of the frame.
+`spike` buys maxSignalLen 220 → 130mm, signalLenTotal −275mm, leadInShort
+30 → 9 and warnings 15 → 8, paid for by crossings 7 → 14 and bends +18.
+
+Audit after the change: `heater-beside-vessel` 4 violations / 248mm → **3 /
+115mm**. The residuals are honest: `dense`'s E-1 is now one row below its
+column (135mm) and priced by a 120mm threshold that predates same-column
+placement — a known-bad diagnostic, not a defect; `spike`'s E-102 serves **two**
+vessels in different columns and the planner abstains on ambiguity by design.
+
+Gated on its own key, **not** on `layout.placementRules`: the master switch
+means "run the post-hoc `enforce()` solver", and a pre-coordinate roster
+change is a different mechanism with a different failure mode. Master-only is
+now certified byte-identical to baseline, so the two keys are independent.
+
+#### 5.3 Re-measured: `suction-source-above` is still a regression, cleanly
+
+The W4 row (+20 in-solve) was taken with the 5.0 noise in the harness, so it
+was re-run on the new baseline with the fix in:
+
+| sheet | baseline | + rule | Δ |
+|---|---|---|---|
+| demo | 344 | 390 | **+46** (util 37 → 25%) |
+| spike | 787 | 845 | **+58** |
+| dense | 369 | 339 | **−30** (tapReach 24 → 0, maxSignalLen 219 → 110) |
+| manifold | 225 | 229 | +4 |
+| **total** | | | **+73** |
+
+The pattern is now unmistakable: where the rule applies it satisfies its own
+targets completely, and it pays with sheet emptiness on every other sheet —
+the instrument-tier coupling of §3.3 / W6, priced by `util`. The verdict
+(revert) is unchanged; the row is now clean.
+
+#### 5.4 Measured and neutral: `overhead-return-level` in-solve target
+
+Implemented as the same y-ordering shape as rule 1 (the reflux/top source sits
+*level* with the vessel it returns to; median over peers so the target cannot
+oscillate between them across sweeps). Writing it caught a **silent no-op of
+the same species as 5.0**: `constrainTargets` gates on `rule.enabled()`, and a
+rule with a `target` but no `enabled` throws inside a try/catch that reads as
+"does not apply" — invisible forever. The self-test that found it now asserts
+the target actually moves and abstains when off.
+
+Corpus row: **byte-identical on all six sheets**. The target fires on `spike`
+(8 adjustments) and the final layout is unchanged — on this corpus the
+preference is already satisfied where it applies. It ships at 0, because a rule
+that ships enabled needs a corpus row proving it and this row says "no change".
+`assertGates()` was extended to cover target-only rules for the same reason:
+an undeclared gate reads as disabled, silently.
+
+#### 5.5 New tool: `probe-fire.mjs`
+
+The W4 lesson — *a measurement needs a cross-check that can disagree with it* —
+is now a command. Per sheet: did the target/affinity phase run at all, which
+entities moved, the flat score-object diff, and any new warnings.
+`--shot` adds before/after PNGs through Chrome, which is the project's own
+gate ("a layout change is not done until the demo sheet has been looked at").
+`node probe-fire.mjs x layout.ruleSuctionSourceAbove --shot` is the standard
+shape for the next rule.
+
+**Next up, unchanged:** W6 (the instrument bubble on the tap *landing point*)
+is still the blocker that would let the y-ordering rules pay for themselves.
+The 2-D capability is now in place for any future proximity rule; the E-102
+ambiguity case (two peers, one home) is the first question it raises.
+
 
 A P&ID generator: hand-written DSL text → semantic model → orthogonal SVG,
 ~13.8k lines across ten plain-JS files loaded by concatenation

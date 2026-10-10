@@ -90,6 +90,50 @@ function autoLayout(data) {
   const column = {};
   for (const e of all) (column[depth[e.id]] = column[depth[e.id]] || []).push(e);
   const colKeys = Object.keys(column).map(Number).sort((a, b) => a - b);
+  // ---- affinity re-homing (placement rules, INSIDE the solve) --------------
+  //
+  // A 2-D placement rule cannot be satisfied by a y-target here: x is rigid
+  // per rank-column, so "the reboiler sits beside the column it serves" is a
+  // roster decision, not a coordinate decision. This pass asks the rule layer
+  // which entities want to share a column (`PID_PLACEMENT.affinityPlan`) and
+  // moves them BEFORE the rowIdx build and the barycentre sweeps below, so
+  // every downstream consumer — the sweeps, the slot assignment, the median
+  // y-solve, the packing — sees the merged roster and the consequences and the
+  // decision are the same decision. (The alternative, moving the entity after
+  // the solve, is the post-hoc `enforce()` architecture measured +105 in
+  // IMPROVEMENTS.md §0d W4.)
+  //
+  // Gated on `layout.affinityRehome` ALONE, deliberately not on
+  // `layout.placementRules`: that master switch means "run the post-hoc
+  // enforce() solver", and this is a different mechanism with a different
+  // failure mode. The two are measured independent — master-only reproduces
+  // the baseline byte-for-byte — so shipping one on does not smuggle the other
+  // in. Default 1 since 2026-10-10; see the registry entry for the row.
+  if (typeof PID_PLACEMENT !== 'undefined' && ruleParam('layout.affinityRehome', 0)) {
+    try {
+      const plan = PID_PLACEMENT.affinityPlan(data, { column: column, colKeys: colKeys, depth: depth });
+      const moved = [];
+      for (const mv of (plan.moves || [])) {
+        const from = column[mv.fromDepth];
+        if (!from) continue;
+        const i = from.findIndex((e2) => e2.id === mv.id);
+        if (i < 0) continue;                     // already moved this pass
+        const ent = from.splice(i, 1)[0];
+        (column[mv.toDepth] = column[mv.toDepth] || []).push(ent);
+        moved.push(mv);
+      }
+      if (moved.length) {
+        data.ruleAffinity = moved.map((m) => m.id + '->column(' + m.peer + ')');
+        data.ruleReport = data.ruleReport || {};
+        data.ruleReport.affinity = moved.length;
+      }
+    } catch (e) {
+      if (!data.ruleAffinityError) {
+        data.ruleAffinityError = e.message;
+        data.warnings.push('[PID-LAY-006] column affinity re-homing failed: ' + e.message);
+      }
+    }
+  }
   // ponytail: stretch columns to fill the sheet — fixed 140mm pitch wastes
   // ~30% of horizontal space on an 864mm sheet, cramming routes into tight corridors.
   const numCols = colKeys.length;
@@ -1025,6 +1069,18 @@ function autoLayout(data) {
         PID_PLACEMENT.ENFORCEABLE.forEach((en) => {
           const rr = byId[en.id];
           if (!rr || !rr.violations) return;
+          // Only a rule that was ENABLED can be "still violated after layout".
+          // `rep.post` is an audit of EVERY rule regardless of enablement, so
+          // without this gate a disabled rule's baseline violation is reported
+          // as a solver failure. Measured: `layout.placementRules:1` with no
+          // rule keys added +5 (one warn per sheet) to demo, spike, dense and
+          // manifold with byte-identical geometry — pure diagnostic noise that
+          // contaminated every per-rule measurement taken with the master
+          // switch on, including the W4 in-solve baseline it was measured
+          // against. A warning that a disabled rule failed to be enforced is
+          // worse than no warning: it reads as a regression that did not
+          // happen.
+          if (!ruleParam(en.gate, 0)) return;
           data.warnings.push(`[PID-LAY-003] placement rule "${en.id}" still violated after layout: ` +
             `${rr.violations} site(s), ${rr.measure}mm (${en.gate})`);
         });

@@ -317,7 +317,32 @@ const PID_RULES = {
       // ships 0 until it has been measured on its own; `placement-audit.mjs`
       // reports the violations a rule would fix, and `enforce()` reports what
       // is STILL violated after the solver ran.
-      ruleSuctionSourceAbove: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'a pump sits below its suction source. MEASURED AND REVERTED — it fixes what it targets (dense crossings 5->2) but costs more than it buys elsewhere (corpus +105). Solver and rule are sound; the post-hoc application is not. See IMPROVEMENTS.md §0d W4' },
+      ruleSuctionSourceAbove: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'a pump sits below its suction source. MEASURED AND REVERTED, TWICE — the post-hoc form cost the corpus +105 (IMPROVEMENTS.md §0d W4), the in-solve form +20 on the old baseline, and +73 re-measured on the 2026-10-10 baseline (dense 369->339 with the rule\'s own targets fully satisfied, but demo +46 emptying the sheet to util 25% and spike +58). The rule is correct; the corpus pays for it. The blocker is the instrument-tier coupling (W6), not the rule' },
+      // In-solve form of `overhead-return-level` (IMPROVEMENTS.md §0d W4):
+      // the reflux/top source sits LEVEL with the vessel it returns to. A
+      // single-axis y target, the same shape as suction-source-above's, which
+      // is why it can ship as soon as it is measured. DEFAULT 0.
+      ruleOverheadReturnLevel: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'a reflux/overhead connection sits level with the vessel it returns to, applied as a y TARGET inside the coordinate solve. MEASURED 2026-10-10 AND SCORE-NEUTRAL: the target fires on spike (8 adjustments) but lands at a byte-identical score, so the corpus says the preference is already satisfied where it applies. DEFAULT 0 — a rule that ships enabled needs a corpus row proving it, and this row says "no change". See IMPROVEMENTS.md §0d' },
+      // The 2-D capability: re-home a heater/exchanger into the rank-column of
+      // the vessel it serves, below it (bottoms draw drops straight down, the
+      // return comes back up, the loop reads as one system). This is a COLUMN
+      // decision, because x is rigid per rank — a y-target cannot express it.
+      // Measured context: dense E-1 lands 210mm from C-1 (dx=185) without it.
+      //
+      // MEASURED AND SHIPPED 2026-10-10 (IMPROVEMENTS.md §0d W5): dense 384 ->
+      // 369 with fill.util 45 -> 63 and fill.gap 0.17 -> 0, which is the FIRST
+      // mechanism in this project to fill the dense sheet's vertical void
+      // (§0a root cause 2); spike 789 -> 787 with maxSignalLen 220 -> 130mm,
+      // signalLenTotal -275mm, leadInShort 30 -> 9 and warnings 15 -> 8, paid
+      // for by crossings 7 -> 14 and bends +18; demo / min / split / manifold
+      // byte-identical. Both changed sheets were looked at before blessing.
+      //
+      // Gated on THIS KEY ALONE, not on `layout.placementRules`: the master
+      // switch means "run the post-hoc enforce() solver", and a roster change
+      // that runs before coordinates exist is a different mechanism with a
+      // different failure mode. Measured equivalence: `placementRules:1` alone
+      // reproduces the baseline byte-for-byte, so the two keys are independent.
+      affinityRehome: { value: 1, min: 0, max: 1, unit: 'bool', desc: 'co-locate a reboiler/exchanger with the tower/vessel/drum it serves by moving it into that vessel\'s rank-column BEFORE the barycentre sweeps. SHIPPED 2026-10-10 on the measurement in the comment above; set 0 to measure the engine without it' },
       ruleSolverIters: { value: 6, min: 1, max: 20, unit: 'count', noScale: true, desc: 'max fixed-point iterations of the placement rule solver. Capped on purpose: an uncapped fixpoint loop in a layout pass is how a renderer hangs' },
       ruleMinSep: { value: 0, min: 0, max: 200, unit: 'mm', noScale: true, desc: 'clearance the rule solver must leave around a moved entity, measured in the axis it moves. 0 = rely on passDecrowd, which has already run; a positive value makes the solver refuse moves a drafter would make' },
       ruleMinGap: { value: 20, min: 0, max: 120, unit: 'mm', desc: 'minimum y separation a placement rule asks for between two entities, applied as a TARGET inside the coordinate solve (not as a post-hoc move). This is what makes the ordering visible on the drawing rather than a 5mm token' },

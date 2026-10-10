@@ -388,6 +388,7 @@
     },
     {
       id: 'overhead-return-level',
+      gate: 'layout.ruleOverheadReturnLevel',
       rationale: 'Vapour and reflux connections are at the top of the vessel. A ' +
                  'reflux line arriving at the side reads as a liquid line and is ' +
                  'misread as such.',
@@ -402,6 +403,46 @@
           if (dy > 4 * TOL) out.push({ measure: dy - 4 * TOL, detail: 'overhead/reflux level differs by ' + dy.toFixed(1) + 'mm' });
         });
         return out;
+      },
+      // ---- target: the IN-SOLVE form ----
+      // Same shape as `suction-source-above` (single-axis y ordering), and it is
+      // the second rule that shape covers: the reflux/top source sits LEVEL
+      // with the vessel it returns to, because a reflux line enters the top of
+      // the column, not its side. Returning the peer's own target (rather than
+      // a signed offset from it) is what "level" means here — |dy| = 0, well
+      // inside the 4*TOL band the check allows.
+      //
+      // The median over peers is deliberate: with two reflux peers, taking the
+      // worst-case single peer makes the target oscillate between them as the
+      // sweeps re-derive `want`, and a target that moves on every sweep is a
+      // solver that never converges. The midpoint is the stable value, and the
+      // packer still gets the last word.
+      target: function (f, ctx, want, api) {
+        var ys = [];
+        f.down.forEach(function (l) {
+          if (l.role !== 'reflux' && l.role !== 'top') return;
+          var p = ctx.facts[l.peer];
+          if (!p || p.ent.x == null) return;
+          ys.push(want[l.peer] !== undefined ? want[l.peer] : p.ent.y);
+        });
+        if (!ys.length) return null;                  // abstain
+        if (ys.length === 1) return ys[0];
+        ys.sort(function (a, b) { return a - b; });
+        var m = ys.length >> 1;
+        return ys.length % 2 ? ys[m] : (ys[m - 1] + ys[m]) / 2;
+      },
+      // `constrainTargets` gates on `enabled(f, ctx)`, NOT on `applies`. A
+      // rule with a `target` but no `enabled` throws inside the try/catch in
+      // constrainTargets, is read as "does not apply right now", and is
+      // therefore invisible forever while reporting nothing wrong — the same
+      // failure mode as the derived-gate bug documented at `ruleEnabled`. The
+      // self-test that found this is the only reason it is not still there.
+      enabled: function (f, ctx) {
+        return f.down.some(function (l) {
+          if (l.role !== 'reflux' && l.role !== 'top') return false;
+          var p = ctx.facts[l.peer];
+          return !!(p && p.ent.x != null);
+        });
       }
     },
     {
@@ -519,6 +560,93 @@
       solve: null
     }
   ];
+
+  // ── column affinity: the 2-D half of the rule layer ────────────────────
+  //
+  // `constrainTargets` edits a TARGET Y, and that architecture is right for a
+  // 1-D ordering ("the pump sits BELOW its source"). But `heater-beside-vessel`
+  // is a PROXIMITY rule, and on this engine proximity is not a coordinate the
+  // placer controls: x is rigid per depth-column (`e.x = XMARGIN + colX * COL`,
+  // pid-router.js:304 — every entity in a rank shares one x), and a reboiler's
+  // rank is always its vessel's rank + 1, so it lands one full column pitch to
+  // the RIGHT of the vessel it serves. Measured on dense: E-1 is 210mm from
+  // C-1 (dx=185, dy=100) — a horizontal separation no y-target can close,
+  // because closing it would need 185mm of vertical room that does not exist.
+  //
+  // A drafter solves this by putting the reboiler IN the column of the vessel,
+  // below it: the bottoms draw drops straight down, the return comes back up,
+  // and the circulation loop reads as one system. That is a COLUMN choice, not
+  // a coordinate choice — so the mechanism has to be the one thing the placer
+  // is free to change before coordinates exist: which rank-column an entity is
+  // rostered in.
+  //
+  // Hence `affinityPlan`: the rule layer supplies POLICY (which entity wants
+  // to share a column with which), returning moves the ROUTER applies as a
+  // roster change before the barycentre sweeps. The sweeps then do the
+  // drafting work for free: `belowFlag` already sorts "fed from bottom-ish
+  // ports" (bottoms, drain, outlet) into the lower rows of their column
+  // (pid-router.js:83-89), so a bottoms-fed heater re-homed into the vessel's
+  // column lands below it with no new ordering code.
+  //
+  // Conservative by construction, and every condition is a decision to NOT move
+  // something: an ambiguous peer set abstains, a peer with an authored position
+  // abstains, and a target column already at the cap abstains. A re-home that
+  // empties the source column is allowed — the alternative (a keep-one-member
+  // guard) would make the rule abstain on the one sheet whose defect it exists
+  // to fix.
+  var AFFINITY_SPECS = [
+    {
+      id: 'heater-beside-vessel',
+      self: ['reboiler', 'exchanger'],           // kinds that want to be co-columnar
+      peer: ['tower', 'vessel', 'drum'],         // the vessel it serves
+      colCap: 3                                  // never merge into a taller column
+    }
+  ];
+
+  // Pure planning: no mutation, no coordinates. `geom` is the router's
+  // { column, colKeys, depth } at the point after rowIdx is first built and
+  // before the barycentre sweeps — the only moment the roster is free to
+  // change. Returns { moves: [{id, fromDepth, toDepth, peer}] }.
+  function affinityPlan(data, geom) {
+    var ctx = semanticFacts(data);
+    var moves = [];
+    ctx.all.forEach(function (e) {
+      var f = ctx.facts[e.id || e.tag];
+      if (!f) return;                                  // instrument keyed by tag
+      if (isAuthored(e)) return;                       // `at`/`rel` outranks everything
+      var spec = null;
+      for (var s = 0; s < AFFINITY_SPECS.length; s++) {
+        if (AFFINITY_SPECS[s].self.indexOf(f.kind) >= 0) { spec = AFFINITY_SPECS[s]; break; }
+      }
+      if (!spec) return;
+
+      // Candidate peers: directly connected by a PROCESS pipe (a signal or tap
+      // link is not a co-location relationship — a bubble over a tank does not
+      // pull an exchanger anywhere), of an eligible kind, and not authored.
+      var peerDepths = [];
+      var peerIds = [];
+      f.up.concat(f.down).forEach(function (l) {
+        var p = ctx.facts[l.peer];
+        if (!p || isAuthored(p.ent)) return;
+        if (spec.peer.indexOf(p.kind) < 0) return;
+        if (peerIds.indexOf(l.peer) < 0) peerIds.push(l.peer);
+        var dp = geom.depth[l.peer];
+        if (dp !== undefined && peerDepths.indexOf(dp) < 0) peerDepths.push(dp);
+      });
+      if (!peerIds.length) return;
+      // More than one candidate COLUMN is ambiguous: the heater has two homes
+      // and picking one invents a priority the drawing did not state. Abstain.
+      if (peerDepths.length !== 1) return;
+
+      var from = geom.depth[e.id];
+      var to = peerDepths[0];
+      if (from === to) return;                         // already co-columnar
+      var roster = geom.column[to] || [];
+      if (roster.length >= spec.colCap) return;        // target column is full
+      moves.push({ id: e.id, fromDepth: from, toDepth: to, peer: peerIds[0], spec: spec.id });
+    });
+    return { moves: moves };
+  }
 
   // ── audit ─────────────────────────────────────────────────────────────
   // Reports, per rule: how many entities it applies to, and the total
@@ -767,7 +895,12 @@
   function assertGates() {
     var problems = [];
     RULES.forEach(function (rule) {
-      if (!rule.solve) return;
+      // A rule with NEITHER solver form cannot be enabled at all, so it names
+      // no gate and there is nothing to check. Covering `target` here matters
+      // for exactly the reason the `gate` field exists: a target-only rule is
+      // enabled through the same registry read, and an undeclared key reads as
+      // disabled — silently, which is the failure mode this function guards.
+      if (!rule.solve && !rule.target) return;
       if (!rule.gate) { problems.push(rule.id + ': no gate declared'); return; }
       if (typeof ruleParam !== 'function') return;
       var raw = ruleParam(rule.gate, undefined);
@@ -844,13 +977,12 @@
     return true;
   }
 
-  // Rules with a solver, and what each one does. `gate` is the registry key
-  // that enables it. A rule with `solve: null` is audit-only BY DESIGN — the
-  // `flow-direction-consistent` rule is the deliberate case (see its entry).
-  var ENFORCEABLE = [
-    { id: 'suction-source-above', gate: 'layout.ruleSuctionSourceAbove',
-      why: 'first rule measured and enabled; single-axis ordering, lowest interaction risk' },
-  ];
+  // Rules with a solver, and the gate that enables each. DERIVED from RULES
+  // rather than hand-maintained: a hardcoded list is how a rule ends up
+  // reported as "still violated" when it was never enabled (fixed 2026-10-10
+  // at the router emission site, where the derived list is consumed).
+  var ENFORCEABLE = RULES.filter(function (r) { return r.solve; })
+    .map(function (r) { return { id: r.id, gate: r.gate, why: r.rationale }; });
 
   var API = {
     portRole: portRole,
@@ -860,6 +992,8 @@
     audit: audit,
     enforce: enforce,
     constrainTargets: constrainTargets,
+    affinityPlan: affinityPlan,
+    AFFINITY_SPECS: AFFINITY_SPECS,
     isClear: isClear,
     ENFORCEABLE: ENFORCEABLE,
     assertGates: assertGates,

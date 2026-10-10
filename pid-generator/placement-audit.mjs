@@ -44,7 +44,7 @@ const cases = only ? CASES.filter((c) => c === only) : CASES;
 if (args.includes('--gates')) {
   const problems = PID_PLACEMENT.assertGates();
   for (const p of problems) console.log('  PROBLEM  ' + p);
-  const enforceable = PID_PLACEMENT.RULES.filter((r) => r.solve);
+  const enforceable = PID_PLACEMENT.RULES.filter((r) => r.solve || r.target);
   console.log(`  ${enforceable.length} enforceable rule(s), ${problems.length} problem(s)`);
   if (!problems.length) for (const r of enforceable) console.log(`  ok   ${r.id} -> ${r.gate}`);
   process.exit(problems.length ? 1 : 0);
@@ -123,6 +123,64 @@ if (args.includes('--selftest')) {
 
     const ok = !threw && finiteOk && wantOk && abstainOk && rep && rep.adjusted === 1;
     console.log(`  ${ok ? 'ok  ' : 'FAIL'} constrainTargets: enabled -> pump target ${want['X-P']} (source 100, gap 20, want 120), adjusted=${rep && rep.adjusted}; disabled -> ${wantOff['X-P']}, adjusted=${repOff && repOff.adjusted}`);
+    if (!ok) bad++;
+  }
+  // overhead-return-level target: the reflux source is pulled LEVEL with the
+  // vessel it returns to. Same y-only shape as suction-source-above, and the
+  // same totality argument: a target that returns anything but a finite number
+  // or null poisons the packing step below it.
+  {
+    const probe = {
+      view: { sheetW: 864, sheetH: 559 }, layout: 'auto',
+      equipment: [{ id: 'X-C', type: 'tower', _seq: 0, x: 300, y: 100 }],
+      valves: [{ id: 'X-E', type: 'gate', _seq: 1, x: 300, y: 260 }],
+      pipes: [{ from: 'X-C', fromPort: 'overhead', to: 'X-E', toPort: 'inlet', kind: 'process' }],
+      nozzles: [], loops: [], junctions: [], instruments: [], alarms: [],
+    };
+    const want = { 'X-C': 100, 'X-E': 260 };
+    let rep = null, threw = false;
+    try { rep = PID_PLACEMENT.constrainTargets(probe, want, { minGap: 20, rules: { 'overhead-return-level': true } }); }
+    catch (e) { threw = true; }
+    const wantOff = { 'X-C': 100, 'X-E': 260 };
+    let repOff = null;
+    try { repOff = PID_PLACEMENT.constrainTargets(probe, wantOff, { minGap: 20, rules: { 'overhead-return-level': false } }); }
+    catch (e) { /* counted below */ }
+    // the receiver is not an overhead source itself, so it must abstain:
+    // exactly one entity moves, and it moves to the receiver's level
+    const ok = !threw && want['X-C'] === 260 && want['X-E'] === 260 &&
+               rep && rep.adjusted === 1 && repOff && repOff.adjusted === 0;
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'} overhead-return-level target: enabled -> source target ${want['X-C']} (receiver at 260), adjusted=${rep && rep.adjusted}; disabled -> ${wantOff['X-C']}`);
+    if (!ok) bad++;
+  }
+  // affinityPlan must be PURE (the router hands it its live rosters, so a plan
+  // that mutated `geom.column` would re-home entities twice) and must pick
+  // exactly the E-1 -> C-1 pairing on dense, where the reboiler lands 210mm
+  // from its column with no affinity.
+  {
+    const data = PID_PARSER.parse(readFileSync('regress/dense.dsl', 'utf8'));
+    const depth = data.flowRank;
+    const all = [...data.equipment, ...data.valves].sort((a, b) => a._seq - b._seq);
+    const column = {};
+    for (const e of all) (column[depth[e.id]] = column[depth[e.id]] || []).push(e);
+    const before = Object.keys(column).sort().map((k) => k + ':' + column[k].length).join('|');
+    const plan = PID_PLACEMENT.affinityPlan(data, {
+      column: column, colKeys: Object.keys(column).map(Number), depth: depth,
+    });
+    const after = Object.keys(column).sort().map((k) => k + ':' + column[k].length).join('|');
+    const pureOk = before === after;
+    const moveOk = plan && plan.moves && plan.moves.length === 1 &&
+                   plan.moves[0].id === 'E-1' && plan.moves[0].peer === 'C-1' &&
+                   plan.moves[0].fromDepth !== plan.moves[0].toDepth;
+    const noop = PID_PLACEMENT.affinityPlan({
+      view: { layout: 'auto' },
+      equipment: [{ id: 'X-P', type: 'pump', _seq: 0, x: 10, y: 10 }],
+      valves: [{ id: 'X-V', type: 'gate', _seq: 1, x: 20, y: 10 }],
+      pipes: [{ from: 'X-V', to: 'X-P', kind: 'process' }],
+      nozzles: [], loops: [], junctions: [], instruments: [], alarms: [],
+    }, { column: {}, colKeys: [], depth: { 'X-P': 0, 'X-V': 1 } });
+    const noopOk = noop && noop.moves.length === 0;
+    const ok = pureOk && moveOk && noopOk;
+    console.log(`  ${ok ? 'ok  ' : 'FAIL'} affinityPlan: pure=${pureOk}, dense move=${moveOk ? 'E-1 -> column(C-1)' : JSON.stringify(plan.moves)}, no-heater=${noopOk}`);
     if (!ok) bad++;
   }
   console.log(bad ? `SELFTEST FAIL (${bad})` : 'SELFTEST ok');

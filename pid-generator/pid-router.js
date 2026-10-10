@@ -157,13 +157,30 @@ function autoLayout(data) {
   if (colsCapRule > 0) {
     colsPerRow = Math.max(2, Math.min(colsPerRow, colsCapRule, numCols));
   } else if (numCols > 2) {
+    // Prefer a squarer block, and among aspect-equivalent wraps prefer the one
+    // whose ROWS ARE BALANCED. The pure aspect pick for a 9-rank chain chose
+    // 7+2 (aspect error 0.074) over 5+4 (error 0.263) — right about the block's
+    // aspect and wrong about the drawing, because the second row is then 2/7
+    // full and the sheet pays for shape with emptiness: measured on dense,
+    // util 53% -> 38% and the corpus +33 for the sheet. Balance is the
+    // tie-breaker that keeps the aspect search from doing that.
+    //
+    // `layout.wrapAspectTol` is the log-space window inside which balance
+    // decides; outside it the aspect metric still wins outright.
     const sheetAsp = availW / Math.max(availH0, 1);
     const colW0 = availW / numCols;
-    let best = numCols, bestErr = Infinity;
+    const nRows = (c) => Math.ceil(numCols / c);
+    const errOf = (c) => Math.abs(Math.log((c * colW0) / (nRows(c) * ROW) / sheetAsp));
+    // how lopsided the last row is: `c` wide, the tail row holds what is left
+    const imbalance = (c) => Math.abs(c - Math.max(1, numCols - (nRows(c) - 1) * c));
+    let bestErr = Infinity;
+    for (let c = 2; c <= numCols; c++) bestErr = Math.min(bestErr, errOf(c));
+    const tol = ruleParam('layout.wrapAspectTol', 0.2);
+    let best = numCols;
+    let bestImb = Infinity;
     for (let c = 2; c <= numCols; c++) {
-      const rows = Math.ceil(numCols / c);
-      const err = Math.abs(Math.log((c * colW0) / (rows * ROW) / sheetAsp));
-      if (err < bestErr) { bestErr = err; best = c; }
+      if (errOf(c) > bestErr + tol) continue;
+      if (imbalance(c) < bestImb) { bestImb = imbalance(c); best = c; }
     }
     colsPerRow = Math.max(2, Math.min(colsPerRow, best));
   }

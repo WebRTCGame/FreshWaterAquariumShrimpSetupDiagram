@@ -66,10 +66,13 @@ const inj = `;(() => { for (const [k, v] of ${JSON.stringify([['layout.placement
 const G_ON = mk(inj);
 
 const CASES = argv[0] === 'x' ? ['spike', 'dense', 'manifold', 'min', 'split'] : [argv[0]];
+// the demo's DSL is the browser page's own source, frozen under regress/_pv/;
+// there is deliberately no regress/demo.dsl to drift from it
+const DSL = (c) => c === 'demo' ? 'regress/_pv/demo.dsl' : `regress/${c}.dsl`;
 const OUT = SHOT ? mkdtempSync(join(tmpdir(), 'rule-')) : null;
 
 for (const c of CASES) {
-  const text = readFileSync(`regress/${c}.dsl`, 'utf8');
+  const text = readFileSync(DSL(c), 'utf8');
   const ra = G_OFF.renderPid(text, 'graphDiv');
   const rb = G_ON.renderPid(text, 'graphDiv');
   const pos = (r) => {

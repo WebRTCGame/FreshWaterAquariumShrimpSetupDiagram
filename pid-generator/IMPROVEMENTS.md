@@ -835,6 +835,72 @@ is still the blocker that would let the y-ordering rules pay for themselves.
 The 2-D capability is now in place for any future proximity rule; the E-102
 ambiguity case (two peers, one home) is the first question it raises.
 
+### W6 — the shape of a sheet is a choice, and the choice was dead code
+
+2026-10-10, second pass, on the demo sheet's complaint that the drawing is a
+thin band across the top of a 1.55:1 page with ~55% of the sheet empty.
+
+**The finding.** `layout.colsPerRowMax` shipped at **99**, and the aspect-
+matching branch is `else if (numCols > 2)` off a `colsCapRule > 0` guard — so
+with the cap above the rank count the entire sheet-aspect search was DEAD CODE
+(IMPROVEMENTS.md 0.6, confirmed by instrumenting the read: `colsPerRowMax ->
+99`, and by byte-identical renders at caps 3/4/5/6, because every one of them
+collapsed to the same `min(colsPerRow, cap, numCols)`). Every sheet wrapped at
+`floor(availW / colSpacing)` regardless of its shape.
+
+**The demo's band has a second cause, and it is the interesting one.**
+`byId` covers equipment and valves, so every pipe passing THROUGH a junction is
+dropped from the flow graph before the ranker sees it. On the demo that dropped
+7 of the chain's 10 edges: TK-101 -> J-0 -> V-101 -> P-101 -> V-102 -> J-1 ->
+{V-103, V-105, PSV-101} -> J-2 -> OP-101 collapsed from an 11-deep chain to
+**THREE ranks**, six of the ten entities in rank 0 with no edge placing them.
+Measured: rank 0 held TK-101, V-101, V-103, V-105, V-106 and PSV-101.
+
+Ranking through junctions was tried and **rejected on measurement**: spike went
+787 -> 7972 with 5 errors, and the demo's 9-rank chain wrapped into a U that
+doubled the discharge back across the sheet (rendered and looked at). The
+boustrophedon wrap is a snake, and a snake needs a crossing-aware ordering to
+be readable — that is §3.1's Sugiyama work, not a one-line reorder. Filed, with
+the numbers, not pursued.
+
+**What shipped instead: the aspect search, with a balance tie-breaker.**
+The pure aspect metric is right about block shape and wrong about emptiness —
+for dense's 8 ranks it prefers a 6+2 split (error 0.037) over 5+3 (0.146), and
+the second row is then 2/6 full: measured, dense util 53% -> 38% and the sheet
++33. So the search now picks among aspect-equivalent candidates (`wrapAspectTol`,
+0.2 in log space) the one whose rows are most BALANCED, and the registry default
+moved 99 -> 0 to enable it.
+
+| sheet | before (cap 99) | after (aspect, balanced) | Δ |
+|---|---|---|---|
+| demo | 313 (util 42) | 318 (util **64**) | +5 |
+| spike | 885 | 865 | **−20** |
+| dense | 360 | 359 | −1 |
+| min | 52 | 52 | 0 |
+| split | 41 | 41 | 0 |
+| manifold | 246 | 246 | 0 |
+| **sum** | **1897** | **1881** | **−16** |
+
+Both changed sheets were rendered and looked at before shipping: the demo reads
+as the two-row process it is (tank and its level tap at top-left, suction
+through P-101 to the manifold, battery limit bottom-right) instead of a band
+with the tank stranded at mid-left, and spike fills the sheet instead of
+leaving the bottom third empty. `layout.colsPerRowMax:99` reproduces the old
+band; `probe-fire.mjs --shot` is how the pair was compared.
+
+The demo's +5 is a real cost and it is worth naming: the aspect wrap buys its
+fill with crossings 0 -> 3 (unpriced by the score — see `routing.crossings` in
+the objective), one more label collision (30 points), and +88mm of tap reach as
+the pump moves away from the taps that land on it. That last one is W6 again,
+and it is the third separate line of evidence for it.
+
+**Measurement caveat recorded for whoever reads these numbers next:** the
+corpus above was taken while `pid-symbols-bundle.js` was mid-edit by another
+work stream (it moved between the two runs — the 326 -> 360 dense shift that is
+NOT this change), so `regress.mjs` is red on the blessed baseline from that
+edit, not from this one. Verified by stashing this change and re-running: still
+red. Re-bless when the symbol work lands.
+
 
 A P&ID generator: hand-written DSL text → semantic model → orthogonal SVG,
 ~13.8k lines across ten plain-JS files loaded by concatenation

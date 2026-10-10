@@ -274,8 +274,22 @@ const PID_RULES = {
       // the drawable area. Before this the cap did not exist and COL was always
       // availW/numCols, so colsPerRow was always numCols and every drawing came out as
       // one flat horizontal band with the bottom of the sheet empty.
-      colsPerRowMax: { value: 99, min: 0, max: null, unit: 'count', desc: 'max columns per tier row; 0 = auto-fit to the sheet aspect. 2 gives a vertical column layout that fills the height', noScale: true },
+      // 0 = auto-fit to the sheet aspect. WAS 99, which made the entire aspect
+      // branch below it dead code (IMPROVEMENTS.md 0.6): with the cap above the
+      // rank count, `min(colsPerRow, cap, numCols)` always returned the plain
+      // `floor(availW / colSpacing)` wrap, so every sheet drew a horizontal
+      // band whatever its shape. Measured at 0 (balanced-row variant, see the
+      // branch): the demo's utilisation 42% -> 64% and its flow reads as the
+      // two-row process it is, spike -20, dense unchanged because the balance
+      // tie-breaker picks the 5+4 split its 9 ranks want.
+      colsPerRowMax: { value: 0, min: 0, max: null, unit: 'count', desc: 'max columns per tier row; 0 = auto-fit to the sheet aspect. 2 gives a vertical column layout that fills the height', noScale: true },
       colSpacing:   { value: 140, min: 40, max: null, unit: 'mm', desc: 'auto-layout column pitch' },
+      // Log-space window in which the wrap search treats two column counts as
+      // aspect-equivalent and picks the one with the more BALANCED rows. 0.2 is
+      // ~20% of block aspect. Without it the aspect metric prefers a 7+2 split
+      // over 5+4 for a 9-rank chain — right about shape, wrong about emptiness:
+      // measured on dense, util 53% -> 38% and the sheet +33.
+      wrapAspectTol: { value: 0.2, min: 0, max: 1, unit: 'log', desc: 'aspect-equivalence window for the wrap search, inside which balanced rows decide', noScale: true },
       colMax:       { value: 0, min: 0, max: null, unit: 'mm', desc: 'cap the column pitch so the chain stays COMPACT and the fit scale enlarges it, instead of stretching it across the full sheet width. 0 = uncapped' },
       colMaxAlt:    { value: 110, min: 0, max: null, unit: 'mm', noScale: true, desc: 'second column-pitch candidate for the layout search. Capping the pitch is a real per-sheet trade and the corpus splits on it: at 110 spike goes 943 -> 838 (crossings 18 -> 10, label collisions 1 -> 0, 620mm less pipe) while manifold goes 324 -> 373; at 90 the reverse. No single value is right for both, so the engine tries both and scores them -- a candidate, not a score term (9.68)' },
       colMaxAlt2:   { value: 150, min: 0, max: null, unit: 'mm', noScale: true, desc: 'third column-pitch candidate. Two values were not enough: spike refuses anything wider than 110 (789 -> 904, crossings 7 -> 16) because a longer pitch gives the router more room to make detours and it takes them, while manifold wants 150 (264 -> 225, crossings 1 -> 0). A two-element axis has to pick one and the other sheets pay for it: 0/110 sums 1891, 0/150 sums 1967, 0/200 sums 1981' },

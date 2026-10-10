@@ -231,6 +231,38 @@ function autoLayout(data) {
       const m = medianOf(nb);
       want[e.id] = m === null ? yOf[e.id] : m;
     }
+    // ---- placement rules, INSIDE the solve --------------------------------
+    // A rule adjusts the TARGET above, before packing, so the median step, the
+    // >= SEP packing and the re-centring below all still run and can overrule
+    // it. That is the difference between a constraint and a post-hoc edit.
+    //
+    // It runs INSIDE the iteration, not once before it, so a rule's preference
+    // is re-derived from the neighbours' current positions each sweep instead
+    // of being computed once against a stale first guess.
+    //
+    // The alternative — running the same rule as a correction AFTER the solve
+    // (placement-rules.js `enforce`) — was measured and is WORSE by 105 across
+    // the corpus, because by then the tap host, the nozzle runs, the label
+    // stacks and the instrument bubbles have all been placed relative to the
+    // entity it moves. See IMPROVEMENTS.md §0d W4.
+    if (typeof PID_PLACEMENT !== 'undefined' && ruleParam('layout.placementRules', 0) && data.view.layout === 'auto') {
+      try {
+        const rep = PID_PLACEMENT.constrainTargets(data, want, {
+          minGap: ruleParam('layout.ruleMinGap', 20),
+        });
+        if (rep.adjusted) {
+          data.ruleTargets = data.ruleTargets || {};
+          for (const k of Object.keys(rep.byRule)) {
+            data.ruleTargets[k] = (data.ruleTargets[k] || 0) + rep.adjusted;
+          }
+        }
+      } catch (e) {
+        if (!data.ruleTargetError) {
+          data.ruleTargetError = e.message;
+          data.warnings.push(`[PID-LAY-005] placement rule target phase failed: ${e.message}`);
+        }
+      }
+    }
     for (const d of colKeys) {
       const mem = column[d].filter((e) => !e.at && !e.rel);
       if (!mem.length) continue;
@@ -954,7 +986,53 @@ function autoLayout(data) {
   })();
   data.equipList = eqList;
 
-  data.equipList = eqList;
+  // ---- placement RULES: the constraint solver, LAST word on order ----------
+  //
+  // Runs after every placement pass and after passDecrowd, and that position is
+  // load-bearing rather than incidental. passDecrowd is a collision solver: if
+  // a rule moves an entity into a neighbour, decrowd has to be allowed to
+  // resolve it. Running the rules first would have decrowd undo the rule on
+  // the next pass and the two would oscillate. So: rules have the last word on
+  // ORDER (a pump below its suction source), decrowd has the last word on
+  // PROXIMITY (nothing overlaps), and a rule that cannot be satisfied without
+  // a collision is REPORTED rather than forced.
+  //
+  // See IMPROVEMENTS.md §0c for why these are constraints and not score
+  // weights, and §0d for the measured rule set.
+  if (typeof PID_PLACEMENT !== 'undefined' && ruleParam('layout.placementRules', 0)) {
+    try {
+      // passDecrowd has already run, so the sheet is collision-free; asking the
+      // solver to respect `minSep` as well makes it refuse moves that a
+      // drafter would make. 0 lets the rule have the last word on order.
+      const minSep = ruleParam('layout.ruleMinSep', 0);
+      data.ruleReport = PID_PLACEMENT.enforce(data, {
+        minSep: minSep,
+        maxIters: ruleParam('layout.ruleSolverIters', 6),
+        // real glyph half-widths, so the 1-D clearance test uses the same sizes
+        // passDecrowd used instead of a guessed 15mm
+        entHalf: (e) => {
+          try { return PIDEngine.entityHalf(e, data.view.symbolScale || 1) || 15; }
+          catch { return 15; }
+        },
+      });
+      const rep = data.ruleReport;
+      // A rule that stays violated after the solver is a finding, not noise:
+      // it means the constraint is unsatisfiable on this sheet and the layout
+      // is visibly wrong in a way the routing score cannot express.
+      if (rep.post && rep.post.violations) {
+        const byId = {};
+        rep.post.rules.forEach((rr) => { byId[rr.id] = rr; });
+        PID_PLACEMENT.ENFORCEABLE.forEach((en) => {
+          const rr = byId[en.id];
+          if (!rr || !rr.violations) return;
+          data.warnings.push(`[PID-LAY-003] placement rule "${en.id}" still violated after layout: ` +
+            `${rr.violations} site(s), ${rr.measure}mm (${en.gate})`);
+        });
+      }
+    } catch (e) {
+      data.warnings.push(`[PID-LAY-004] placement rule solver failed: ${e.message}`);
+    }
+  }
 
   // ---- the drawing zone: ONE rectangle, published for every consumer ---------
   //

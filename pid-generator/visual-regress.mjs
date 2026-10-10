@@ -148,15 +148,14 @@ Promise.all([load('${b64c}'),load('${b64b}')]).then(([A,B])=>{
   const d = mkdtempSync(join(tmpRoot, 'cmp-'));
   const f = join(d, 'a.html');
   writeFileSync(f, html);
-  const outPng = join(d, 'diff.png');
-  execFileSync(CHROME, ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars',
-    `--user-data-dir=${mkdtempSync(join(tmpRoot, 'ud-'))}`,
-    `--screenshot=${resolve(outPng)}`, `--window-size=${W},${Math.round((W * 559) / 864)}`,
-    '--default-background-color=ffffff', '--virtual-time-budget=8000',
-    '--dump-dom', 'file:///' + f.replace(/\\/g, '/')], { encoding: 'utf8', stdio: 'pipe' });
-
-  // read the JSON payload back out of the DOM dump
-  const dom = execFileSync(CHROME, ['--headless', '--disable-gpu', '--no-sandbox',
+  // ONE Chrome launch. This used to be two: the first took a `--screenshot` of the
+  // same page into `diff.png`, and the return value was discarded — the file was
+  // never read, and the second launch used a FRESH --user-data-dir, so there was no
+  // cache to prime either. It cost one full headless launch per case (6 per run, on
+  // the critical path of every regression) to produce a file nothing opened. The
+  // payload comes back through the DOM dump, which is the only channel that carries
+  // the base64 diff image out of the page.
+  const dom = execFileSync(CHROME, ['--headless', '--disable-gpu', '--no-sandbox', '--hide-scrollbars',
     `--user-data-dir=${mkdtempSync(join(tmpRoot, 'ud-'))}`,
     '--virtual-time-budget=8000', '--dump-dom', 'file:///' + f.replace(/\\/g, '/')],
     { encoding: 'utf8', stdio: 'pipe' });

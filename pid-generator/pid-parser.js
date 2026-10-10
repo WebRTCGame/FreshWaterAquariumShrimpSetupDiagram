@@ -981,19 +981,40 @@ const connCache = {};
  * @returns {{ role: string; direction: string; connectionClass: any; }} 
  */
 
+// Port role, single source of truth: the placement rule layer owns the table
+// (placement-rules.js PORT_ROLE_RULES) and this delegates to it, so a role
+// added for a placement rule cannot drift from the one the router uses when
+// resolving nozzles (pid-router.js:1744).
+//
+// W4 NOTE: the two regex chains had already drifted. This copy knew `vent`,
+// `drain` and `sample` as roles of their own; the rules copy collapses them
+// into `top`/`bottom`, because a placement rule does not care which of the
+// three it was, only that the connection leaves from the top or the bottom.
+// Both vocabularies are right for their own use — which is exactly why one
+// table with an explicit collapse beats two independent chains.
+//
+// The inline fallback keeps pid-parser.js loadable on its own; the harness
+// always loads placement-rules.js first (see harness2.mjs).
 function portMetadata(id, type) {
-  const name = id.toLowerCase();
-  const signal = /actuator|signal|control/.test(name);
-  let role = 'connection', direction = null;
-  if (/suction|inlet|feed|motive|shell[_-]?in|tube[_-]?in|fuel/.test(name)) { role = 'inlet'; direction = 'in'; }
-  else if (/discharge|outlet|product|shell[_-]?out|tube[_-]?out|steam|gas[_-]?out|liquid[_-]?out/.test(name)) { role = 'outlet'; direction = 'out'; }
-  else if (/vent/.test(name)) { role = 'vent'; direction = 'out'; }
-  else if (/drain|bottom/.test(name)) { role = 'drain'; direction = 'out'; }
-  else if (/relief/.test(name)) { role = 'relief'; direction = 'out'; }
-  else if (/sample/.test(name)) { role = 'sample'; direction = 'out'; }
-  else if (/top/.test(name)) role = 'top';
-  else if (/left|right/.test(name)) role = name;
-  if (signal) { role = 'signal'; direction = 'in'; }
+  let role, direction;
+  if (typeof PID_PLACEMENT !== 'undefined') {
+    const r = PID_PLACEMENT.portRole(id);
+    role = r.role; direction = r.direction;
+  } else {
+    const name = id.toLowerCase();
+    const signal = /actuator|signal|control/.test(name);
+    role = 'connection'; direction = null;
+    if (/suction|inlet|feed|motive|shell[_-]?in|tube[_-]?in|fuel/.test(name)) { role = 'inlet'; direction = 'in'; }
+    else if (/discharge|outlet|product|shell[_-]?out|tube[_-]?out|steam|gas[_-]?out|liquid[_-]?out/.test(name)) { role = 'outlet'; direction = 'out'; }
+    else if (/vent/.test(name)) { role = 'vent'; direction = 'out'; }
+    else if (/drain|bottom/.test(name)) { role = 'drain'; direction = 'out'; }
+    else if (/relief/.test(name)) { role = 'relief'; direction = 'out'; }
+    else if (/sample/.test(name)) { role = 'sample'; direction = 'out'; }
+    else if (/top/.test(name)) role = 'top';
+    else if (/left|right/.test(name)) role = name;
+    if (signal) { role = 'signal'; direction = 'in'; }
+  }
+  const signal = role === 'signal';
   return { role, direction, connectionClass: signal ? 'signal' : (type === 'nozzle' || type === 'pipe' ? 'process' : type) };
 }
 /**

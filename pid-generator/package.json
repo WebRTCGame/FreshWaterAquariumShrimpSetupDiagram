@@ -4,7 +4,13 @@
   "version": "1.0.0",
   "description": "P&ID DSL: text -> semantic model -> validated orthogonal SVG",
   "scripts": {
-    "test": "node test.mjs"
+    "test": "node regress.mjs",
+    "test:gated": "node regress.mjs --fail-visual",
+    "test:bless": "node regress.mjs --bless",
+    "measure": "node measure.mjs",
+    "preview": "node preview.mjs",
+    "visual": "node visual-regress.mjs",
+    "audit": "node audit-symbols.mjs"
   },
   "engines": {
     "node": ">=18"

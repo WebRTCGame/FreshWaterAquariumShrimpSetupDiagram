@@ -18,7 +18,7 @@
     "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 262mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 144mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
     "[PID-INS-005] tap \"LT-101\": shares 21mm of process corridor (reads as one line) — move the bubble or add a via",
-    "[PID-ANN-001] 14 label(s) are drawn over process linework: centrifugal pump x1, E-103 x1, NZ-C101-B x1, NZ-E101-O x1, 3\" x1, NZ-P102-S x1, +8 more. A label on a pipe is unreadable; audit item [15] names all of them."
+    "[PID-ANN-001] 10 label(s) are drawn over process linework: centrifugal pump x1, E-103 x1, NZ-E101-O x1, T-102.top x1, gate valve x1, relief valve x1, +4 more. A label on a pipe is unreadable; audit item [15] names all of them."
    ],
    "warningsTotal": 16,
    "score": {
@@ -37,6 +37,8 @@
      "len": 0.05,
      "tap": 0.2,
      "sig": 0.2,
+     "annOnLine": 0,
+     "sigTotal": 0,
      "warn": 5,
      "overlapLen": 12,
      "fill": 400,
@@ -65,7 +67,11 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 1
+     "labelCollisions": 1,
+     "labelOnLine": 10,
+     "nozzleTagsOnLine": 3,
+     "equipTagsOnLine": 0,
+     "valveStacksOnLine": 2
     },
     "lines": {
      "overlaps": 0,
@@ -77,7 +83,9 @@
     },
     "instruments": {
      "tapReachTotal": 226,
-     "maxSignalLen": 220
+     "maxSignalLen": 220,
+     "signalLenTotal": 1467,
+     "signalRuns": 11
     },
     "issues": {
      "errors": 0,
@@ -101,7 +109,7 @@
     "12": 0,
     "13": 0,
     "14": 1,
-    "15": 24,
+    "15": 19,
     "16": 2
    },
    "lists": {
@@ -141,17 +149,17 @@
      "\"centrifugal pump\" on 1 segment(s) @(615,302)",
      "\"E-103\" on 1 segment(s) @(175,399)",
      "\"NZ-R101-B\" on 1 segment(s) @(609,265)",
-     "\"NZ-C101-B\" on 1 segment(s) @(279,244)",
      "\"NZ-E101-O\" on 2 segment(s) @(435,366)",
-     "\"3\"\" on 1 segment(s) @(595,279)",
-     "\"NZ-D101-V\" on 2 segment(s) @(511,169)",
-     "\"NZ-P102-S\" on 1 segment(s) @(595,354)",
-     "\"3\"\" on 1 segment(s) @(595,359)",
      "\"NZ-P102-D\" on 1 segment(s) @(635,366)",
      "\"T-102.top\" on 1 segment(s) @(179,388)",
      "\"gate valve\" on 1 segment(s) @(243,211)",
      "\"control valve\" on 2 segment(s) @(448,281)",
-     "\"PSV-101\" on 1 segment(s) @(647,130)"
+     "\"PSV-101\" on 1 segment(s) @(647,130)",
+     "\"relief valve\" on 1 segment(s) @(647,125)",
+     "\"V-102\" on 1 segment(s) @(595,184)",
+     "\"V-103\" on 1 segment(s) @(468,355)",
+     "\"control valve\" on 3 segment(s) @(468,361)",
+     "\"V-105\" on 3 segment(s) @(227,186)"
     ],
     "16": [
      "\"NZ-R101-T\" x1",
@@ -185,6 +193,8 @@
      "len": 0.05,
      "tap": 0.2,
      "sig": 0.2,
+     "annOnLine": 0,
+     "sigTotal": 0,
      "warn": 5,
      "overlapLen": 12,
      "fill": 400,
@@ -213,7 +223,11 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 0,
+     "labelOnLine": 0,
+     "nozzleTagsOnLine": 0,
+     "equipTagsOnLine": 0,
+     "valveStacksOnLine": 0
     },
     "lines": {
      "overlaps": 0,
@@ -225,7 +239,9 @@
     },
     "instruments": {
      "tapReachTotal": 31,
-     "maxSignalLen": 40
+     "maxSignalLen": 40,
+     "signalLenTotal": 118,
+     "signalRuns": 2
     },
     "issues": {
      "errors": 0,
@@ -305,6 +321,8 @@
      "len": 0.05,
      "tap": 0.2,
      "sig": 0.2,
+     "annOnLine": 0,
+     "sigTotal": 0,
      "warn": 5,
      "overlapLen": 12,
      "fill": 400,
@@ -333,7 +351,11 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 0,
+     "labelOnLine": 2,
+     "nozzleTagsOnLine": 0,
+     "equipTagsOnLine": 1,
+     "valveStacksOnLine": 1
     },
     "lines": {
      "overlaps": 0,
@@ -345,7 +367,9 @@
     },
     "instruments": {
      "tapReachTotal": 21,
-     "maxSignalLen": 92
+     "maxSignalLen": 92,
+     "signalLenTotal": 484,
+     "signalRuns": 4
     },
     "issues": {
      "errors": 0,
@@ -429,6 +453,8 @@
      "len": 0.05,
      "tap": 0.2,
      "sig": 0.2,
+     "annOnLine": 0,
+     "sigTotal": 0,
      "warn": 5,
      "overlapLen": 12,
      "fill": 400,
@@ -457,7 +483,11 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 0,
+     "labelOnLine": 0,
+     "nozzleTagsOnLine": 0,
+     "equipTagsOnLine": 0,
+     "valveStacksOnLine": 0
     },
     "lines": {
      "overlaps": 0,
@@ -469,7 +499,9 @@
     },
     "instruments": {
      "tapReachTotal": 0,
-     "maxSignalLen": 0
+     "maxSignalLen": 0,
+     "signalLenTotal": 0,
+     "signalRuns": 0
     },
     "issues": {
      "errors": 0,
@@ -544,6 +576,8 @@
      "len": 0.05,
      "tap": 0.2,
      "sig": 0.2,
+     "annOnLine": 0,
+     "sigTotal": 0,
      "warn": 5,
      "overlapLen": 12,
      "fill": 400,
@@ -572,7 +606,11 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0
+     "labelCollisions": 0,
+     "labelOnLine": 2,
+     "nozzleTagsOnLine": 0,
+     "equipTagsOnLine": 0,
+     "valveStacksOnLine": 4
     },
     "lines": {
      "overlaps": 0,
@@ -584,7 +622,9 @@
     },
     "instruments": {
      "tapReachTotal": 22,
-     "maxSignalLen": 75
+     "maxSignalLen": 75,
+     "signalLenTotal": 232,
+     "signalRuns": 2
     },
     "issues": {
      "errors": 0,

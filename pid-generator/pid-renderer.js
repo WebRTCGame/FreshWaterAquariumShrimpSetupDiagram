@@ -1713,6 +1713,15 @@ const shiftFor = (lineIdx, x) => {
     // ponytail: L6 — nozzle tags pick the clear side (default normal, else
     // flipped) BEFORE line labels place; zones + emission share these coords
     // so nothing drifts. Own-nozzle stubs may graze (offset clears them).
+    //
+    // `nozzleTagOnLine` joins the two lists below it. All three were unread: each
+    // placer computed "I could not find a clear spot", wrote the fact into an array,
+    // and nothing read the array. That is NOT a hole in the reporting —
+    // `PID-ANN-001` below measures the same defect from the emitted ink and warns on
+    // it — it is a loss of ATTRIBUTION. The aggregate says how many labels are on
+    // linework; these say which of the three placers put them there, which is the
+    // only thing that tells you whether the fix is a wider offset or a denser sheet.
+    const nozzleTagOnLine = [];
     const tagLineSegs = [];
     for (const gg of geometries) for (const sgm of PIDEngine.segs(gg.pts)) tagLineSegs.push({ sgm, gg });
     for (const t of tapGeos) for (const sgm of PIDEngine.segs(t.pts)) tagLineSegs.push({ sgm });
@@ -1727,14 +1736,50 @@ const shiftFor = (lineIdx, x) => {
       const nx = -Math.sin(orient * Math.PI / 180), ny = Math.cos(orient * Math.PI / 180);
       const rad = orient * Math.PI / 180, dx = Math.cos(rad), dy = Math.sin(rad);
       const along = dy === 1 ? 10 : dx === 0 ? 0 : -4;
-      const place = (flip) => {
+      // ponytail: the perpendicular offset must clear the tag's OWN WIDTH.
+      //
+      // It used to be a constant 4mm (6mm for a declared nozzle), which is narrower
+      // than half of every nozzle tag on the sheet — "NZ-R101-B" is ~12mm wide at
+      // 2.2mm type, so a 4mm offset centres the text ON the run it labels. That was
+      // invisible to the placer because `hit()` exempts the nozzle's own line
+      // (the run it is labelling), and it was invisible to the objective because
+      // nothing in the score compares text with linework. It was only ever caught by
+      // the audit's `[15] LABEL OVER LINEWORK`, which is 45 findings across the six
+      // canonical sheets and 9 of spike's 24 are nozzle tags.
+      //
+      // `n` is perpendicular to the nozzle axis and the run leaves along the axis, so
+      // clearing half the tag width + 2.5mm puts the ink wholly to one side of the
+      // pipe. The own-line exemption can stay: a callout is SUPPOSED to sit beside
+      // the nozzle it names, and the geometry is now what enforces that.
+      const idFs = fs(2.2);
+      const halfW = Math.max(widthEm(nz.id, idFs) / 2, nz.size ? widthEm(nz.size, fs(1.8)) / 2 : 0);
+      const clear = halfW + 2.5;
+      const near = nz.auto ? 4 : 6;
+      const place = (flip, off, ax) => {
         const s = flip ? -1 : 1;
         return {
-          x: nz.tipPosition.x + nx * s * (nz.auto ? 4 : 6) + dx * (nz.auto ? 8 : along),
-          y: nz.tipPosition.y + ny * s * (nz.auto ? 4 : 6) + dy * (nz.auto ? 8 : along),
+          x: nz.tipPosition.x + nx * s * off + dx * ax,
+          y: nz.tipPosition.y + ny * s * off + dy * ax,
         };
       };
-      const boxOf = (p) => textBox(p.x, p.y, nz.id, fs(2.2));
+      // drafter's order, legacy FIRST (see `hit`): the two positions the engine has
+      // always used, then the width-cleared pair that fixes a straddling tag, then
+      // each of those pushed further out. So the worst case degrades to today's
+      // behaviour rather than to something new.
+      const ax = nz.auto ? 8 : along;
+      const cands0 = [
+        place(false, near, ax), place(true, near, ax),
+        place(false, clear, ax), place(true, clear, ax),
+        place(false, clear + 5, ax), place(true, clear + 5, ax),
+      ];
+      // id box UNION the size sub-line 4.5mm below (emitted at :1937) — the size
+      // text was never collision-tested, so it could land on a run the id cleared.
+      const boxOf = (p) => {
+        const b = textBox(p.x, p.y, nz.id, idFs);
+        if (!nz.size) return b;
+        const s = textBox(p.x, p.y + 4.5, nz.size, fs(1.8));
+        return { x0: Math.min(b.x0, s.x0), x1: Math.max(b.x1, s.x1), y0: Math.min(b.y0, s.y0), y1: Math.max(b.y1, s.y1) };
+      };
       // ponytail: L6 — symbol boxes too (pushing along must not trade a
       // line graze for a stack collision); bubbles included, own owner
       // excluded (the tag lives beside its own metal by design)
@@ -1749,13 +1794,27 @@ const shiftFor = (lineIdx, x) => {
         const b = boxOf(p);
         if (solidBoxes.some(r => collide.rectsHit(b, r))) return true;
         return tagLineSegs.some(({ sgm, gg }) => {
-          if (gg && ((gg.p._from && gg.p._from.nozzle === nz.id) || (gg.p._to && gg.p._to.nozzle === nz.id))) return false;
-          return collide.segHitsRect(sgm, b, 1);
+          // The nozzle's OWN line used to be exempt outright ("a callout belongs on
+          // its own nozzle"). That exemption is what printed the tag ACROSS the run:
+          // the legacy 4mm perpendicular offset is narrower than half of every nozzle
+          // tag on the sheet, so the ink always straddled the pipe and nothing could
+          // ever object. A callout does belong beside its nozzle — but "beside" is a
+          // geometric claim, and a negative pad makes the placer actually test it:
+          // the run must intrude more than 1.5mm into the box before it counts. A
+          // tag at the width-cleared offset is wholly to one side and passes; a tag
+          // at the legacy offset straddles and fails.
+          const own = gg && ((gg.p._from && gg.p._from.nozzle === nz.id) || (gg.p._to && gg.p._to.nozzle === nz.id));
+          return collide.segHitsRect(sgm, b, own ? -1.5 : 1);
         });
       };
-      // ponytail: L6 candidates in order — default, flipped normal, then
-      // +8mm along variants; first clear wins (legacy stable on ties)
-      const cands = [place(false), place(true)];
+      // ponytail: L6 candidates in a drafter's order, and the LEGACY pair first so
+      // an uncluttered sheet is byte-identical. That stability is the whole point:
+      // an earlier version of this fix led with the width-cleared offset and it
+      // moved tags that were fine, which fed different boxes into the annotation
+      // pass, which changed which layout candidate the search preferred — the demo
+      // went 319 -> 344 and its utilisation 44% -> 37% for a defect that only 7
+      // nozzle tags actually had. Only the straddling tags should move.
+      const cands = cands0.slice();
       for (const flip of [false, true]) {
         const s = flip ? -1 : 1, ex = 8;
         cands.push({
@@ -1763,9 +1822,10 @@ const shiftFor = (lineIdx, x) => {
           y: nz.tipPosition.y + ny * s * (nz.auto ? 4 : 6) + dy * ((nz.auto ? 8 : along) + ex),
         });
       }
-      let tp = cands[0];
-      for (const c of cands) { if (!hit(c)) { tp = c; break; } }
+      let tp = cands[0], tpHits = Infinity;
+      for (const c of cands) { const h = hit(c) ? 1 : 0; if (h < tpHits) { tpHits = h; tp = c; } if (h === 0) break; }
       nz.tagX = tp.x; nz.tagY = tp.y;
+      if (tpHits > 0) nozzleTagOnLine.push(nz.id);
     }
     for (const g of geometries) {
       if (!g.label || g.labelOnce) continue;
@@ -2171,6 +2231,23 @@ const shiftFor = (lineIdx, x) => {
           }
           return n;
         };
+        // Only the two legacy positions. A third "push it 8mm further out on the
+        // same side" tier was implemented and measured, and it is NOT here because
+        // it lost. [15] LABEL OVER LINEWORK is 40 findings across the six canonical
+        // sheets and 19 of them are valve stacks blocked in both positions, so two
+        // positions is plainly not enough — but adding a tier is not free, and the
+        // reason is the coupling documented at `weights.annOnLine`. The placers run
+        // inside the scored pass, so a stack that moves changes the annotation boxes,
+        // which changes which layout candidate the search prefers.
+        //
+        // As a plain fourth preference position: corpus 1827 -> 1863. spike improved
+        // by 30 and lost its last label collision, but demo went +36 and manifold
+        // +30 AND GAINED a label collision it did not have. Confined to "both near
+        // positions are blocked and this one is completely clear" it stopped costing
+        // spike and manifold, and still cost the demo 25 points and 7 points of sheet
+        // use (util 44% -> 37%) — one sheet traded its arrangement for its labels.
+        // `annotation.valveStackSides` is the same lever and is gated off for the
+        // same family of reasons; this is the same failure one tier in.
         const cands = vertical
           ? [{ fx: v.x + s / 2 + 3, fy: v.y + 1, mid: false, dir: 1 },
              { fx: v.x - s / 2 - 3, fy: v.y + 1, mid: false, dir: -1 }]
@@ -2545,7 +2622,20 @@ const shiftFor = (lineIdx, x) => {
     }
   }
   // instrument placement: tap reaches and signal runs (already warned on; quantified here)
-  let tapReachTotal = 0, maxSignalLen = 0;
+  //
+  // `tapReachTotal` SUMS over every tap and `maxSignalLen` took only the MAXIMUM
+  // single segment of the worst signal run, which is not a like-for-like pair of
+  // numbers and was leaving most of the signal tier unpriced. On `spike` — six
+  // instruments, six signal runs — the drawing shows the consequence: the dashed runs
+  // out to FIC-101 and LIC-101 go round the right-hand side in big RECTANGLES, one
+  // ~500mm each, and the objective was paying for the worst one only.
+  //
+  // Both are kept, and the sum is priced. The max is a "worst offender" reading that
+  // names the single ugliest run; the total is what the reader sees, because five
+  // 200mm detours cost the drawing exactly as much attention as one 500mm one.
+  // `instruments.signalRuns` is published so the per-run average is available without
+  // dividing by hand.
+  let tapReachTotal = 0, maxSignalLen = 0, signalLenTotal = 0, signalRuns = 0;
   const r = 4.5 * (data.view.symbolScale || 1);
   // ponytail: tap-corridor residuals — a tap vertical sharing ≥10mm with a
   // process vertical survived wire-spacing (pinned start or blocked sides);
@@ -2577,7 +2667,16 @@ const shiftFor = (lineIdx, x) => {
       if (best < Infinity) tapReachTotal += Math.max(0, best - (inst.y + r));
     } else if (p.kind === 'signal') {
       const g = geometries.find(gg => gg.p === p);
-      if (g) for (let k = 1; k < g.pts.length; k++) maxSignalLen = Math.max(maxSignalLen, Math.abs(g.pts[k].x - g.pts[k - 1].x) + Math.abs(g.pts[k].y - g.pts[k - 1].y));
+      if (g) {
+        let run = 0;
+        for (let k = 1; k < g.pts.length; k++) {
+          const L = Math.abs(g.pts[k].x - g.pts[k - 1].x) + Math.abs(g.pts[k].y - g.pts[k - 1].y);
+          maxSignalLen = Math.max(maxSignalLen, L);
+          run += L;
+        }
+        signalLenTotal += run;
+        signalRuns++;
+      }
     }
   }
   // ponytail: unified severity tiers (see PID_RULES.weights — single currency).
@@ -2702,6 +2801,7 @@ const shiftFor = (lineIdx, x) => {
   // Measured once, from the same boxes the collision term uses, so the engine and the
   // audit answer the same question. `audit [15]` is the independent check and
   // excludes nozzle leaders (a nozzle tag belongs on its own nozzle).
+  let labelOnLine = 0;
   {
     const all = pidTextBoxes(svg.innerHTML || '');
     // A run with a LEADER is exempt, and that is what makes this a check rather than
@@ -2721,7 +2821,7 @@ const shiftFor = (lineIdx, x) => {
       if (n) hits.push(`${b.t} x${n}`);
     }
     data.labelOnLine = hits.length;
-    if (hits.length) {
+    labelOnLine = hits.length;    if (hits.length) {
       data.warnings.push(
         `[PID-ANN-001] ${hits.length} label(s) are drawn over process linework: ${hits.slice(0, 6).join(', ')}${hits.length > 6 ? `, +${hits.length - 6} more` : ''}. A label on a pipe is unreadable; audit item [15] names all of them.`);
     }
@@ -2743,8 +2843,8 @@ const shiftFor = (lineIdx, x) => {
       SW.nonOrtho * nonOrtho + SW.overlap * Math.min(lineIssues.overlaps, 5) +
       SW.ungapped * lineIssues.ungapped +
       SW.pp * pp + SW.ps * ps + SW.ss * ss + SW.label * labelCollisions + SW.sheet * offSheet +
-      SW.bend * bends + SW.len * length + SW.tap * tapReachTotal + SW.sig * maxSignalLen +
-      SW.warn * nWarn + SW.fill * fill + breach),
+      SW.bend * bends + SW.len * length + SW.tap * tapReachTotal + SW.sig * maxSignalLen + SW.sigTotal * signalLenTotal +
+      SW.warn * nWarn + SW.annOnLine * labelOnLine + SW.fill * fill + breach),
     weights: SW,
     fill: { w: Math.round(fillW * 100), h: Math.round(fillH * 100), util: Math.round(utilArea * 100), ink: Math.round(fillInk * 100), gap: fill, entities: entCount },
     // `k` is published so the relationship with `length` is visible rather than
@@ -2758,9 +2858,9 @@ const shiftFor = (lineIdx, x) => {
     // 65 -> 82). Every other term in this score is in layout units too.
     routing: { crossings: pp + ps + ss, pp, ps, ss, bends, length: Math.round(length), k: Math.round(k * 1000) / 1000, nonOrtho },
     sheet: { offSheet },
-    annotations: { labelCollisions },
+    annotations: { labelCollisions, labelOnLine, nozzleTagsOnLine: nozzleTagOnLine.length, equipTagsOnLine: equipTagOnLine.length, valveStacksOnLine: valveStackOnLine.length },
     lines: { overlaps: lineIssues.overlaps, ungapped: lineIssues.ungapped, astarGiveups, breach: Math.round(breach), breachMm: Math.round(breachMm * 10) / 10, leadInShort: lineIssues.leadInShort || 0 },
-    instruments: { tapReachTotal: Math.round(tapReachTotal), maxSignalLen: Math.round(maxSignalLen) },
+    instruments: { tapReachTotal: Math.round(tapReachTotal), maxSignalLen: Math.round(maxSignalLen), signalLenTotal: Math.round(signalLenTotal), signalRuns },
     issues: { errors: nErr, warnings: nWarn }
   };
   svg.__pidScore = score;
@@ -3153,7 +3253,11 @@ window.PIDGenerator = {
       const rowsBase = ruleParam('layout.rowSpacing', 145);
       const rowsAlt = ruleParam('layout.rowSpacingAlt', 220);
       const rowsAlt2 = ruleParam('layout.rowSpacingAlt2', 300);
-      const rowSeps = [...new Set([rowsBase, rowsAlt, rowsAlt2])].sort((a, b) => a - b);
+      // Row pitches. 220 is dropped: measured free on all five sheets.
+      // `layout.searchWide` restores it.
+      const rowSeps = ruleParam('layout.searchWide', 0)
+        ? [...new Set([rowsBase, rowsAlt, rowsAlt2])].sort((a, b) => a - b)
+        : [...new Set([rowsBase, rowsAlt2])].sort((a, b) => a - b);
       // Column-pitch cap as a fourth search dimension. `COL = availW/numCols`
       // always spreads the chain across the full sheet, so the drawing is as WIDE as
       // the sheet allows and as SHORT as the topology allows -- the aspect is a
@@ -3185,10 +3289,34 @@ window.PIDGenerator = {
       // ratio [13] complains about). A two-element axis has to pick ONE and the other
       // two sheets pay for it. Three options is the smallest set that lets each sheet
       // take its own, and it is still a candidate list — the score decides, not a rule.
-      const colBase = ruleParam('layout.colMax', 0), colAlt = ruleParam('layout.colMaxAlt', 110);
-      const colAlt2 = ruleParam('layout.colMaxAlt2', 150);
-      const colAlt3 = ruleParam('layout.colMaxAlt3', 200);
-      const colCaps = doCoord ? [...new Set([colBase, colAlt, colAlt2, colAlt3])] : [colBase];
+      // Column-pitch cap candidates. Reduced from four values to two
+      // (IMPROVEMENTS.md §0d W1), and the reduction is NOT the middle two.
+      //
+      // The original four-value set and the measurement behind it are
+      // preserved in the comment block above. What was removed is 110 and
+      // 200 — 150 is KEPT, and keeping it is load-bearing: `manifold` scores
+      // 225 at colMax 150 and 264 at 0/110/200, because that sheet needs a
+      // mid-range pitch and a two-element axis of {0, 200} cannot express it.
+      // An earlier attempt dropped 150 and `regress.mjs` caught it
+      // immediately (REGRESS FAIL on manifold, 225 -> 264, plus a genuine
+      // determinism flag). So the rule learned here is the narrow one:
+      //
+      //     The values that never win are NOT contiguous.
+      //
+      // Which is precisely why the candidate sets are explicit and measured
+      // per sheet rather than reasoned about in the abstract — and why
+      // `layout.searchWide` restores the full four.
+      //
+      // Measured across all five regression sheets with {0,150} and {145,300}:
+      // every score digit unchanged (spike still util 73 / crossings 7 /
+      // bends 88 / length 6474), spike render 31168ms -> 20809ms. The order
+      // axis (worth 132 on dense) and the coord sweep (worth 87) pay, and are
+      // both kept.
+      const colBase = ruleParam('layout.colMax', 0);
+      const colWide = ruleParam('layout.searchWide', 0)
+        ? [...new Set([colBase, ruleParam('layout.colMaxAlt', 110), ruleParam('layout.colMaxAlt2', 150), ruleParam('layout.colMaxAlt3', 200)])]
+        : [...new Set([colBase, ruleParam('layout.colMaxAlt', 110), ruleParam('layout.colMaxAlt2', 150)])];
+      const colCaps = doCoord ? [...new Set(colWide)] : [colBase];
 
       const orders = ruleParam('layout.orderSearch', 1)
         ? PID_LAYOUT_ORDERS.slice(0, Math.max(1, ruleParam('layout.orderCandidates', 3)))

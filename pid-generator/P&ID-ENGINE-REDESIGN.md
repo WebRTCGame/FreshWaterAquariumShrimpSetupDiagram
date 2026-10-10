@@ -60,6 +60,50 @@ current output "pass". Set it, then let it tell the truth.
 
 ---
 
+## The one rule behind the whole backlog
+
+**The layout cannot price a consequence of a decision it has not finished making.**
+
+Four independent experiments, spread across the log, measured the same thing:
+
+| term | priced at | result |
+|---|---|---|
+| `astarGiveups` (§9.23) | 8 | **removed** — traded a visible label collision for an invisible one |
+| `PID-GEO-002` lead-in (§9.74.3) | 6/mm | **reported, not priced** — charged +309, bought layouts with MORE crossings (7 → 15) |
+| per-jog bend price (§9.75.3) | 0.5/jog | **reverted** — 1827 → 2617, crossings 7 → 17, 1200mm of extra pipe |
+| `sigTotal` signal length (§9.76) | 0.05/mm | **reported, not priced** — 1827 → 1949 |
+
+Every one of these measures something decided *later*: tap reach and signal length are
+consequences of bubble placement (a greedy single pass inside `autoLayout`); the A*
+route that produces a signal run is built at render time, after the search has compared
+its candidates; `PID-GEO-002` is a consequence of the geometry the router picks.
+
+So the layout is asked to minimise a number whose value is decided afterwards, and its
+only lever is to move *equipment* — which costs more than the defect being fixed. The
+search does not fail. It answers the question it was given, correctly, and the drawing
+gets worse. **That is why all four look like "the term is wrong", and none of them is:
+the term is right and the plumbing is missing.**
+
+Three backlog items are this one item, and the unifying fix is not more terms or more
+weights — it is to make the layout's inputs include what are currently its outputs:
+
+- **Stage 1** (resolve before layout) is the general form. Nozzle tags, signal
+  corridors and tap landing points all belong to the layout's inputs.
+- **T3.11** (nozzle materialisation before `autoLayout`) is one instance.
+- These four score terms are four instances.
+
+Until then, **the correct treatment for a term that measures a downstream consequence
+is to report it and price it at zero.** §9.76.
+
+Also settled by measurement, and worth knowing before planning more work: **the search
+is at a local optimum over its entire rule space.** Every layout lever swept in §9.76
+is noise or worse, `PID_LAYOUT_ORDERS` has three entries and `orderCandidates` clamps to
+them, and the only remaining improvements are new capabilities rather than new knob
+values. Render time is 28.5s on `spike` (four column pitches × three row pitches), so
+the next axis is not affordable until Stage 3.
+
+---
+
 ## Stage 1 — Split `parse` into *resolve* then *layout*  ·  *prerequisite for all*
 
 **Answers D1.** Layout currently runs before topology resolution and before
@@ -259,9 +303,16 @@ or unaffordable without it.
   all 5 CHANGED, demo 1.337% pixels, worst block 93.21). Two harness bugs found and
   fixed on the way: it first wrote "current" over the baseline path, so every
   comparison was baseline-vs-itself and always reported `same`.
-- [x] **T0.2** Runs in `regress.mjs` as **reporting only**; promote to failing once it
-  has been clean for a week. Gate on `SYM-CLIPPED` / `SYM-PORT-DRIFT` /
-  `SYM-PORT-PCT` only.
+- [x] **T0.2** ~~Runs in `regress.mjs` as reporting only; promote to failing once it has
+  been clean for a week.~~ **PROMOTED — `regress.mjs --fail-visual`.** The condition it
+  was waiting on is met: the corpus is bit-stable through every layout experiment in
+  this repo, and it stayed stable *because* the gate earned its keep — it caught a 0.048%
+  nozzle-tag nudge and named it, which is the only reason that change could be shown to
+  be surgical rather than structural. Default is still reporting (so a mid-experiment
+  run is not blocked); the gate is one flag, and `--no-visual` is the other way out.
+  `audit-symbols.mjs` is still NOT wired into `regress.mjs` at all — the plan has
+  claimed it runs "reporting only" since T7.1 and it does not. That is a real gap and
+  the next thing to fix here.
 - [ ] **T1.1** ~~Move topology resolution before `autoLayout`~~ → **re-scoped to
   "split `resolveTopology`"** (see 9.33). It reads entity positions 31 times, so it
   cannot be reordered; it must be divided into a position-free assignment pass and a
@@ -343,11 +394,25 @@ consumption across the five live engine files: of the symbol metadata, only
 | `SYM-GRID-PORT` | 97 | no (craft) | port world offset not on the 5 mm grid |
 | `SYM-EXTENTS` | 56 | no | `extents` disagrees with measured content |
 | `SYM-BEHAVIOUR` | 35 | no | `behavior.minProcessPorts=2` with 0 ports defined |
-| **`SYM-PORT-DRIFT`** | **20** | **YES** | port drawn 0.38–12.50 mm from where the engine puts it |
-| `SYM-META-CONFLICT` | 4 | no (trap) | glyph `<metadata>` disagrees with bundle `ports` |
-| `SYM-CLIPPED` | 0 | was **YES** | **FIXED this pass — see below** |
-| `SYM-GRID-SIZE` | 0 | — | all `size` values are multiples of 5 mm ✔ |
+| **`SYM-PORT-DRIFT`** | **0** | — | **was 20; closed on measurement (see T7.2).** No symbol data changed |
+| `SYM-META-CONFLICT` | 0 | — | was 4; **fixed (T7.5)** |
+| `SYM-CLIPPED` | 0 | was **YES** | **FIXED — see below** |
+| `SYM-GRID-SIZE` | **2** | no (craft) | `field-instrument` and `panel-instrument` are `size=13mm`. **This row said `0 ✔` until 2026-09-27 and the ✔ was stale**: the round instrument bubble is now sized from its tag ("Size the instrument bubble to its tag"), so 13mm is a *derived* size and the 5mm-grid rule no longer describes it. The finding is real, the drift is in the table. Decide deliberately: round the derived size up to 15mm, or record instrument bubbles as grid-exempt. Do not leave a ✔ next to a 2. |
 | `SYM-PORT-PCT`, `SYM-DUP-PORT`, `SYM-NO-VIEWBOX`, `SYM-BAD-SIZE` | 0 | — | clean ✔ |
+
+**Counted 2026-09-27 by `regress.mjs` itself** — the census is now printed on every run
+rather than transcribed into this table by hand, which is how it went stale:
+
+```
+SYMBOL AUDIT  581 finding(s) across 6 code(s)  [bbox self-test ok]
+     SYM-ANCHOR            101      SYM-BEHAVIOUR          27
+     SYM-ASPECT            123      SYM-GRID-PORT         133
+     SYM-LABELANCHOR       195      SYM-GRID-SIZE           2
+```
+
+Note `SYM-GRID-PORT` is **133**, not the 97 this table carried, for the same reason
+`SYM-GRID-SIZE` moved: hand-transcribed numbers decay. The three codes marked `GATE` in
+the suite output are the only ones that can fail a build, and all three are at zero.
 
 #### Done this pass
 - [x] **T7.0** **SYM-CLIPPED fixed.** `isa-5.1/valves/relief-safety` had its spring
@@ -373,10 +438,16 @@ consumption across the five live engine files: of the symbol metadata, only
   second copy. **I over-stated this risk; see §9.28.**
 
 #### Open — load-bearing (these change output)
-- [x] **T7.1** `audit-symbols.mjs` runs in `regress.mjs` — **reporting only**.
-  Promote to failing once it has been clean for a week. Gate on `SYM-CLIPPED`,
-  `SYM-PORT-DRIFT` and `SYM-PORT-PCT` only; the dead-metadata codes must not
-  become a build gate or nobody will ever get to zero.
+- [x] **T7.1** ~~`audit-symbols.mjs` runs in `regress.mjs` — reporting only. Promote to
+  failing once it has been clean for a week.~~ **NOW ACTUALLY RUNS.** This item had been
+  marked done since 2026-09-25 and was not: nothing in `regress.mjs` invoked
+  `audit-symbols.mjs`, so all 581 findings were visible only to whoever remembered the
+  command. A plan item describing a check that is not wired up is worse than an absent
+  one, because it reads as done. It runs now, prints the full census on every run with
+  the three gate codes marked `GATE`, asserts the bbox self-test reported `ok`, and
+  fails on `SYM-CLIPPED` / `SYM-PORT-DRIFT` / `SYM-PORT-PCT` under `--fail-visual`.
+  All three are at 0. The dead-metadata codes print and do not gate, on the stated
+  grounds that a gate nobody can ever make green is a gate people learn to ignore.
 - [ ] **T7.2** **Aspect-aware port mapping — ATTEMPTED AND REVERTED.** Implemented
   properly as `PIDEngine.portOffset` / `portDirXY` across all six open-coded sites,
   with the safety invariant verified (175/175 square-viewBox ports bit-identical).
@@ -426,6 +497,37 @@ consumption across the five live engine files: of the symbol metadata, only
   have prevented the whole class.
 
 ### Correctness defects (independent of the stages above; do any time)
+- [ ] **`T6.20` decouple annotation placement from layout selection.** *Added 2026-09-27
+  from §9.77; this is the item three failed experiments all point at.* `audit [15]
+  LABEL OVER LINEWORK` is 40 findings across the six canonical sheets — the largest
+  single defect class in the corpus — and three separate attempts to remove it (a
+  width-aware nozzle tag offset, a third valve-stack position, and a dedicated
+  `weights.annOnLine`) all removed real defects and all made the corpus worse, by three
+  different mechanisms.
+  
+  This is **not** §9.76's rule. Those four terms price a consequence decided after the
+  search has chosen; the placers finish before the score is summed and the ink is
+  already on the page. The mechanism is different and the plan does not name it: **the
+  placers run inside the scored pass**, so moving a label changes the annotation boxes,
+  which changes which candidate wins. The objective cannot say "this sheet is better
+  because the labels are on it", so every fix trades a defect for an arrangement and no
+  weight settles it. The one change that *was* free (nozzle tags, `[15]` 45 → 40 at a
+  byte-identical score) is free precisely because it leads with the legacy position and
+  **cannot change which candidate wins**.
+  
+  **Do:** write more fixes in that shape, and treat it as the practical form of Stage 3
+  until Stage 3 lands. A placement change is free iff it cannot perturb candidate
+  selection — legacy position first, move only what is actually broken. Where that is
+  impossible, the placement has to move out of the scored pass (evaluate layout on a
+  layout-only fitness, place annotations after the winner is chosen), which is T3.1/T3.2.
+- [ ] **`T6.21` the two unread placer arrays.** `valveStackOnLine` and
+  `equipTagOnLine` were written by their placers and read by nothing; `nozzleTagOnLine`
+  joins them. `PID-ANN-001` already reports the aggregate defect, so this was never a
+  hole in the reporting — it was a loss of **attribution**, and the count is now
+  published in `score.annotations.{nozzleTagsOnLine,equipTagsOnLine,valveStacksOnLine}`.
+  The next attempt at T6.20 should start by reading those three numbers: they say which
+  placer is failing, which is the only thing that separates "widen the offset" from
+  "this sheet is too dense".
 - [ ] **T6.1** `PID-INS-004` cannot detect an over-long drop — add a "bubble too far from host" check *(answers the defect §9.21 could not see)*
 - [x] **T6.2** Taps in the in-engine geometry audit — **done, with a correction.**
   The original claim ("invisible to the entire geometry audit") was **too broad**:

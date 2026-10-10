@@ -4333,3 +4333,277 @@ remaining 14 on the demo are all at lead-ins, which are protected on purpose.
 
 No score change. `routing.k` published; `routing.length` confirmed correct. Two
 negative results recorded, one of them about my own reasoning.
+
+---
+
+## 9.76 The rule behind four separate measurements: the layout cannot price a consequence
+
+This is the most useful thing found in several rounds of work, and it is a rule rather
+than a fix. Four separate experiments, spread over the log, all measured the same
+thing.
+
+### The four
+
+| # | term | priced at | result | what the search did |
+|---|---|---|---|---|
+| 1 | `astarGiveups` (9.23) | 8/Make | **removed** | traded a visible label collision for an invisible one |
+| 2 | `PID-GEO-002` lead-in (9.74.3) | 6/mm | **reported, not priced** | charged +309 and bought layouts with MORE crossings (7 -> 15) |
+| 3 | per-jog bend price (9.75.3) | 0.5/jog | **reverted** | 1827 -> 2617, crossings 7 -> 17, 1200mm of extra pipe |
+| 4 | `sigTotal` signal length (below) | 0.05/mm | **reported, not priced** | 1827 -> 1949; bought nothing |
+
+### The fourth, in full
+
+`tapReachTotal` sums over every tap. `maxSignalLen` took the **maximum single segment
+of the worst signal run**. That is not a like-for-like pair, and the gap is large:
+
+```
+  case       runs   worst segment   TOTAL signal   process pipe   signal as % of pipe
+  demo         2         38mm            128mm         1606mm           8%
+  spike       11        220mm           1467mm         6474mm          23%
+  dense        4         92mm            484mm         3079mm          16%
+  min          2         40mm            118mm          507mm          23%
+  split        0          0mm              0mm          609mm           0%
+  manifold     2         75mm            232mm         2463mm           9%
+```
+
+So on `spike` the objective was paying 220mm (44 points) and ignoring 1467mm — and
+the render shows exactly what the ignored 1247mm looks like: the dashed runs to FIC-101
+and LIC-101 go round the right-hand side of the sheet in large RECTANGLES, which is the
+"instrument tier reads as disconnected" complaint 9.57 raised and has never been fixed.
+
+Pricing the total at the same rate as process pipe (0.05/mm — on a P&ID a signal run
+and a pipe run cost the same ink and the same eye) gives:
+
+```
+  case       as-is   sigTotal priced
+  demo         319         325
+  spike        789         862
+  dense        384         409
+  min           65          71
+  split         45          45
+  manifold     225         237
+  sum         1827        1949
+```
+
+Worse on four of six, by 122. The count stays in `instruments.signalLenTotal` and
+`.signalRuns`, so the 1467 is now visible; the price is zero.
+
+### Why, stated once
+
+**Every one of these terms measures a CONSEQUENCE of a decision the layout has not
+finished making.**
+
+- Tap reach and signal length are consequences of *bubble placement*.
+- Bubble placement is a greedy single pass inside `autoLayout`, constrained by free
+  slots, riser corridors and whatever the render will later draw.
+- The A* route that produces the signal run is built at RENDER time, after the layout
+  search has already compared its candidates.
+- `PID-GEO-002` is a consequence of the geometry the router picks, and the router
+  grants a full lead-in only where there is room in the port's own direction.
+- A* give-ups are a consequence of a grid the obstacles made unreachable.
+
+So the layout is asked to minimise a number whose value is decided later, and the only
+lever it has is to move *equipment* — which costs more than the instrument-tier defect
+being fixed. The search does not fail; it answers the question it was given, correctly,
+and the drawing gets worse. That is why these four all look like "the term is wrong"
+and none of them is: **the term is right and the plumbing is missing.**
+
+### What it reframes
+
+The backlog has been carrying these as separate items. They are one item:
+
+- **T2** (declare the constraints) is the general form.
+- **T3.11** (move nozzle materialisation before `autoLayout`) is one instance.
+- These four score terms are four instances.
+
+The unifying fix is not more terms and not more weights. It is to make the layout's
+inputs include the things that are currently its outputs — nozzle tags, signal
+corridors, tap landing points — and then most of these terms become satisfiable instead
+of unpriceable. Until that happens, **the correct treatment for a term that measures a
+downstream consequence is to report it and price it at zero**, and this log now has
+four independent measurements saying so rather than one opinion.
+
+### Also refuted on measurement, not pursued
+
+- **`T6.18` collinear self-overlap.** `lines.overlaps` compares geometry PAIRS, so a
+  single pipe retracing its own corridor is a different question and had no check.
+  Measured across all 89 emitted paths on all six sheets: **0 self-overlaps**, and 0
+  real U-turns (>170 degrees). The 12 apparent U-turns my first detector found were an
+  artefact of joining across the `M` of a new subpath — the engine emits the lead-in
+  stub as its own subpath with an 8mm gap, and a detector that ignores `M` manufactures
+  a 180-degree "U-turn" that is not in the drawing. T6.18 is not a live defect; it is
+  filed as refuted rather than left open, because the gap in the *check* was real even
+  though the corpus is clean.
+
+### The layout rule space is exhausted
+
+Before concluding, every layout lever nobody had touched since the fit was fixed was
+swept, and all of them are noise or worse:
+
+```
+  setting                        demo   spike   dense   min  split  manifold   sum
+  (as-is)                         319     789     384     65     45       225    1827
+  minSepAlt 45 -> 70              319     789     380     65     45       225    1823
+  decrowdIters 4 -> 8             319     789     384     65     45       225    1827
+  decrowdZone 0.5 -> 0.8          315     834     415     65     45       305    1979
+  crowdX 34 -> 50                 308     900     384     65     45       262    1964
+  decrowdAir 14 -> 22             344     824     384     65     45       228    1890
+  labelZone 16 -> 22              344     789     418     65     45       284    1945
+```
+
+`minSepAlt:70` buys 4 points on dense and doubles the candidate count, so it is not
+worth it. Everything else is worse. The order axis is also full: `PID_LAYOUT_ORDERS`
+has three entries and `orderCandidates: 6` and `: 9` both clamp to the same three.
+
+**The search is at a local optimum over its entire rule space.** Every remaining
+improvement is a new capability, not a new knob value.
+
+---
+
+## 9.77 A fifth measurement of §9.76, and the one case where the rule does not apply
+
+Three attempts to fix `[15] LABEL OVER LINEWORK` — 45 findings across the six canonical
+sheets, the largest single defect class in the corpus — and one of them shipped free.
+The other two are the most interesting result in this log, because they fail for a
+reason §9.76 does not predict.
+
+### The corpus as it stood
+
+`audit [15]` (text against linework; a leadered line designation is exempt) over all six
+sheets, and the same number split by which placer put the ink there:
+
+| | demo | spike | dense | min | split | manifold | total |
+|---|---|---|---|---|---|---|---|
+| `[15]` | 9 | 24 | 6 | 0 | 0 | 6 | **45** |
+
+Attributed by hand from the finding text: 9 are nozzle tags, 19 are valve label stacks
+(a tag or its `CONTROL VALVE` / `GATE VALVE` / `RELIEF VALVE` description row), 7 are
+equipment tags and descriptions, 4 are line specs, 6 are instrument and leader text.
+
+The valve column is the one that matters, and the engine already knew: the stack placer
+computes `chosenHits`, pushes `v.id` into `valveStackOnLine` when it is non-zero, and
+**nothing ever reads that array.** Same for `equipTagOnLine`. Two of the three placers
+were reporting their own failures into a variable that was then dropped on the floor.
+
+### What that is NOT
+
+It is tempting to call that the bug. It is not. `PID-ANN-001` measures the same defect
+from the emitted ink — every text run in the finished sheet, not just the two placers
+that were taught to avoid it — and warns on it, so the defect was already reported and
+already inside the objective at the generic 5 points per warning. What the two dead
+arrays cost is **attribution**: the aggregate says how many labels are on linework, the
+arrays say which placer put them there, and that is the only thing that distinguishes
+"widen the offset" from "this sheet is too dense". They are now published in
+`score.annotations.{nozzleTagsOnLine,equipTagsOnLine,valveStacksOnLine}`, which is
+where the next attempt should start reading.
+
+### 1. Width-aware nozzle tag offset — SHIPPED, and free
+
+`pid-renderer.js`, the nozzle tag pre-pass. The perpendicular offset was a constant
+`4mm` (`6mm` for a declared nozzle) and the tag is centred on that point, so the box
+spans ±half the tag width around it. "NZ-R101-B" at 2.2mm type is ~12mm wide: **the
+offset was narrower than half the tag**, so every nozzle callout was centred *across*
+the run it labelled.
+
+Nothing objected, for two reasons that had to be found separately:
+
+1. `hit()` **exempted the nozzle's own line** — "a callout belongs on its own nozzle" —
+   so the run it was straddling could never reject the placement.
+2. The `size` sub-line drawn 4.5mm below the id was never in the collision box at all.
+
+The fix offsets perpendicular by `halfWidth + 2.5mm` and collision-tests the union of
+both text lines, with the own-line exemption replaced by a strict test (`pad -1.5`: the
+run must intrude more than 1.5mm into the box). `n` is perpendicular to the nozzle axis
+and the run leaves along the axis, so clearing half the tag puts the ink wholly to one
+side.
+
+**This did not work the first time, and the reason is the whole point of this entry.**
+Leading the candidate ladder with the width-cleared offset moved tags that were already
+fine, which changed the annotation boxes, which changed which layout candidate the
+search preferred:
+
+```
+  case      baseline   cleared-first ladder
+  demo         319              344        util 44% -> 37%
+  spike        789              789
+  others                          identical
+  sum         1827             1852
+```
+
+Five real defects fixed, +25 on the score, and the demo visibly sparser. Reordering so
+the **legacy position leads** and only a straddling tag moves:
+
+```
+  case      baseline   legacy-first ladder
+  all six                        identical   (sum 1827)
+  `[15]` 45 -> 40   demo 9, spike 19, dense 6, manifold 6
+```
+
+**45 → 40 at a byte-identical score on every sheet.** `visual-regress` confirms the
+change is surgical: 0.048% of pixels on spike, and the demo diff image is two small tags
+near TK-101 and nothing else.
+
+The generalisable finding: **a placement change that cannot change which candidate wins
+cannot cost anything.** That is the shape to write more fixes in, and it is available
+today without touching the architecture.
+
+### 2. A third position for a blocked valve stack — REVERTED
+
+`[15]`'s largest sub-class is 19 valve stacks, and every one of them is the same
+complaint: above/below (or left/right, rotated) are both blocked. Two positions is not
+a search. A third "push it 8mm further out **on the same side**" tier was added, on the
+reasoning that it is a smaller deviation than the sideways pair that
+`annotation.valveStackSides` already gates off for a measured reason.
+
+It loses, and it loses the way everything else on this list loses:
+
+```
+  as a 4th preference position      sum 1827 -> 1863
+      spike  789 -> 759   (and its last label collision went to 0)
+      demo   319 -> 355
+      manifold 225 -> 255   AND GAINED a label collision it did not have
+
+  confined to "both near blocked AND this one is clear"
+      spike, dense, manifold  back to baseline
+      demo   319 -> 344   util 44% -> 37%
+```
+
+The second form is the interesting one: it stops costing two sheets and still costs the
+demo 25 points and 7 points of sheet use, because on the demo it *does* fix a real label
+and the objective will not pay for the arrangement it trades. `valveStackSides` is the
+same lever one tier in, gated off for the same family of reasons.
+
+### 3. Pricing label-over-linework — REVERTED, and the rule needed widening
+
+`PID-ANN-001` rode the generic `warn` weight at 5. `weights.annOnLine` gave it its own
+weight so the search could defend sheet area with label clearance:
+
+```
+  annOnLine   0 -> 20
+  demo    319 -> 376    util 44% -> 31%
+  spike   789 -> 969
+  dense   384 -> 420    util 45% -> 38%
+  manifold 225 -> 245
+  sum     1827 -> 2120
+```
+
+Worse on four of six, by 293, and it bought the sparser sheets rather than the cleaner
+labels — the `util` obituary all over again.
+
+**This is the case §9.76's rule does not cover, and that is why it is worth writing
+down.** The four terms in §9.76 all measure a consequence decided *after* the search has
+compared its candidates. This one does not: the placers run inside the scored pass, the
+ink is on the page, and the number is read off it. The decision is complete when the term
+is evaluated. By the letter of the rule it is priceable, and it still fails.
+
+The real reason is a coupling §9.76 does not name: **label placement and layout
+selection are entangled.** The placers run inside the scored pass, so moving a label
+changes the annotation boxes, which changes which candidate wins, and the objective
+cannot express "this sheet is better because the labels are on it". Every
+annotation-placement fix therefore trades a defect for an arrangement, and no weight
+settles it. `annOnLine` ships at **0** with the count published, and the honest reading
+is that this is Stage 3 work, not a tuning problem.
+
+Three measurements, three different mechanisms, one shape: the annotation tier is not
+badly tuned, it is structurally unable to improve without decoupling it from layout
+selection.

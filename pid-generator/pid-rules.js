@@ -104,7 +104,72 @@ const PID_RULES = {
   weights: {
     err: 1000, nonOrtho: 500, overlap: 150, ungapped: 150,
     pp: 15, ps: 10, ss: 5, label: 30, sheet: 100,
-    bend: 2, len: 0.05, tap: 0.2, sig: 0.2, warn: 5,
+    bend: 2, len: 0.05, tap: 0.2, sig: 0.2,
+    // `annOnLine` prices a label drawn across a process pipe, and it is the one
+    // annotation term that gets its OWN weight rather than riding the generic `warn`.
+    //
+    // The reason it needs one is a measured coupling, and it is the same story three
+    // times over. Two independent attempts to fix the defect — a width-aware nozzle
+    // tag offset, and a third "push it further out" tier for a valve stack whose two
+    // positions are both blocked — each removed real label-over-linework and each
+    // made the corpus WORSE, because the placers run before the score, so changing
+    // where a label lands changes the annotation boxes, which changes which layout
+    // candidate the search prefers. The fix bought a clean label and sold a sparser
+    // sheet, and at 5 points per warning the objective could not tell the trade was
+    // bad. demo 319 -> 344 and utilisation 44% -> 37% for one sheet's worth of
+    // labels; as a plain fourth preference position the valve tier cost 36 across the
+    // corpus and added a NEW label collision on manifold.
+    //
+    // This term is NOT one of the four the redesign plan's "one rule" disqualifies.
+    // Those all measure a consequence decided AFTER the search has chosen — tap
+    // reach, signal length, per-jog bends, lead-in. This one measures work the
+    // renderer finished doing before the score was summed: the placers have run, the
+    // ink is on the page, and the number is read off it. The decision is complete
+    // when the term is evaluated, so pricing it is not a lookahead.
+    //
+    // 20 was the measured number and it is WRONG, which is the point. Pricing a label
+    // on a pipe at 20 took the corpus 1827 -> 2120 (spike +180, dense +36, demo +57,
+    // manifold +20) and dropped sheet utilisation on three sheets. The search bought
+    // label clearance with sheet area, exactly as the `util` term did before it.
+    //
+    // This is therefore the FIFTH independent measurement of the rule the redesign
+    // plan states — after `astarGiveups`, the lead-in term, per-jog bends and
+    // `sigTotal` — and the first one on a term that is NOT a downstream consequence.
+    // The plan's disqualification does not apply here: the placers have finished and
+    // the ink is on the page before this number is read. And it still fails, for a
+    // reason the plan does not anticipate. It is not that the layout is being asked
+    // to price an unfinished decision. It is that **label placement and layout
+    // selection are coupled**: the placers run inside the scored pass, so moving a
+    // label changes the annotation boxes, which changes which candidate wins, and
+    // the objective cannot express "this sheet is better because the labels are on
+    // it". Every annotation-placement fix therefore trades a defect for an
+    // arrangement, and no weight settles it.
+    //
+    // The decoupling already exists for one of the three placers and it is the only
+    // placement change in this project that has ever been free: the width-aware
+    // nozzle tag offset (see `pid-renderer.js`, the `clear` candidate) took audit
+    // [15] from 45 to 40 across the six sheets at a byte-identical score, because it
+    // leads with the LEGACY position and only moves a tag that actually straddles
+    // its run. A fix that cannot change which candidate wins cannot cost anything.
+    // That is the shape to write more of, and it is Stage 3 work, not a weight.
+    annOnLine: 0,
+    // `sig` prices the WORST single signal segment; `sigTotal` prices EVERY millimetre
+    // of EVERY signal run, and it is ZERO — which is the fourth measurement of the
+    // same answer, not a copy of the third.
+    //
+    // The gap is real and worth naming: `tapReachTotal` sums while `maxSignalLen` took
+    // a maximum, so on `spike` — 11 signal runs totalling **1467mm**, which is 23% of
+    // its 6474mm of process pipe, with the dashed runs going round the right-hand side
+    // in ~500mm rectangles — five of the six detours were free.
+    //
+    // Pricing them at 0.05/mm, the same rate as process length, costs **+122** across
+    // the corpus (spike 789 -> 862, dense 384 -> 409, min 65 -> 71, manifold
+    // 225 -> 237). The drawing gets worse, not better. The count stays in
+    // `instruments.signalLenTotal` / `.signalRuns` so the 1467 is visible, and §9.76
+    // has the synthesis: tap reach and signal length are consequences of bubble
+    // placement, and the layout cannot price a consequence of a decision it has not
+    // finished making.
+    sigTotal: 0, warn: 5,
     overlapLen: 12,
     fill: 400,
     // 400 is the measured THRESHOLD, not a guess. Below it the term is inert on every
@@ -245,7 +310,26 @@ const PID_RULES = {
       junctionGap:  { value: 22, min: 6, max: null, unit: 'mm', desc: 'junction sit-out distance on port lead-out axis' },
       centre:       { value: 1, min: 0, max: 1, unit: 'bool', desc: 'translate the composed block to centre it on the sheet' },
       orderSearch:  { value: 1, min: 0, max: 1, unit: 'bool', desc: 'search placement-pass orders and keep the best by score' },
+      // ---- placement RULES (IMPROVEMENTS.md §0c/§0d W4) ----
+      // Unlike every `layout.*` key above, these are CONSTRAINTS, not
+      // weights. A rule that applies is satisfied, not traded against sheet
+      // fullness or pipe length — see P&ID-ENGINE-REDESIGN.md:63-96. Each
+      // ships 0 until it has been measured on its own; `placement-audit.mjs`
+      // reports the violations a rule would fix, and `enforce()` reports what
+      // is STILL violated after the solver ran.
+      ruleSuctionSourceAbove: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'a pump sits below its suction source. MEASURED AND REVERTED — it fixes what it targets (dense crossings 5->2) but costs more than it buys elsewhere (corpus +105). Solver and rule are sound; the post-hoc application is not. See IMPROVEMENTS.md §0d W4' },
+      ruleSolverIters: { value: 6, min: 1, max: 20, unit: 'count', noScale: true, desc: 'max fixed-point iterations of the placement rule solver. Capped on purpose: an uncapped fixpoint loop in a layout pass is how a renderer hangs' },
+      ruleMinSep: { value: 0, min: 0, max: 200, unit: 'mm', noScale: true, desc: 'clearance the rule solver must leave around a moved entity, measured in the axis it moves. 0 = rely on passDecrowd, which has already run; a positive value makes the solver refuse moves a drafter would make' },
+      ruleMinGap: { value: 20, min: 0, max: 120, unit: 'mm', desc: 'minimum y separation a placement rule asks for between two entities, applied as a TARGET inside the coordinate solve (not as a post-hoc move). This is what makes the ordering visible on the drawing rather than a 5mm token' },
+      placementRules: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'run the placement rule constraint solver (pid-router.js, after passDecrowd). Master switch for every layout.rule* key. DEFAULT 0 — the solver works and the rules are correct, but a constraint applied AFTER layout cannot pay for its own knock-on effects (measured: +105 across the corpus). Ship order is inside the coordinate solve, not after it' },
       orderCandidates: { value: 3, min: 1, max: 3, unit: 'count', desc: 'how many pass orders to try' },
+      // Search WIDTH, not a layout parameter: 0 = the reduced candidate sets
+      // that measured free across the corpus (24 full renders per sheet,
+      // spike 31.2s -> 20.8s, every score digit unchanged). 1 = the original
+      // wide sets (72 renders), kept because the reduction is a property of
+      // THESE five sheets and not a proof about a new corpus. See
+      // IMPROVEMENTS.md §0d W1.
+      searchWide: { value: 0, min: 0, max: 1, unit: 'bool', desc: 'search the full row-pitch and column-cap axes (72 renders) instead of the reduced sets (24 renders) that measured free' },
       centreBottomReserve: { value: 60, min: 0, max: null, unit: 'mm', noScale: true, desc: 'bottom band reserved for the title block when centring' },
     },
     annotation: {

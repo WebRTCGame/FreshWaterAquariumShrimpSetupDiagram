@@ -3,7 +3,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 // Usage: node harness2.mjs [out.svg] [--src=file.dsl] — renders pid-spike.html
 // source (or the given DSL file), writes SVG, prints errors/warnings/score.
 // Exit 1 on errors.
-const files = ['pid-textmetrics.js', 'pid-rules.js', 'pid-collide.js', 'geometric_objects.js', 'pid-symbols-bundle.js', 'assembly.js', 'pid-parser.js', 'pid-router.js', 'pid-validator.js', 'pid-renderer.js'];
+// placement-rules.js must load BEFORE pid-parser.js: portMetadata() delegates
+// its port-role table to PID_PLACEMENT, and having one table is what stops the
+// two copies drifting (see the note at that function).
+const files = ['pid-textmetrics.js', 'pid-rules.js', 'pid-collide.js', 'geometric_objects.js', 'pid-symbols-bundle.js', 'assembly.js', 'placement-rules.js', 'pid-parser.js', 'pid-router.js', 'pid-validator.js', 'pid-renderer.js'];
 const GEN = files.map((f) => readFileSync(f, 'utf8')).join('\n;\n');
 const srcArg = process.argv.find((a) => a.startsWith('--src='));
 const demo = srcArg ? readFileSync(srcArg.slice(6), 'utf8')

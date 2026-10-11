@@ -312,7 +312,28 @@ const PID_RULES = {
       crowdX:       { value: 34, min: 0, max: 200, unit: 'mm', desc: 'horizontal proximity within which two entities must be de-crowded vertically' },
       decrowdZone:  { value: 0.5, min: 0, max: 4, unit: 'ratio', desc: 'multiple of the label zone reserved per entity when de-crowding' },
       instLabelZone:{ value: 1, min: 0, max: 4, unit: 'ratio', desc: 'multiple of the label zone kept clear below an instrument bubble' },
-      tapAlign:     { value: 60, min: 0, max: 200, unit: 'mm', desc: 'max vertical travel allowed when aligning a bubble to its line-tap elevation' },
+      // 20, not the 60 this rule was born with: the 60 came from the era when
+      // the only consumer was the (dead) nozzle-tip loop in `stackOn`, so it
+      // was never load-bearing. Measured 2026-10-11 with tapPortElevation live:
+      // at 60 the alignment reaches far enough to reflow the routing and the
+      // corpus hands back the whole tap-reach win (spike +20, label collisions
+      // 1 -> 5); at 20 the alignment lands the bubble on the port elevation and
+      // no further, the routing does not reflow, and the corpus is -22.
+      tapAlign:     { value: 20, min: 0, max: 200, unit: 'mm', desc: 'max vertical travel allowed when aligning a bubble to its line-tap elevation. 20 is the measured shipping value (W7)' },
+      // The landing point's elevation for a `.line` tap, read from the host's
+      // port GEOMETRY (letterbox-correct portOffset) instead of the host's
+      // bounding-box top. `data.nozzles` is empty until after layout, so the
+      // nozzle-tip path in stackOn cannot fire HERE; this is the layout-time
+      // form of it.
+      //
+      // MEASURED 2026-10-11 (IMPROVEMENTS.md §0d W7): corpus 1881 -> 1859 with
+      // spike's tapReachTotal 491 -> 136mm — the cost three separate
+      // measurements had been paying. The 2026-09-25 attempt at the same idea
+      // measured much worse (spike 1051 -> 2161) but was aiming with the
+      // pre-SYM-PORT-DRIFT offset formula, so it was not measuring what it
+      // claimed to. Paired with tapAlign 20: at 60 the alignment reaches far
+      // enough to reflow the routing and the corpus gives the win back.
+      tapPortElevation: { value: 1, min: 0, max: 1, unit: 'bool', desc: 'align a line-tap bubble to the tapped PORT elevation (symbol geometry) rather than the host bounding box. SHIPPED 2026-10-11 on the W7 measurement; paired with layout.tapAlign 20' },
       decrowdIters: { value: 4, min: 1, max: 20, unit: 'count', desc: 'de-crowding relaxation sweeps' },
       terminals:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 're-anchor off-page connectors to their partner after all placement passes' },
       terminalClear:{ value: 14, min: 0, max: 60, unit: 'mm', desc: 'min clearance between a terminal and its anchor\'s other pipe runs' },

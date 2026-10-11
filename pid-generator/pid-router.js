@@ -394,14 +394,11 @@ function autoLayout(data) {
     }
     if (!conn) continue;
     const size = (eq.symbol ? symbolSize(eq.symbol) : symbolSize(SYMBOL_KEYS[eq.type] || 'pip/equipment/vessel-vertical')) * (eq.scale || 1) * (data.view.symbolScale || 1);
-    const sx = ((conn.x - 50) / 100) * size, sy = ((conn.y - 50) / 100) * size;
-    let rx = sx, ry = sy, pdx = conn.x - 50, pdy = conn.y - 50;
-    if (eq.rotation) {
-      const rp = PIDEngine.rotatePoint(rx, ry, eq.rotation);
-      rx = rp.x; ry = rp.y;
-      const rd = PIDEngine.rotatePoint(pdx, pdy, eq.rotation);
-      pdx = rd.x; pdy = rd.y;
-    }
+    // same letterbox-aware mapping the renderer uses, so the port the router aims at and
+    // the port the ink draws are one number
+    const off = PIDEngine.portWorld(eq.symbol || (SYMBOL_KEYS[eq.type] || ''), conn, size, eq.rotation, 1);
+    const rx = off.x, ry = off.y;
+    let pdx = off.x, pdy = off.y;
     // ponytail: key off the nozzle tip when one is defined — pipes attach at
     // tips, and snapping to the glyph port crowds the valve onto the stub.
     // (tips are position-only at this stage; resolveNozzlePositions fills the
@@ -572,17 +569,24 @@ function autoLayout(data) {
     }
     return offs;
   })();
-  const freeSlot = (x, y) => {
+  // Is this slot free? Hoisted out of `freeSlot` because the port-elevation
+  // alignment in `stackOn` needs to ASK before it commits: an aligned
+  // elevation that is already taken makes freeSlot dodge the bubble SIDEWAYS,
+  // which moves the tap's landing off the host's run — the very dogleg the
+  // alignment exists to remove. Measured on the demo: FT-101's bubble left
+  // P-101's column entirely and dropped onto a neighbouring run.
+  const slotTaken = (x, y) => {
     const FS = ruleParam('layout.freeSlot', 45);
-    const taken = (sx, sy) =>
-      usedSlots.some(s => Math.abs(s.x - sx) < FS && Math.abs(s.y - sy) < FS) ||
-      avoidBoxes.some(b => Math.abs(b.e.x - sx) < b.h && sy > b.y0 && sy < b.y1);
+    return usedSlots.some(s => Math.abs(s.x - x) < FS && Math.abs(s.y - y) < FS) ||
+           avoidBoxes.some(b => Math.abs(b.e.x - x) < b.h && y > b.y0 && y < b.y1);
+  };
+  const freeSlot = (x, y) => {
     // home position first (displacement 0), then shortest-displacement wins
-    if (!taken(x, y)) { usedSlots.push({ x, y }); return { x, y }; }
+    if (!slotTaken(x, y)) { usedSlots.push({ x, y }); return { x, y }; }
     const rest = pidShuffle(slotCands.filter(o => o.d > 0), 2)
       .slice().sort((a, b) => a.d - b.d);
     for (const o of rest) {
-      if (!taken(x + o.dx, y + o.dy)) { const s = { x: x + o.dx, y: y + o.dy }; usedSlots.push(s); return s; }
+      if (!slotTaken(x + o.dx, y + o.dy)) { const s = { x: x + o.dx, y: y + o.dy }; usedSlots.push(s); return s; }
     }
     return { x, y };
   };
@@ -633,6 +637,54 @@ function autoLayout(data) {
         if (cand > 34 && cand < SHEET_H - 42 && Math.abs(cand - yy) <= ruleParam('layout.tapAlign', 60)) yy = cand;
       }
     }
+    // ---- the landing point's elevation, from the symbol's own geometry ----
+    //
+    // `data.nozzles` is EMPTY until resolveNozzlePositions runs — long after
+    // this pass — so the nozzle-tip loop above is dead HERE, and the bubble
+    // lands at the host's bounding-box top instead of the elevation the tap
+    // will actually connect to. That gap is PID-INS-006's sideways travel:
+    // the bubble is then `tapReachTotal` millimetres from its own landing
+    // point, which is the cost three separate measurements have now paid for.
+    //
+    // This was attempted once and measured WORSE (2026-09-25, reverted: spike
+    // 1051 -> 2161, maxSignalLen 225 -> 475mm, because bubbles pushed into
+    // other instruments' signal lanes). It is re-attempted for exactly one
+    // reason: that measurement was taken with port offsets computed as
+    // `((conn.x - 50) / 100) * size`, which SYM-PORT-DRIFT proved wrong for the
+    // 123 non-square-viewBox symbols — a 12.5mm error on flow-nozzle alone, so
+    // the alignment was aiming at an elevation that was not the port's. The
+    // letterbox-correct `portOffset` is what makes this worth re-measuring,
+    // and it ships behind `layout.tapPortElevation` until the corpus says
+    // otherwise.
+    if (inst._tapLine && ruleParam('layout.tapPortElevation', 0)) {
+      const hs0 = inst._tapHostId;
+      const hostE = hs0 ? byId[hs0] : null;
+      const tp0 = pipes.find(p => p.kind === 'tap' && (p.from === inst.tag || p.to === inst.tag));
+      const portName = tp0 ? (tp0.from === inst.tag ? tp0.toPort : tp0.fromPort) : null;
+      if (hostE && (hostE.symbol || SYMBOL_KEYS[hostE.type])) {
+        const sym = hostE.symbol || SYMBOL_KEYS[hostE.type];
+        const conns = symbolConnections(sym);
+        const conn = portName ? conns.find(c => c.id === portName) : null;
+        if (conn) {
+          try {
+            // same size convention as the valve snap (router:396), so the
+            // elevation the router aims at and the elevation the ink draws are
+            // one number
+            const sz = symbolSize(sym) * (hostE.scale || 1) * (data.view.symbolScale || 1);
+            const off = PIDEngine.portWorld(sym, conn, sz, hostE.rotation, 1);
+            const portY = anchorE.y + off.y;
+            const cand = portY - half - gap;
+            // Only if the HOME slot is free at that elevation. A taken slot
+            // sends freeSide dodging sideways, which drags the tap's landing
+            // off the host's run — a straight drop beats a perfect elevation,
+            // every time, because the drop is what the reader follows.
+            if (cand > 34 && cand < SHEET_H - 42 &&
+                Math.abs(cand - yy) <= ruleParam('layout.tapAlign', 20) &&
+                !slotTaken(anchorE.x + (dxBias || 0), cand)) yy = cand;
+          } catch (e) { /* abstain: a geometry read that throws leaves the box-top default */ }
+        }
+      }
+    }
     const slot = freeSlot(anchorE.x + (dxBias || 0), yy);
     inst.x = slot.x;
     inst.y = slot.y;
@@ -666,7 +718,14 @@ function autoLayout(data) {
     const host = hostId ? byId[hostId] : null;
     // hand `stackOn` the tap's landing context so it can align to a LINE's
     // elevation rather than the host symbol's bounding box (see stackOn)
-    if (tp) { inst._tapLine = !!(tp._tap && tp._tap.lineTap); inst._tapHostId = hostId; }
+    //
+    // `tp.lineTap` is the PARSER's flag (pid-parser.js:502, set from the
+    // `.line` suffix); `tp._tap` is what resolveTopology attaches AFTER this
+    // pass runs. Reading only `_tap` made this read dead at layout time —
+    // documented at stackOn and the reason the elevation branch never fired
+    // during placement. Both are read now, so the flag means the same thing
+    // before and after topology resolution.
+    if (tp) { inst._tapLine = !!(tp.lineTap || (tp._tap && tp._tap.lineTap)); inst._tapHostId = hostId; }
     else { inst._tapLine = false; inst._tapHostId = null; }
     if (host) stackOn(inst, host, avoidHalf(host), ruleParam('layout.stackField', 24), hasRiserAbove(host) ? riserBias(host) : 0);
   }

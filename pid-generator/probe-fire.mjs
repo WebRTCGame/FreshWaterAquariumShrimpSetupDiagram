@@ -26,6 +26,11 @@
 // already includes it — that is the point: a future measurement is always
 // against what ships, not against a remembered past.
 //
+// Keys may carry a value — `layout.tapPortElevation=0` — which is how you
+// measure a feature that has SHIPPED: the off run is then the feature disabled
+// rather than the registry default. W7's -8 was measured exactly that way,
+// after a first pair against a mid-edit baseline read -22 and was wrong.
+//
 // Measured example of why the score-object diff matters: the W4 in-solve
 // baseline of suction-source-above read "+5 on four sheets", which the
 // PID-LAY-003 false positive (fixed 2026-10-10) inflated by exactly one warn
@@ -52,7 +57,12 @@ globalThis.document = {
 };
 const base = ENGINE.map((f) => readFileSync(f, 'utf8')).join('\n;\n');
 const argv = process.argv.slice(2);
-const KEYS = (argv[1] || '').split(',').filter(Boolean);
+const KEYS = (argv[1] || '').split(',').filter(Boolean).map((s) => {
+  const i = s.indexOf('=');
+  if (i < 0) return [s, 1];
+  const v = s.slice(i + 1);
+  return [s.slice(0, i), v === '1' ? 1 : (v === '0' ? 0 : v)];
+});
 const SHOT = argv.includes('--shot');
 
 // The same override shape measure.mjs uses, applied inside the eval scope so
@@ -62,7 +72,7 @@ const mk = (inj) => {
   return globalThis.PIDGenerator;
 };
 const G_OFF = mk(null);
-const inj = `;(() => { for (const [k, v] of ${JSON.stringify([['layout.placementRules', 1], ...KEYS.map((k) => [k, 1])])}) { const p = k.split('.'); let n = PID_RULES.params; for (let i = 0; i < p.length - 1; i++) n = n[p[i]]; n[p[p.length - 1]] = { value: v }; } })();`;
+const inj = `;(() => { for (const [k, v] of ${JSON.stringify([['layout.placementRules', 1], ...KEYS])}) { const p = k.split('.'); let n = PID_RULES.params; for (let i = 0; i < p.length - 1; i++) n = n[p[i]]; n[p[p.length - 1]] = { value: v }; } })();`;
 const G_ON = mk(inj);
 
 const CASES = argv[0] === 'x' ? ['spike', 'dense', 'manifold', 'min', 'split'] : [argv[0]];

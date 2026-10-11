@@ -5,16 +5,22 @@
    "warnings": [
     "[PID-VAL-004] control valve \"V-103\" has no defined fail action",
     "[PID-VAL-004] control valve \"V-105\" has no defined fail action",
-    "[PID-TXT-001] annotation type OVER: 36 run(s) at 3.6mm, 23 run(s) at 3.9mm, 12 run(s) at 4.2mm, 23 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-GEO-002] geometry \"P-101 -> FV-101\": port lead-in only 7.0mm (< 14mm) — bend too close to the P-101 port",
-    "[PID-GEO-002] geometry \"R-101 -> V-102\": port lead-in only 12.0mm (< 14mm) — bend too close to the R-101 port",
-    "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 149mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-INS-006] tap \"LT-101 -> C-101\": 56.0mm of sideways travel for a 152mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
-    "[PID-ANN-001] 11 label(s) are drawn over process linework: column x1, E-101 x1, NZ-P101-D x1, 3\" x1, T-102.top x1, control valve x1, +5 more. A label on a pipe is unreadable; audit item [15] names all of them."
+    "[PID-LAY-001] drawing exceeds the drawable zone (height 547 > 423mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead",
+    "[PID-TXT-001] annotation type OVER: 42 run(s) at 3.6mm, 23 run(s) at 3.9mm, 12 run(s) at 4.2mm, 23 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-GEO-002] geometry \"P-101 -> FV-101\": port lead-in only 10.0mm (< 14mm) — bend too close to the P-101 port",
+    "[PID-GEO-002] geometry \"V-102 -> C-101\": port lead-in only 11.7mm (< 14mm) — bend too close to the V-102 port",
+    "[PID-GEO-002] geometry \"J-4 -> V-105\": port lead-in only 11.7mm (< 14mm) — bend too close to the V-105 port",
+    "[PID-GEO-002] geometry \"P-103 -> J-3\": port lead-in only 12.3mm (< 14mm) — bend too close to the P-103 port",
+    "[PID-INS-006] tap \"TT-101 -> R-101\": 55.0mm of sideways travel for a 146mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-101 -> C-101\": 35.0mm of sideways travel for a 114mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"PT-101 -> D-101\": 76.0mm of sideways travel for a 104mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"LT-102 -> D-101\": 38.0mm of sideways travel for a 114mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-INS-006] tap \"FT-103 -> P-103\": 41.0mm of sideways travel for a 177mm run (limit 30mm) — the bubble is not above its landing point; move it, or land the tap closer",
+    "[PID-ANN-001] 20 label(s) are drawn over process linework: centrifugal pump x1, kettle reboiler x1, centrifugal pump x1, centrifugal pump x1, NZ-P101-D x1, NZ-C101-1 x1, +14 more. A label on a pipe is unreadable; audit item [15] names all of them."
    ],
-   "warningsTotal": 8,
+   "warningsTotal": 14,
    "score": {
-    "total": 787,
+    "total": 864,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -38,32 +44,32 @@
      "breachCap": 200
     },
     "fill": {
-     "w": 81,
-     "h": 86,
-     "util": 69,
-     "ink": 16,
+     "w": 83,
+     "h": 100,
+     "util": 83,
+     "ink": 17,
      "gap": 0,
      "entities": 29
     },
     "routing": {
-     "crossings": 14,
+     "crossings": 10,
      "pp": 6,
-     "ps": 7,
-     "ss": 1,
-     "bends": 106,
-     "length": 6334,
-     "k": 1.006,
+     "ps": 4,
+     "ss": 0,
+     "bends": 82,
+     "length": 7275,
+     "k": 0.771,
      "nonOrtho": 0
     },
     "sheet": {
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0,
-     "labelOnLine": 11,
-     "nozzleTagsOnLine": 2,
-     "equipTagsOnLine": 2,
-     "valveStacksOnLine": 3
+     "labelCollisions": 2,
+     "labelOnLine": 20,
+     "nozzleTagsOnLine": 5,
+     "equipTagsOnLine": 1,
+     "valveStacksOnLine": 1
     },
     "lines": {
      "overlaps": 0,
@@ -71,105 +77,118 @@
      "astarGiveups": 0,
      "breach": 0,
      "breachMm": 0,
-     "leadInShort": 9
+     "leadInShort": 10.3
     },
     "instruments": {
-     "tapReachTotal": 161,
-     "maxSignalLen": 130,
-     "signalLenTotal": 1192,
+     "tapReachTotal": 136,
+     "maxSignalLen": 273,
+     "signalLenTotal": 1526,
      "signalRuns": 11
     },
     "issues": {
      "errors": 0,
-     "warnings": 7
+     "warnings": 13
     }
    }
   },
   "audit": {
-   "paths": "23 process, 11 signal, 5 taps | entities: 34 | texts: 166",
+   "paths": "23 process, 11 signal, 6 taps | entities: 34 | texts: 166",
    "counts": {
     "0": 0,
-    "3": 8,
+    "3": 4,
     "4": 1,
     "5": 0,
     "6": 0,
-    "7": 0,
+    "7": 2,
     "8": 5,
     "9": 0,
-    "10": 1,
-    "11": 71,
+    "10": 0,
+    "11": 81,
     "12": 0,
     "13": 0,
-    "14": 0,
-    "15": 20,
-    "16": 0
+    "14": 11,
+    "15": 39,
+    "16": 4
    },
    "lists": {
     "0": [],
     "3": [
-     "FT-101~tap-> X E-102->D-101 @(430,177)",
-     "LT-101~tap-> X V-101->P-101 @(260,160)",
-     "V-101->P-101 X V-102->C-101 @(372,170)",
-     "V-102->C-101 X PT-101->PIC-101 @(380,170)",
-     "E-102->D-101 X PT-101->PIC-101 @(430,185)",
-     "J-4->E-103 X J-3->T-102 @(210,370)",
-     "J-4->E-103 X J-3->T-102 @(210,370)",
-     "FIC-101->FV-101 X PT-101->PIC-101 @(475,175)"
+     "V-101->P-101 X V-102->C-101 @(260,140)",
+     "V-101->P-101 X V-102->C-101 @(260,140)",
+     "R-101->V-102 X R-101->PSV-101 @(660,135)",
+     "R-101->V-102 X R-101->PSV-101 @(660,135)"
     ],
     "4": [
-     "LT-101~tap-> & C-101->E-101 overlap 26mm at y=250"
+     "FT-103~tap-> & P-103->J-3 overlap 21mm at y=440"
     ],
     "5": [],
     "6": [],
-    "7": [],
+    "7": [
+     "\"stirred reactor\" & \"NZ-R101-B\" @(660,219)",
+     "\"3\"x4\"\" & \"3\"-PW-102-1E1-H-INS-50-T\" @(632,120)"
+    ],
     "8": [
-     "FV-101->R-101 3mm (525,208)->(525,205)",
-     "E-103->J-3 1mm (195,340)->(196,340)",
-     "LT-101->LIC-101 2mm (335,220)->(337,220)",
-     "LIC-101->V-103 1mm (337,335)->(337,336)",
-     "FT-103->FIC-103 1.5mm (710,242)->(710,240)"
+     "V-103->P-103 2.5mm (620,392)->(620,390)",
+     "V-103->P-103 1.4mm (620,390)->(621,390)",
+     "LIC-101->V-103 1.7mm (337,385)->(337,387)",
+     "PIC-101->V-105 1.5mm (230,89)->(230,90)",
+     "PIC-101->V-105 1.7mm (230,90)->(228,90)"
     ],
     "9": [],
-    "10": [
-     "LT-101~tap-> X V-101->P-101 @(260,160)"
-    ],
+    "10": [],
     "11": [
-     "content 623x386mm bbox (113,86)->(735,472) | 81% W x 88% H | drawable 768x439mm | sheet 864x559mm | INK 15% of zone"
+     "content 635x429mm bbox (110,45)->(745,474) | 83% W x 98% H | drawable 768x439mm | sheet 864x559mm | INK 16% of zone"
     ],
     "12": [],
     "13": [],
-    "14": [],
-    "15": [
-     "\"centrifugal pump\" on 1 segment(s) @(410,227)",
-     "\"column\" on 2 segment(s) @(325,198)",
-     "\"E-101\" on 1 segment(s) @(231,287)",
-     "\"kettle reboiler\" on 2 segment(s) @(231,293)",
-     "\"NZ-P101-D\" on 1 segment(s) @(430,211)",
-     "\"3\"\" on 1 segment(s) @(430,216)",
-     "\"2\"\" on 1 segment(s) @(305,206)",
-     "\"T-102.top\" on 1 segment(s) @(169,383)",
-     "\"control valve\" on 4 segment(s) @(468,211)",
-     "\"PSV-101\" on 1 segment(s) @(692,130)",
-     "\"relief valve\" on 1 segment(s) @(692,125)",
-     "\"V-102\" on 1 segment(s) @(640,189)",
-     "\"control valve\" on 2 segment(s) @(217,171)",
-     "\"N/O\" on 1 segment(s) @(217,166)"
+    "14": [
+     "FIC-101 \"FIC\" needs 5.46mm but the bubble radius is 4.35mm (25% over)",
+     "FIC-101 \"101\" needs 4.64mm but the bubble radius is 4.35mm (7% over)",
+     "TIC-101 \"TIC\" needs 5.46mm but the bubble radius is 4.35mm (25% over)",
+     "TIC-101 \"101\" needs 4.64mm but the bubble radius is 4.35mm (7% over)",
+     "LIC-101 \"LIC\" needs 5.46mm but the bubble radius is 4.35mm (25% over)",
+     "LIC-101 \"101\" needs 4.64mm but the bubble radius is 4.35mm (7% over)",
+     "FIC-103 \"FIC\" needs 5.46mm but the bubble radius is 4.35mm (25% over)",
+     "FIC-103 \"103\" needs 4.64mm but the bubble radius is 4.35mm (7% over)",
+     "PIC-101 \"PIC\" needs 5.60mm but the bubble radius is 4.46mm (26% over)",
+     "LIC-102 \"LIC\" needs 5.46mm but the bubble radius is 4.35mm (25% over)",
+     "LIC-102 \"102\" needs 4.64mm but the bubble radius is 4.35mm (7% over)"
     ],
-    "16": []
+    "15": [
+     "\"centrifugal pump\" on 1 segment(s) @(410,192)",
+     "\"kettle reboiler\" on 1 segment(s) @(231,343)",
+     "\"centrifugal pump\" on 1 segment(s) @(660,392)",
+     "\"centrifugal pump\" on 1 segment(s) @(660,347)",
+     "\"NZ-P101-D\" on 1 segment(s) @(429,176)",
+     "\"3\"\" on 1 segment(s) @(429,180)",
+     "\"NZ-R101-T\" on 1 segment(s) @(666,145)",
+     "\"NZ-C101-1\" on 1 segment(s) @(270,134)",
+     "\"NZ-C101-B\" on 1 segment(s) @(279,187)",
+     "\"NZ-P103-S\" on 1 segment(s) @(639,364)",
+     "\"3\"\" on 1 segment(s) @(639,368)",
+     "\"NZ-P103-D\" on 1 segment(s) @(679,376)",
+     "\"NZ-E102-T1\" on 1 segment(s) @(378,324)",
+     "\"NZ-D101-V\" on 1 segment(s) @(546,89)"
+    ],
+    "16": [
+     "\"stirred reactor\" x1",
+     "\"NZ-R101-B\" x1",
+     "\"3\"x4\"\" x1",
+     "\"3\"-PW-102-1E1-H-INS-50-T\" x1"
+    ]
    }
   },
-  "budget": 708
+  "budget": 778
  },
  "min": {
   "harness": {
    "errors": [],
    "warnings": [
-    "[PID-TXT-001] annotation type OVER: 6 run(s) at 3.6mm, 4 run(s) at 3.9mm, 2 run(s) at 4.2mm, 4 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 8.0mm (< 14mm) — bend too close to the FIC-1 port"
+    "[PID-TXT-001] annotation type OVER: 6 run(s) at 3.6mm, 4 run(s) at 3.9mm, 2 run(s) at 4.2mm, 4 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable."
    ],
-   "warningsTotal": 2,
+   "warningsTotal": 1,
    "score": {
-    "total": 65,
+    "total": 50,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -194,8 +213,8 @@
     },
     "fill": {
      "w": 59,
-     "h": 17,
-     "util": 10,
+     "h": 18,
+     "util": 11,
      "ink": 2,
      "gap": 0,
      "entities": 5
@@ -205,9 +224,9 @@
      "pp": 0,
      "ps": 0,
      "ss": 0,
-     "bends": 8,
-     "length": 507,
-     "k": 1.655,
+     "bends": 6,
+     "length": 508,
+     "k": 1.65,
      "nonOrtho": 0
     },
     "sheet": {
@@ -226,17 +245,17 @@
      "astarGiveups": 0,
      "breach": 0,
      "breachMm": 0,
-     "leadInShort": 6
+     "leadInShort": 0
     },
     "instruments": {
-     "tapReachTotal": 31,
+     "tapReachTotal": 0,
      "maxSignalLen": 40,
-     "signalLenTotal": 118,
+     "signalLenTotal": 128,
      "signalRuns": 2
     },
     "issues": {
      "errors": 0,
-     "warnings": 2
+     "warnings": 1
     }
    }
   },
@@ -249,7 +268,7 @@
     "5": 0,
     "6": 0,
     "7": 0,
-    "8": 2,
+    "8": 0,
     "9": 0,
     "10": 0,
     "11": 11,
@@ -266,41 +285,34 @@
     "5": [],
     "6": [],
     "7": [],
-    "8": [
-     "FV-1->T-1 2mm (415,283)->(415,285)",
-     "FV-1->T-1 2.5mm (415,285)->(413,285)"
-    ],
+    "8": [],
     "9": [],
     "10": [],
     "11": [
-     "content 442x83mm bbox (54,239)->(496,322) | 58% W x 19% H | drawable 768x439mm | sheet 864x559mm | INK 2% of zone"
+     "content 444x87mm bbox (54,235)->(498,322) | 58% W x 20% H | drawable 768x439mm | sheet 864x559mm | INK 2% of zone"
     ],
     "12": [],
     "13": [
-     "fills only 19% of drawable height (< 45%) — content is 58% W x 19% H; consider splitting the sheet or adding scope"
+     "fills only 20% of drawable height (< 45%) — content is 58% W x 20% H; consider splitting the sheet or adding scope"
     ],
     "14": [],
     "15": [],
     "16": []
    }
   },
-  "budget": 59
+  "budget": 45
  },
  "dense": {
   "harness": {
    "errors": [],
    "warnings": [
     "[PID-VAL-004] control valve \"V-2\" has no defined fail action",
-    "[PID-VAL-002] control valve \"FV-1\": controller \"FIC-1\" should sit directly above the valve (actuator up)",
-    "[PID-VAL-002] control valve \"V-2\": controller \"LIC-1\" should sit directly above the valve (actuator up)",
-    "[PID-LAY-001] drawing exceeds the drawable zone (height 457 > 423mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead",
     "[PID-TXT-001] annotation type OVER: 12 run(s) at 3.6mm, 11 run(s) at 3.9mm, 6 run(s) at 4.2mm, 9 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-GEO-002] geometry \"FV-1 -> C-1\": port lead-in only 10.0mm (< 14mm) — bend too close to the FV-1 port",
-    "[PID-ANN-001] 4 label(s) are drawn over process linework: NZ-C1-B x1, NZ-E1-O x1, FV-1 x1, control valve x1. A label on a pipe is unreadable; audit item [15] names all of them."
+    "[PID-GEO-002] geometry \"FIC-1 -> FV-1\": port lead-in only 11.7mm (< 14mm) — bend too close to the FV-1 port"
    ],
-   "warningsTotal": 7,
+   "warningsTotal": 3,
    "score": {
-    "total": 369,
+    "total": 348,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -324,21 +336,21 @@
      "breachCap": 200
     },
     "fill": {
-     "w": 63,
-     "h": 100,
-     "util": 63,
-     "ink": 7,
-     "gap": 0,
+     "w": 47,
+     "h": 64,
+     "util": 30,
+     "ink": 6,
+     "gap": 0.32,
      "entities": 12
     },
     "routing": {
-     "crossings": 5,
-     "pp": 4,
-     "ps": 1,
+     "crossings": 0,
+     "pp": 0,
+     "ps": 0,
      "ss": 0,
-     "bends": 34,
-     "length": 3052,
-     "k": 0.911,
+     "bends": 30,
+     "length": 2136,
+     "k": 1.424,
      "nonOrtho": 0
     },
     "sheet": {
@@ -346,9 +358,9 @@
     },
     "annotations": {
      "labelCollisions": 0,
-     "labelOnLine": 4,
-     "nozzleTagsOnLine": 2,
-     "equipTagsOnLine": 0,
+     "labelOnLine": 0,
+     "nozzleTagsOnLine": 0,
+     "equipTagsOnLine": 1,
      "valveStacksOnLine": 1
     },
     "lines": {
@@ -357,17 +369,17 @@
      "astarGiveups": 0,
      "breach": 0,
      "breachMm": 0,
-     "leadInShort": 4
+     "leadInShort": 2.3
     },
     "instruments": {
-     "tapReachTotal": 24,
-     "maxSignalLen": 219,
-     "signalLenTotal": 703,
+     "tapReachTotal": 20,
+     "maxSignalLen": 172,
+     "signalLenTotal": 560,
      "signalRuns": 4
     },
     "issues": {
      "errors": 0,
-     "warnings": 6
+     "warnings": 3
     }
    }
   },
@@ -375,7 +387,7 @@
    "paths": "9 process, 4 signal, 2 taps | entities: 14 | texts: 68",
    "counts": {
     "0": 0,
-    "3": 7,
+    "3": 0,
     "4": 0,
     "5": 0,
     "6": 0,
@@ -383,54 +395,40 @@
     "8": 1,
     "9": 0,
     "10": 0,
-    "11": 59,
+    "11": 30,
     "12": 0,
     "13": 0,
-    "14": 2,
-    "15": 6,
+    "14": 0,
+    "15": 3,
     "16": 0
    },
    "lists": {
     "0": [],
-    "3": [
-     "V-1->P-1 X FV-1->C-1 @(385,115)",
-     "V-1->P-1 X FV-1->C-1 @(385,115)",
-     "V-1->P-1 X J-1->OUT-1 @(490,85)",
-     "FV-1->C-1 X J-1->OUT-1 @(490,75)",
-     "FV-1->C-1 X J-1->OUT-1 @(490,75)",
-     "V-2->C-1 X J-1->OUT-1 @(480,445)",
-     "V-2->C-1 X J-1->OUT-1 @(480,445)"
-    ],
+    "3": [],
     "4": [],
     "5": [],
     "6": [],
     "7": [],
     "8": [
-     "J-1->V-2 2mm (460,437)->(460,435)"
+     "LIC-1->V-2 1.7mm (365,175)->(363,175)"
     ],
     "9": [],
     "10": [],
     "11": [
-     "content 485x412mm bbox (185,49)->(670,460) | 63% W x 94% H | drawable 768x439mm | sheet 864x559mm | INK 7% of zone"
+     "content 363x279mm bbox (250,130)->(613,409) | 47% W x 64% H | drawable 768x439mm | sheet 864x559mm | INK 6% of zone"
     ],
     "12": [],
     "13": [],
-    "14": [
-     "FIC-1 \"FIC\" needs 4.72mm but the bubble radius is 4.35mm (9% over)",
-     "LIC-1 \"LIC\" needs 4.72mm but the bubble radius is 4.35mm (9% over)"
-    ],
+    "14": [],
     "15": [
-     "\"NZ-C1-O\" on 1 segment(s) @(421,85)",
-     "\"NZ-C1-B\" on 1 segment(s) @(409,159)",
-     "\"NZ-E1-O\" on 1 segment(s) @(455,451)",
-     "\"FV-1\" on 2 segment(s) @(580,92)",
-     "\"control valve\" on 5 segment(s) @(580,86)",
-     "\"LIC\" on 1 segment(s) @(230,404)"
+     "\"P-1\" on 1 segment(s) @(554,167)",
+     "\"NZ-C1-F\" on 1 segment(s) @(420,199)",
+     "\"3\"\" on 1 segment(s) @(342,160)"
     ],
     "16": []
    }
   },
-  "budget": 332
+  "budget": 313
  },
  "split": {
   "harness": {
@@ -440,7 +438,7 @@
    ],
    "warningsTotal": 1,
    "score": {
-    "total": 45,
+    "total": 41,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -476,8 +474,8 @@
      "pp": 0,
      "ps": 0,
      "ss": 0,
-     "bends": 5,
-     "length": 609,
+     "bends": 3,
+     "length": 607,
      "k": 1.776,
      "nonOrtho": 0
     },
@@ -550,20 +548,20 @@
     "16": []
    }
   },
-  "budget": 41
+  "budget": 37
  },
  "manifold": {
   "harness": {
    "errors": [],
    "warnings": [
     "[PID-LAY-001] drawing exceeds the drawable zone (width 836 > 768mm) — the zone is a centring target, not a bound; this one is now drawn to the frame instead",
-    "[PID-TXT-001] annotation type OVER: 25 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
-    "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 10.0mm (< 14mm) — bend too close to the T-2 port",
-    "[PID-ANN-001] 2 label(s) are drawn over process linework: gate valve x1, gate valve x1. A label on a pipe is unreadable; audit item [15] names all of them."
+    "[PID-TXT-001] annotation type OVER: 19 run(s) at 3.6mm, 12 run(s) at 3.9mm, 8 run(s) at 4.2mm, 7 run(s) at 4.5mm — above the 3.5mm print limit; largest 4.5mm. annotation.typeScale is 1.4 and annotation.typeFloor is 3.5mm — note the floor BINDS for every base size at or below 2.50mm, so those roles are all flattened to exactly 3.5mm and their individual sizes are no longer distinguishable.",
+    "[PID-GEO-002] geometry \"T-2 -> J-R\": port lead-in only 8.5mm (< 14mm) — bend too close to the T-2 port",
+    "[PID-ANN-001] 2 label(s) are drawn over process linework: gate valve x2, N/O x1. A label on a pipe is unreadable; audit item [15] names all of them."
    ],
    "warningsTotal": 4,
    "score": {
-    "total": 225,
+    "total": 236,
     "weights": {
      "err": 1000,
      "nonOrtho": 500,
@@ -588,8 +586,8 @@
     },
     "fill": {
      "w": 100,
-     "h": 88,
-     "util": 88,
+     "h": 83,
+     "util": 83,
      "ink": 6,
      "gap": 0,
      "entities": 11
@@ -599,8 +597,8 @@
      "pp": 0,
      "ps": 0,
      "ss": 0,
-     "bends": 34,
-     "length": 2463,
+     "bends": 31,
+     "length": 2333,
      "k": 0.989,
      "nonOrtho": 0
     },
@@ -608,7 +606,7 @@
      "offSheet": 0
     },
     "annotations": {
-     "labelCollisions": 0,
+     "labelCollisions": 1,
      "labelOnLine": 2,
      "nozzleTagsOnLine": 0,
      "equipTagsOnLine": 0,
@@ -620,12 +618,12 @@
      "astarGiveups": 1,
      "breach": 0,
      "breachMm": 0,
-     "leadInShort": 4
+     "leadInShort": 5.5
     },
     "instruments": {
-     "tapReachTotal": 22,
-     "maxSignalLen": 75,
-     "signalLenTotal": 232,
+     "tapReachTotal": 21,
+     "maxSignalLen": 40,
+     "signalLenTotal": 183,
      "signalRuns": 2
     },
     "issues": {
@@ -635,60 +633,61 @@
    }
   },
   "audit": {
-   "paths": "13 process, 2 signal, 2 taps | entities: 15 | texts: 62",
+   "paths": "13 process, 2 signal, 2 taps | entities: 15 | texts: 61",
    "counts": {
     "0": 0,
     "3": 1,
     "4": 0,
     "5": 0,
     "6": 0,
-    "7": 0,
-    "8": 2,
+    "7": 1,
+    "8": 0,
     "9": 0,
     "10": 1,
-    "11": 86,
+    "11": 81,
     "12": 0,
     "13": 1,
     "14": 0,
-    "15": 6,
-    "16": 0
+    "15": 5,
+    "16": 2
    },
    "lists": {
     "0": [],
     "3": [
-     "FT-1~tap-> X J-H->V-3 @(60,155)"
+     "FT-1~tap-> X J-H->V-3 @(60,150)"
     ],
     "4": [],
     "5": [],
     "6": [],
-    "7": [],
-    "8": [
-     "V-1->T-1 2mm (165,183)->(165,185)",
-     "V-1->T-1 2.5mm (165,185)->(163,185)"
+    "7": [
+     "\"3\"\" & \"gate valve\" @(128,206)"
     ],
+    "8": [],
     "9": [],
     "10": [
-     "FT-1~tap-> X J-H->V-3 @(60,155)"
+     "FT-1~tap-> X J-H->V-3 @(60,150)"
     ],
     "11": [
-     "content 757x382mm bbox (51,80)->(808,462) | 99% W x 87% H | drawable 768x439mm | sheet 864x559mm | INK 6% of zone"
+     "content 756x362mm bbox (52,95)->(808,457) | 98% W x 82% H | drawable 768x439mm | sheet 864x559mm | INK 6% of zone"
     ],
     "12": [],
     "13": [
-     "spans 87% of the drawable but fills only 7% of its own bounding box with ink — the drawing is the shape of its box (L, U or ring); re-flow the depth ranks rather than scaling the sheet"
+     "spans 82% of the drawable but fills only 7% of its own bounding box with ink — the drawing is the shape of its box (L, U or ring); re-flow the depth ranks rather than scaling the sheet"
     ],
     "14": [],
     "15": [
-     "\"centrifugal pump\" on 1 segment(s) @(60,217)",
-     "\"control valve\" on 2 segment(s) @(123,186)",
-     "\"2\"\" on 1 segment(s) @(123,196)",
-     "\"gate valve\" on 1 segment(s) @(128,201)",
-     "\"gate valve\" on 1 segment(s) @(128,221)",
-     "\"FT\" on 1 segment(s) @(60,144)"
+     "\"centrifugal pump\" on 1 segment(s) @(60,212)",
+     "\"control valve\" on 2 segment(s) @(123,181)",
+     "\"2\"\" on 1 segment(s) @(123,191)",
+     "\"gate valve\" on 2 segment(s) @(128,196)",
+     "\"N/O\" on 2 segment(s) @(128,201)"
     ],
-    "16": []
+    "16": [
+     "\"3\"\" x1",
+     "\"gate valve\" x1"
+    ]
    }
   },
-  "budget": 203
+  "budget": 212
  }
 }

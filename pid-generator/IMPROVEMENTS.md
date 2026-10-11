@@ -835,6 +835,73 @@ is still the blocker that would let the y-ordering rules pay for themselves.
 The 2-D capability is now in place for any future proximity rule; the E-102
 ambiguity case (two peers, one home) is the first question it raises.
 
+### W7 — the tap's landing point, re-measured, and the honest number is -8
+
+2026-10-11. `tapReachTotal` has been the stated cost in three separate
+measurements — the W4 suction rule (+20), the aspect-wrap demo row (+5), and the
+affinity rule (spike +330mm) — and every one of them traced to the same place:
+`stackOn` puts a bubble at the host's bounding-box top, while a `.line` tap has
+to land on the process RUN at the port's elevation. The gap is the sideways
+travel PID-INS-006 reports.
+
+**Why it never got fixed.** `data.nozzles` is empty during layout (materialised
+later, at `resolveNozzlePositions`), so the nozzle-tip loop in `stackOn` is dead
+*here*. The 2026-09-25 attempt to work around it with `symbolConnections`
+measured much worse — spike 1051 -> 2161, maxSignalLen 225 -> 475mm — and was
+reverted with that number attached.
+
+**Re-measured, because the input to that measurement had been wrong.** The
+abandoned attempt aimed with port offsets computed as
+`((conn.x - 50) / 100) * size`, which SYM-PORT-DRIFT proved wrong for the 123
+non-square-viewBox symbols — a 12.5mm error on flow-nozzle alone, so it was
+aiming at an elevation that was not the port's. With the letterbox-correct
+`portOffset` the alignment is re-attempted behind `layout.tapPortElevation`.
+
+**The first pair measured -22 and was WRONG, and the reason matters.** The pair
+was taken while another work stream was mid-edit on `pid-symbols-bundle.js`
+(visible as a mid-measurement dense 326 -> 360 shift that was not this change).
+Re-measured on a stable tree, minutes apart, off vs on:
+
+| sheet | off | on | Δ |
+|---|---|---|---|
+| demo | 320 | 320 | 0 |
+| spike | 864 | 864 | 0 |
+| dense | 348 | 348 | 0 |
+| min | 50 | 50 | 0 |
+| split | 41 | 41 | 0 |
+| manifold | 244 | 236 | **−8** |
+| **corpus** | **1867** | **1859** | **−8** |
+
+The -22 was the symbol edit's improvement, not this change's. The symbol work
+had independently moved spike's tapReachTotal 491 -> 136mm — the exact number
+this alignment produced on the old tree — which is why the on/off pair collapsed
+to nothing on five of six sheets. **The honest number is -8, all of it on
+manifold** (maxSignalLen 75 -> 40mm; utilisation 88 -> 83; bends +1).
+
+**The demo, and the one thing the guard bought.** `probe-demo-diff.mjs` (which
+entities a key moves, off vs on) reports NO movement on the demo, and the same
+with the guard removed — so the alignment abstains there, and the demo's
+unchanged score is real rather than a wash. An earlier render had suggested
+FT-101's bubble dodging sideways off P-101's column under this alignment; the
+guard (ask `slotTaken` before committing to the aligned elevation, because a
+taken slot makes `freeSlot` dodge the bubble sideways and drags the tap's
+landing off the host's run) is kept because the failure mode is real and the
+guard costs nothing measured — a straight drop beats a perfect elevation,
+because the drop is what the reader follows.
+
+**The cap is load-bearing and was measured.** The same alignment at the original
+`layout.tapAlign` (60mm) hands back what it buys: on the old tree spike +20 with
+label collisions 1 -> 5 and lead-in breaches +14.6mm, because a bubble pushed far
+from its box-top lands inside the instrument tier's crowded zone. At 20mm the
+alignment reaches the port elevation and no further, and the routing does not
+reflow. `tapAlign` now ships at 20 with that measurement in its desc.
+
+Also fixed on the way: `inst._tapLine` read `tp._tap.lineTap`, which
+`resolveTopology` attaches *after* layout — a dead read at the only moment it is
+consulted. It now reads the parser's own `tp.lineTap`, set from the `.line`
+suffix at parse time, so the flag means the same thing before and after topology
+resolution.
+
 ### W6 — the shape of a sheet is a choice, and the choice was dead code
 
 2026-10-10, second pass, on the demo sheet's complaint that the drawing is a

@@ -366,6 +366,101 @@ function autoLayout(data) {
     e.y = yOf[e.id] !== undefined ? yOf[e.id] : YMARGIN + s.row * ROW + s.i * (ROW * 0.55);
   }
 
+  // ---- orphan void-fill ----------------------------------------------------
+  // An entity with no process connection has no neighbour pulling it anywhere:
+  // the ranker gives it the last column, the median step is indifferent to it,
+  // and it lands wherever the chain happened to end. Measured on dense: the
+  // drum D-1 parks in the bottom-left corner while the middle-right of the
+  // sheet is empty — §0a root cause 4, "the engine has no orphan policy at
+  // all". The audit rule `orphan-co-location` reports 0 for that configuration
+  // because its 200mm threshold is wrong, which is a separate known-bad.
+  //
+  // An orphan is the ONE entity that is free to go wherever the drawing is
+  // thinnest, so put it there: choose the grid position whose distance to the
+  // nearest placed entity is greatest (farthest-point placement). It runs after
+  // the coordinate write, so the rest of the sheet is final, and BEFORE the
+  // placement passes, so the orphan's own instrument and bubble stack follow
+  // it rather than being stranded where the host used to be.
+  //
+  // Gated on its own key. It moves an entity for a fill gain, and the search is
+  // deliberately INSIDE the placed block: the objective's fill term prices the
+  // ink gap inside the drawing's bbox, not the sheet's utilisation, so an
+  // orphan placed at the sheet edge widens the bbox, adds no ink density, and
+  // pays for a longer instrument signal while pricing nothing — measured
+  // (search the sheet): dense fill.util 58 -> 91 and maxSignalLen 122 -> 312mm
+  // with a 781mm LT-1 -> LIC-1 run, i.e. the eye's win and the score's loss.
+  // Inside the block it closes the void the block already has, which is the
+  // term that is actually priced, and dense buys -66 from it.
+  if (ruleParam('layout.orphanVoidFill', 0)) {
+    // Orphan = no PROCESS connection at all, counting THROUGH junctions. The
+    // junction-blind `incoming`/`outgoing` maps above drop every pipe that
+    // touches a junction, which makes a valve hanging off a manifold look
+    // orphaned — the demo's V-105 and V-106 are exactly that, and relocating
+    // them to "fill the void" wrecks the manifold (+84 on the demo, +138 on
+    // spike, measured). An orphan is an entity no pipe reaches by any route.
+    const jById = {};
+    for (const j of junctions) jById[j.id] = j;
+    const flowAdj = {};
+    const addEdge = (a, b) => {
+      if (!a || !b) return;
+      (flowAdj[a] = flowAdj[a] || {})[b] = 1;
+      (flowAdj[b] = flowAdj[b] || {})[a] = 1;
+    };
+    const jPipes = {};
+    for (const p of processPipes) {
+      if (p.kind === 'tap') continue;               // a tap is an instrument link, not process flow
+      const jid = jById[p.from] ? p.from : (jById[p.to] ? p.to : null);
+      if (jid) { (jPipes[jid] = jPipes[jid] || []).push(p); continue; }
+      addEdge(p.from, p.to);
+    }
+    for (const jid of Object.keys(jPipes)) {
+      const ends = jPipes[jid].map(p => (p.from === jid ? p.to : p.from));
+      for (const a of ends) for (const b of ends) if (a !== b) addEdge(a, b);
+    }
+    const orph = all.filter(e => !e.at && !e.rel &&
+      !(flowAdj[e.id] && Object.keys(flowAdj[e.id]).length));
+    if (orph.length) {
+      const others = all.filter(e => e.x != null && e.y != null && orph.indexOf(e) < 0);
+      const grid = data.view.grid || 5;
+      const step = ruleParam('layout.voidGrid', 20);
+      // Search INSIDE the block the placed entities already occupy, not the
+      // whole sheet. The objective's fill term prices the ink GAP inside the
+      // drawing's bbox, not the sheet's utilisation — so an orphan placed at
+      // the sheet edge widens the bbox, adds no ink density, and pays for a
+      // longer instrument signal while pricing nothing. Measured (search the
+      // sheet): dense fill.util 58 -> 91 and maxSignalLen 122 -> 312mm with a
+      // 781mm LT-1 -> LIC-1 run. Inside the bbox it closes the void the block
+      // already has, which is the term that is actually priced.
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const p of others) {
+        x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x);
+        y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y);
+      }
+      const pad = ruleParam('layout.voidPad', 30);
+      x0 = Math.max(XMARGIN, x0 - pad); x1 = Math.min((data.view.sheetW || 864) - XMARGIN, x1 + pad);
+      y0 = Math.max(YMARGIN, y0 - pad); y1 = Math.min((data.view.sheetH || 559) - 40, y1 + pad);
+      for (const o of orph) {
+        let bx = o.x, by = o.y, best = -Infinity;
+        for (let x = x0; x <= x1; x += step) {
+          for (let y = y0; y <= y1; y += step) {
+            let d = Infinity;
+            for (const p of others) {
+              const dd = Math.hypot(p.x - x, p.y - y);
+              if (dd < d) d = dd;
+              if (d <= best) break;          // cannot beat the incumbent
+            }
+            if (d > best) { best = d; bx = x; by = y; }
+          }
+        }
+        o.x = Math.round(bx / grid) * grid;
+        o.y = Math.round(by / grid) * grid;
+        others.push(o);                       // the next orphan avoids this one
+        data.ruleOrphanFill = data.ruleOrphanFill || [];
+        data.ruleOrphanFill.push(o.id);
+      }
+    }
+  }
+
   // rule: a valve directly downstream of equipment sits close to it (spacing no less
   // than the valve width) at the equipment port's elevation, so the process line
   // runs straight instead of jogging
@@ -2146,18 +2241,14 @@ function nozzleTip(owner, portId, nzLen, SC) {
   const ports = symbolConnections(owner.symbol || SYMBOL_KEYS[owner.type] || '');
   const port = ports.find(p => p.id === portId);
   if (!port) return null;
-  const pdx = port.x - 50, pdy = port.y - 50;
-  const len = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
-  let bx = owner.x + (port.x - 50) / 100 * ownerSize;
-  let by = owner.y + (port.y - 50) / 100 * ownerSize;
-  let rDirX = pdx / len, rDirY = pdy / len;
-  if (owner.rotation) {
-    const rp = PIDEngine.rotatePoint(pdx / 100 * ownerSize, pdy / 100 * ownerSize, owner.rotation);
-    bx = owner.x + rp.x;
-    by = owner.y + rp.y;
-    const rd = PIDEngine.rotatePoint(pdx / len, pdy / len, owner.rotation);
-    rDirX = rd.x; rDirY = rd.y;
-  }
+  // The port's world offset, through the ONE mapping (letterbox- and rotation-aware).
+  // This was a third open-coded copy of `(pct-50)/100*size`, so on any non-square glyph
+  // the nozzle base landed off the metal by up to 12.5 mm while the pipe attached
+  // correctly at the same port.
+  const off = PIDEngine.portWorld(owner.symbol || SYMBOL_KEYS[owner.type] || '', port, ownerSize, owner.rotation, 1);
+  const bx = owner.x + off.x, by = owner.y + off.y;
+  const len = Math.hypot(off.x, off.y) || 1;
+  let rDirX = off.x / len, rDirY = off.y / len;
   // snap to cardinal directions (0, 90, 180, 270) — P&IDs are orthographic
   let orientation = Math.round(Math.atan2(rDirY, rDirX) * 180 / Math.PI / 90) * 90;
   if (orientation < 0) orientation += 360;

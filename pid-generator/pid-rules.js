@@ -378,6 +378,23 @@ const PID_RULES = {
       // different failure mode. Measured equivalence: `placementRules:1` alone
       // reproduces the baseline byte-for-byte, so the two keys are independent.
       affinityRehome: { value: 1, min: 0, max: 1, unit: 'bool', desc: 'co-locate a reboiler/exchanger with the tower/vessel/drum it serves by moving it into that vessel\'s rank-column BEFORE the barycentre sweeps. SHIPPED 2026-10-10 on the measurement in the comment above; set 0 to measure the engine without it' },
+      // Orphan policy (§0a root cause 4): an entity with NO process connection
+      // is parked by the ranker wherever the chain ended — dense's drum D-1 sat
+      // in the bottom-left corner while the middle of the sheet was empty.
+      //
+      // MEASURED AND SHIPPED 2026-10-11 (IMPROVEMENTS.md §0d W8): dense 351 ->
+      // 285, with routing.length -573mm, crossings 4 -> 0, pp/ps 2/2 -> 0 and
+      // signalLenTotal -108mm, and the other five sheets BYTE-IDENTICAL — the
+      // only sheet with a true orphan. The sheet was looked at before blessing.
+      //
+      // The definition of "orphan" has to see THROUGH junctions: the junction-
+      // blind edge maps make a valve hanging off a manifold look orphaned (the
+      // demo's V-105 and V-106), and relocating those to fill a void wrecked
+      // the manifold — measured +84 on the demo and +138 on spike before the
+      // junction-aware fix.
+      orphanVoidFill: { value: 1, min: 0, max: 1, unit: 'bool', desc: 'place a process-orphan entity (no process pipes by any route, junctions included) at the grid position farthest from every placed entity SEARCHED INSIDE the placed block. SHIPPED 2026-10-11 on the W8 measurement' },
+      voidGrid: { value: 20, min: 5, max: 60, unit: 'mm', desc: 'candidate grid pitch for the orphan void-fill search', noScale: true },
+      voidPad: { value: 30, min: 0, max: 200, unit: 'mm', desc: 'how far outside the placed block the orphan void-fill may search. 30 keeps the orphan inside the drawing: the fill term prices the ink gap inside the bbox, not the sheet utilisation', noScale: true },
       ruleSolverIters: { value: 6, min: 1, max: 20, unit: 'count', noScale: true, desc: 'max fixed-point iterations of the placement rule solver. Capped on purpose: an uncapped fixpoint loop in a layout pass is how a renderer hangs' },
       ruleMinSep: { value: 0, min: 0, max: 200, unit: 'mm', noScale: true, desc: 'clearance the rule solver must leave around a moved entity, measured in the axis it moves. 0 = rely on passDecrowd, which has already run; a positive value makes the solver refuse moves a drafter would make' },
       ruleMinGap: { value: 20, min: 0, max: 120, unit: 'mm', desc: 'minimum y separation a placement rule asks for between two entities, applied as a TARGET inside the coordinate solve (not as a post-hoc move). This is what makes the ordering visible on the drawing rather than a 5mm token' },

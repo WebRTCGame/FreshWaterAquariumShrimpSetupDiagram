@@ -902,6 +902,60 @@ consulted. It now reads the parser's own `tp.lineTap`, set from the `.line`
 suffix at parse time, so the flag means the same thing before and after topology
 resolution.
 
+### W8 — the orphan policy, and the junction blindness that broke it first
+
+2026-10-11. §0a root cause 4: an entity with no process connection is parked by
+the ranker wherever the chain ended — dense's drum D-1 sat in the bottom-left
+corner while the middle of the sheet was empty, and the `orphan-co-location`
+audit rule reports 0 for that because its 200mm threshold is wrong (a separate
+known-bad). An orphan is the ONE entity that is free to go wherever the drawing
+is thinnest, so the obvious policy is farthest-point placement inside the block.
+
+**First attempt: +91, and the reason is the same junction blindness that
+flattened the demo's ranks.** The orphan test used the junction-blind
+`incoming`/`outgoing` maps, which drop every pipe touching a junction — so a
+valve hanging off a *manifold* looks orphaned. The demo's V-105 and V-106 are
+exactly that, and relocating them to "fill the void" wrecked the manifold:
+demo +84, spike +138. The test now sees through junctions (an orphan is an
+entity no process pipe reaches by any route), and the feature fires on dense
+only.
+
+**Second attempt, and it is also a lesson about WHICH void to fill.** Searching
+the whole sheet put the orphan at the sheet edge: dense's fill.util 58 -> 91
+(the eye's win) and maxSignalLen 122 -> 312mm with a 781mm LT-1 -> LIC-1 run
+(the score's loss, +34). The objective's fill term prices the ink gap INSIDE
+the drawing's bbox, not the sheet's utilisation — so an orphan at the sheet edge
+widens the bbox, adds no ink density, and pays for a longer instrument signal
+while pricing nothing. Searching INSIDE the placed block (`layout.voidPad`)
+closes the void the block already has, which is the term that is priced.
+
+| sheet | off | on | Δ |
+|---|---|---|---|
+| demo | 330 | 330 | 0 |
+| spike | 873 | 873 | 0 |
+| dense | 351 | **285** | **−66** |
+| min | 50 | 50 | 0 |
+| split | 43 | 43 | 0 |
+| manifold | 261 | 261 | 0 |
+| **corpus** | | | **−66** |
+
+dense buys it with routing.length -573mm, crossings 4 -> 0, pp/ps 2/2 -> 0 and
+signalLenTotal -108mm; the two `PID-VAL-002` controller-above-valve warnings
+disappear because the drum no longer drags its controller off its valve, and
+`audit [3]` (crossings) goes 3 -> 0. The other five sheets are byte-identical:
+dense is the only corpus sheet with a true orphan. Looked at before blessing —
+the drum now fills the L-shaped void inside the block instead of sitting in the
+corner.
+
+**Pattern worth naming, because it is now three for three.** Every placement
+policy added this week was wrong exactly once, and for a different reason each
+time: the rule layer was reading ports that did not exist yet (W4's
+provisional bindings), the shape search was dead code (W6), and the orphan test
+could not see through a junction (W8). The common shape is a *policy reading a
+graph that is missing an edge* — and the fix is always to ask what the policy
+would need to know, then check whether the data structure it reads actually
+holds it.
+
 ### W6 — the shape of a sheet is a choice, and the choice was dead code
 
 2026-10-10, second pass, on the demo sheet's complaint that the drawing is a

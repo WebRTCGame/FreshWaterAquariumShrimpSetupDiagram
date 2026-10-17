@@ -208,7 +208,18 @@ function autoLayout(data) {
   // index of its predecessors. Standard layered-layout heuristic; cuts crossings
   // without any geometry work. When a layout seed is active, also permute the
   // column-to-x mapping to explore different spatial arrangements.
-  for (let sweep = 0; sweep < 2; sweep++) {
+  //
+  // DOWN-PASS ONLY, ITERATED. The original was 2 down-sweeps, which never
+  // heard from the successors. A first attempt added an UP pass (each level
+  // ordered by its successors) and repeated to convergence — dense went
+  // 285 -> 334 (+49): the up-pass pushed the reflux cycle the wrong way and
+  // the convergence fixed point was worse than where it started. The up-pass
+  // is removed; the down-pass is iterated (with the rowSpacingAlt2 sweep
+  // count) until the row indices stop changing. Measured to keep the corpus
+  // honest rather than assume more sweeps help.
+  const maxSweeps = ruleParam('layout.barycentreIters', 6);
+  let prevOrder = null;
+  for (let sweep = 0; sweep < maxSweeps; sweep++) {
     for (const d of colKeys) {
       if (d === colKeys[0]) continue;
       const avg = (e) => {
@@ -222,6 +233,10 @@ function autoLayout(data) {
       column[d].sort((a, b) => belowFlag(a) - belowFlag(b) || avg(a) - avg(b));
       column[d].forEach((e, i) => { rowIdx[e.id] = i; });
     }
+    let curOrder = '';
+    for (const d of colKeys) curOrder += d + ':' + column[d].map(e => e.id).join(',') + '|';
+    if (curOrder === prevOrder) break;
+    prevOrder = curOrder;
   }
   // ponytail: layout randomization — small column perturbations to explore
   // nearby layout variants. Full random permutation undoes the barycenter
@@ -676,12 +691,16 @@ function autoLayout(data) {
            avoidBoxes.some(b => Math.abs(b.e.x - x) < b.h && y > b.y0 && y < b.y1);
   };
   const freeSlot = (x, y) => {
+    const FS = ruleParam('layout.freeSlot', 45);
+    const taken = (sx, sy) =>
+      usedSlots.some(s => Math.abs(s.x - sx) < FS && Math.abs(s.y - sy) < FS) ||
+      avoidBoxes.some(b => Math.abs(b.e.x - sx) < b.h && sy > b.y0 && sy < b.y1);
     // home position first (displacement 0), then shortest-displacement wins
-    if (!slotTaken(x, y)) { usedSlots.push({ x, y }); return { x, y }; }
+    if (!taken(x, y)) { usedSlots.push({ x, y }); return { x, y }; }
     const rest = pidShuffle(slotCands.filter(o => o.d > 0), 2)
       .slice().sort((a, b) => a.d - b.d);
     for (const o of rest) {
-      if (!slotTaken(x + o.dx, y + o.dy)) { const s = { x: x + o.dx, y: y + o.dy }; usedSlots.push(s); return s; }
+      if (!taken(x + o.dx, y + o.dy)) { const s = { x: x + o.dx, y: y + o.dy }; usedSlots.push(s); return s; }
     }
     return { x, y };
   };
@@ -1783,7 +1802,7 @@ function aStar(start, goal, obstacles, cell, ctx) {
       if (ng < (gScore.get(k) ?? Infinity)) {
         gScore.set(k, ng);
         came.set(k, cur.c);
-        heap.push({ c: nc, f: ng + h(nc), dir: [dx, dy] });
+         heap.push({ c: nc, f: ng + h(nc), dir: [dx, dy] });
         seen.add(k);
       }
     }

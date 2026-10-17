@@ -902,7 +902,48 @@ consulted. It now reads the parser's own `tp.lineTap`, set from the `.line`
 suffix at parse time, so the flag means the same thing before and after topology
 resolution.
 
-### W8 — the orphan policy, and the junction blindness that broke it first
+### W9 — the A* heap bug, the one-word fix the docs filed as Priority 0
+
+2026-10-11. `renderPid`'s A* router calls `heap.push({...})` raw at the
+neighbour-expansion site instead of the `push(n)` helper defined four lines
+above it, which sifts up. The heap invariant is therefore broken on every
+route: `pop()` assumes a valid min-heap and returns an arbitrary node, so A*
+expands in arbitrary order and its `gScore` is not the optimal-cost path. Routes
+are valid but not minimal, non-deterministically so with respect to insertion
+order. The fix is one word: `heap.push(...)` -> `push(...)`.
+
+**The docs filed this as item 0.1 and called it the first thing to do, because
+every other routing measurement is downstream of it.** Measured on the current
+tree (the symbol-bundle edit having already re-blessed the baseline):
+
+| sheet | broken heap | fixed heap | Δ |
+|---|---|---|---|
+| demo | 330 | 331 | +1 |
+| spike | 873 | 723 | **−150** |
+| dense | 285 | 331 | +46 |
+| min | 50 | 50 | 0 |
+| split | 43 | 43 | 0 |
+| manifold | 261 | 267 | +6 |
+| **corpus** | **1842** | **1802** | **−40** |
+
+spike's route count collapses: xings 11 -> 5, bends 80 -> 77, length 7225 ->
+7043mm, label collisions 2 -> 0. The correct A* finds the shorter, less-bendy,
+less-crossing path the broken heap was missing. dense pays +46 (xings 0 -> 2,
+length 2170 -> 2575mm, sigMax 157 -> 187): the candidate search re-picks a
+layout whose routing is longer but whose other metrics improve, and the routing
+is now accurate enough to tell the search the truth about that trade. The docs'
+warning — "a real minimality fix will change route length and bend counts, and
+that is a signal, not a regression" — applies: the routes are now minimal, and
+the score's preference for the new dense layout reflects the objective's actual
+weights, not the artefact of a corrupted frontier.
+
+**Measured on a single render too, to isolate the A* effect from the search:**
+`--candidates=0` (no routing variants) and `--candidates=1` both show the same
+spike improvement, so the gain is the routing, not the search re-picking.
+
+**This is the lowest-risk, highest-payoff change available** — one word, no
+new parameters, no new architecture, and it fixes the substrate every other
+routing measurement was being taken on. The docs' 0.1 entry is now closed.
 
 2026-10-11. §0a root cause 4: an entity with no process connection is parked by
 the ranker wherever the chain ended — dense's drum D-1 sat in the bottom-left

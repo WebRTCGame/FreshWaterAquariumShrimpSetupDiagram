@@ -2041,8 +2041,9 @@ const shiftFor = (lineIdx, x) => {
     const zones = [];
     for (const v of valves) {
       if (v.x == null) continue;
-      const h = PIDEngine.entitySize(v, SC) / 2;
-      zones.push({ x0: v.x - h, x1: v.x + h, y0: v.y - h, y1: v.y + h + LABEL_ZONE });
+      // the drawn metal, not the nominal box: a 100x83.33 valve glyph draws 10x8.33mm
+      const { w, h } = PIDEngine.entityExtent(v, SC);
+      zones.push({ x0: v.x - w / 2, x1: v.x + w / 2, y0: v.y - h / 2, y1: v.y + h / 2 + LABEL_ZONE });
     }
     for (const i2 of instruments) {
       if (i2.x == null) continue;

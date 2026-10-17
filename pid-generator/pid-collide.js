@@ -73,12 +73,12 @@ function collideNearby(items, x, y, r, getRect) {
 // entity → padded obstacle rect (same pads as routeObstacles: single source
 // of truth for "what counts as colliding").
 function collideEntityBox(e, SC, isInst) {
-  const s = PIDEngine.entitySize(e, SC || 1);
+  const { w, h } = PIDEngine.entityExtent(e, SC || 1);
   const PAD = (typeof ruleParam === 'function' ? ruleParam('routing.obstaclePad', 4) : 4);
   const padB = isInst
     ? (typeof ruleParam === 'function' ? ruleParam('routing.instrumentMargin', 3) : 3)
     : (typeof ruleParam === 'function' ? ruleParam('routing.labelPadBottom', 14) : 14);
-  return { x0: e.x - s / 2 - PAD, x1: e.x + s / 2 + PAD, y0: e.y - s / 2 - PAD, y1: e.y + s / 2 + padB };
+  return { x0: e.x - w / 2 - PAD, x1: e.x + w / 2 + PAD, y0: e.y - h / 2 - PAD, y1: e.y + h / 2 + padB };
 }
 // nozzle flange → obstacle rects (array: tube + flange bar separately).
 // A single fat box overstates the metal and warps routing (measured: +7

@@ -101,6 +101,31 @@ var PIDEngine = {
     return PIDEngine.entitySize(e, sc) / 2;
   },
 
+  /** DRAWN size of an entity, in mm: {w, h}.
+   *
+   * `entitySize` is the NOMINAL box — the square that embedSymbolRaw nests the glyph in.
+   * For a non-square viewBox the glyph is letterboxed inside that square and only fills
+   * part of it, so the nominal size over-states the metal in one axis. A 160x80 flow
+   * element at size 100 draws 100x50mm but reports 100x100, and every obstacle box,
+   * clearance and label zone built from it keeps 25mm clear above and below a body that
+   * occupies 25mm — half the reservation is empty.
+   *
+   * Measured across the library: 123 of 201 symbols are letterboxed, and the flow
+   * elements, orifice, pitot and strainer sit at 50% dead box.
+   *
+   * Instruments are unaffected: a bubble is a circle in a square viewBox, and entitySize
+   * already returns the tag-grown size.
+   */
+  entityExtent(e, sc) {
+    const size = PIDEngine.entitySize(e, sc || 1);
+    const key = e.symbol || (typeof SYMBOL_KEYS !== 'undefined' && SYMBOL_KEYS[e.type]) || '';
+    const vb = PIDEngine.symbolViewBox(key);
+    if (!vb) return { w: size, h: size };
+    const k = Math.min(size / vb.w, size / vb.h);
+    if (!isFinite(k) || k <= 0) return { w: size, h: size };
+    return { w: vb.w * k, h: vb.h * k };
+  },
+
   /** The glyph's own viewBox, as {w, h}, or null if it has none. */
   symbolViewBox(symbolKey) {
     const def = (typeof window !== 'undefined' && window.PID_SYMBOLS && window.PID_SYMBOLS[symbolKey]) || null;
@@ -112,80 +137,50 @@ var PIDEngine = {
     return { x: p[0], y: p[1], w: p[2], h: p[3] };
   },
 
-  /** Offset from an entity's centre to one of its ports, in the units of `size`.
+  /** Port pct -> offset from the glyph centre, in the units of `size`.
    *
-   *  ===================================================================
-   *  CORRECT MAPPING — MEASURED, AND DELIBERATELY NOT USED. See 9.30.
-   *  ===================================================================
-   *  Six call sites compute `((conn.x - 50) / 100) * size` in both axes. That
-   *  identity is only true when the glyph's viewBox is SQUARE, and 123 of 201
-   *  symbols are not: `embedSymbolRaw` nests the glyph's own <svg viewBox>
-   *  inside a square width=size height=size box, so the browser applies
-   *  preserveAspectRatio and letterboxes it, leaving the drawn content's centre
-   *  offset from the box centre.
+   * THE ONE MAPPING. Everything that turns a glyph port into a sheet coordinate comes
+   * through here, because there were two open-coded copies of it and they disagreed with
+   * each other and with the browser.
    *
-   *  Worked example, isa-5.1/flow-elements/flow-nozzle (viewBox 160x80, size 100):
-   *    s = min(100/160, 100/80) = 0.625; ox = 0; oy = (100 - 50)/2 = 25
-   *    port "left" at pct (10,25) -> viewBox (16,20) -> screen (10, 37.5)
-   *      -> offset from centre (-40, -12.5)
-   *    naive formula gave (-40, -25)  =>  12.50 mm error, matching the
-   *    audit-symbols SYM-PORT-DRIFT figure exactly.
-   *  The DIRECTION is wrong for the same reason: the on-screen vector is not
-   *  parallel to (conn.x-50, conn.y-50) once the content is offset.
+   * A glyph is nested by embedSymbolRaw as <svg x width=size height=size viewBox="..">,
+   * so the browser applies preserveAspectRatio (xMidYMid meet) and LETTERBOXES any
+   * non-square viewBox into that square box. `((pct-50)/100)*size` in both axes ignores
+   * that padding, so on a non-square viewBox the engine's belief and the drawn ink
+   * disagree — up to 12.5 mm on flow-nozzle (viewBox 160x80, size 100), which is the pipe
+   * missing the symbol entirely. portOffset carried the correct arithmetic while connWorld
+   * and the router kept the naive one; both now call this.
    *
-   *  For a square viewBox this reduces EXACTLY to the old formula, so square
-   *  symbols are bit-identical either way.
-   *
-   *  WHY IT IS NOT CALLED (measured, 2026-09-25 — do not just switch it on):
-   *
-   *    configuration              spike  dense  min  split  demo  total
-   *    naive (in use)               995    248   58    36   199   1536
-   *    all six sites corrected     1051    288   63    38   227   1667
-   *    all but nozzleTip position  1569    228   63    36   225   2121
-   *
-   *  The geometrically correct mapping made every sheet WORSE, and in one
-   *  configuration spike jumped 995 -> 1569. The reason is coupling: the naive
-   *  formula is wrong about the INK but self-consistent with everything else in
-   *  the engine — 5/20 mm grid alignment, cardinal snapping of nozzle directions,
-   *  collision margins and the 14 mm lead-in were all calibrated against it.
-   *  Correcting one term of a coupled system moves it off its optimum unless the
-   *  others are re-tuned in the same change.
-   *
-   *  The visible cost of leaving it alone is near zero: 18 of the 20 drifting
-   *  symbols are under 2 mm on a 10-100 mm body, and the two 12.5 mm offenders
-   *  (flow-nozzle, venturi-tube) appear on no sheet in the corpus.
-   *
-   *  So: adopt this in Stage 1/2 TOGETHER with re-tuning the grid and lead-in
-   *  constants, never as an isolated change. `audit-symbols.mjs` reports
-   *  SYM-PORT-DRIFT and will tell you when the drift itself is closed.
+   * Rotation is applied in VIEWBOX units, not percent. Percent space is the viewBox
+   * stretched to 100x100, so a rotation there is a shear once the viewBox is not square.
    */
-  portOffset(symbolKey, conn, size) {
-    const naive = { x: ((conn.x - 50) / 100) * size, y: ((conn.y - 50) / 100) * size };
+  portWorld(symbolKey, conn, size, rotation, sc) {
+    sc = sc || 1;
+    let cx = conn.x, cy = conn.y;
+    if (rotation) {
+      const vbR = PIDEngine.symbolViewBox(symbolKey);
+      const w = vbR ? vbR.w : 100, h = vbR ? vbR.h : 100;
+      const rp = PIDEngine.rotatePoint(((cx - 50) / 100) * w, ((cy - 50) / 100) * h, rotation);
+      cx = 50 + (rp.x / w) * 100;
+      cy = 50 + (rp.y / h) * 100;
+    }
+    const flat = () => { const k = (size / 100) * sc; return { x: (cx - 50) * k, y: (cy - 50) * k }; };
     const vb = PIDEngine.symbolViewBox(symbolKey);
-    if (!vb) return naive;
+    if (!vb) return flat();
     const s = Math.min(size / vb.w, size / vb.h);
-    if (!isFinite(s) || s <= 0) return naive;
+    if (!isFinite(s) || s <= 0) return flat();
     const ox = (size - vb.w * s) / 2, oy = (size - vb.h * s) / 2;
-    // The viewBox origin is CANCELLED by the viewport mapping, not carried through it.
-    // A glyph drawn as <svg x=cx-s/2 y=cy-s/2 width=s height=s viewBox="X Y W H"> maps a
-    // viewBox point (vx,vy) to ox + (vx - X)*s -- so the term is (vx - vb.x)*s, and adding
-    // vb.x as well displaces every port and the anchor by (vb.x*s, vb.y*s).
-    //
-    // It was written with `ox + vx * s`, which double-counts the origin. The visible cost
-    // looked near-zero because 199 of 201 symbols have a viewBox at the origin, so the term
-    // vanishes -- and because audit-symbols.mjs, the check that tracks this, was itself
-    // mis-specified and could not see it. The two symbols that do carry an origin were
-    // displaced by the full amount:
-    //   isa-5.1/valves/relief-safety      2.41mm  (viewBox 24 -24.33 52x141.997)
-    //   y32.11-1961/furnaces/box-furnace  6.16mm  (viewBox 9 -4 112x110)
-    //
-    // The note above warned this correction must not be made in isolation, alongside
-    // re-tuning the grid and lead-in constants. That warning was about coupling: those
-    // constants were calibrated against the WRONG port positions, so they are now
-    // calibrated against a bug and will need revisiting. With only 2 symbols affected the
-    // coupling is small and measurable, which is the condition the note asked for.
-    const vx = (conn.x / 100) * vb.w, vy = (conn.y / 100) * vb.h;
-    return { x: ox + vx * s - size / 2, y: oy + vy * s - size / 2 };
+    // The viewBox origin is CANCELLED by the viewport mapping, not carried through it:
+    // a viewBox point v lands at ox + (v - vb.x)*s, so a pct maps to ox + pct/100*vb.w*s.
+    return {
+      x: (ox + (cx / 100) * vb.w * s - size / 2) * sc,
+      y: (oy + (cy / 100) * vb.h * s - size / 2) * sc,
+    };
+  },
+
+  /** Offset from an entity centre to one of its ports, in the units of `size`. */
+  portOffset(symbolKey, conn, size) {
+    return PIDEngine.portWorld(symbolKey, conn, size, 0, 1);
   },
 
   /** Outward unit direction from an entity centre to one of its ports, accounting
@@ -228,18 +223,15 @@ var PIDEngine = {
   connWorld(e, conn, size, opts) {
     const noNozzle = opts && opts.noNozzle;
     const sc = (opts && opts.sc) || 1;
-    let cx = conn.x, cy = conn.y;
-    if (e.rotation) {
-      const rp = PIDEngine.rotatePoint(cx - 50, cy - 50, e.rotation);
-      cx = rp.x + 50; cy = rp.y + 50;
-    }
-    const scale = (size / 100) * sc;
-    const x = e.x + (cx - 50) * scale;
-    const y = e.y + (cy - 50) * scale;
+    const key = e.symbol || (typeof SYMBOL_KEYS !== 'undefined' && SYMBOL_KEYS[e.type]) || '';
+    const o = PIDEngine.portWorld(key, conn, size, e.rotation, sc);
+    let x = e.x + o.x, y = e.y + o.y;
     if (!noNozzle && conn.type === 'nozzle') {
-      const dx = cx - 50, dy = cy - 50;
-      const len = magnitude({ x: dx, y: dy }) || 1;
-      return { x: x + (dx / len) * 14 * scale, y: y + (dy / len) * 14 * scale };
+      // the lead runs along the port's TRUE world direction, and keeps the same magnitude
+      // the naive path gave (14% of size, scaled) so the lead-in constants are unchanged
+      const len = magnitude(o) || 1;
+      const lead = 14 * (size / 100) * sc;
+      return { x: x + (o.x / len) * lead, y: y + (o.y / len) * lead };
     }
     return { x, y };
   },
@@ -264,11 +256,11 @@ var PIDEngine = {
     return 0;
   },
 
-  /** Bounding box around an entity. */
+  /** Bounding box around an entity, on the DRAWN metal rather than the nominal box. */
   entityBBox(e, pad, padBottom) {
-    const s = PIDEngine.entitySize(e);
+    const { w, h } = PIDEngine.entityExtent(e);
     const pb = padBottom != null ? padBottom : pad;
-    return { x0: e.x - s / 2 - pad, x1: e.x + s / 2 + pad, y0: e.y - s / 2 - pad, y1: e.y + s / 2 + pb };
+    return { x0: e.x - w / 2 - pad, x1: e.x + w / 2 + pad, y0: e.y - h / 2 - pad, y1: e.y + h / 2 + pb };
   },
 
   /** Set the instrument-check function (called once after instruments array is available). */

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P&amp;ID Studio — Symbol Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pid-studio.css?v=4">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ title bar ============ -->
+  <header id="titlebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" class="brand-mark" aria-hidden="true">
+        <circle cx="7" cy="12" r="4.4"/><circle cx="17" cy="12" r="4.4"/>
+        <path d="M11.4 12h1.2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">P&amp;ID&nbsp;Studio</span>
+    </div>
+    <div class="crumb">
+      <span id="crumbName" class="crumb-name" title="">no component</span>
+      <span id="dirtyPill" class="pill pill-warn" hidden>unsaved</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-group">
+      <button id="undoBtn" class="icon-btn" title="Undo (Ctrl+Z)" aria-label="Undo"><svg viewBox="0 0 24 24" class="ic"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v1"/></svg></button>
+      <button id="redoBtn" class="icon-btn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><svg viewBox="0 0 24 24" class="ic"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0-6 6v1"/></svg></button>
+    </div>
+    <div class="tb-spacer"></div>
+    <div class="tb-group">
+      <button id="exportBtn" class="btn" title="Download this component as JSON (works with apply-component.mjs)">Export JSON</button>
+      <button id="bundleBtn" class="btn" title="Download pid-symbols-bundle.js with every edit baked in">Download bundle</button>
+      <button id="linkBtn" class="btn" title="Link a local generator file to save into directly (Chromium)">Link generator…</button>
+      <button id="saveBtn" class="btn btn-primary" disabled title="Save into the linked generator file">Save</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-group">
+      <button id="paletteBtn" class="icon-btn" title="Command palette (Ctrl+K)" aria-label="Command palette"><svg viewBox="0 0 24 24" class="ic"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg></button>
+      <button id="themeBtn" class="icon-btn" title="Toggle light / dark" aria-label="Toggle theme"><svg viewBox="0 0 24 24" class="ic"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button id="helpBtn" class="icon-btn" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts"><svg viewBox="0 0 24 24" class="ic"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h12"/></svg></button>
+    </div>
+  </header>
+
+  <div id="main">
+    <!-- ============ tool rail ============ -->
+    <nav id="rail" aria-label="Tools">
+      <button class="tool" data-tool="select" title="Select &amp; move (V)" aria-label="Select tool"><svg viewBox="0 0 24 24" class="ic"><path d="M5 3l14 8-6 1.5L10 19z"/></svg></button>
+      <div class="rail-sep"></div>
+      <button class="tool" data-tool="pen" title="Pen — click points, Enter to finish (P)" aria-label="Pen tool"><svg viewBox="0 0 24 24" class="ic"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.6 7.6"/><circle cx="11" cy="11" r="2"/></svg></button>
+      <button class="tool" data-tool="line" title="Line (L)" aria-label="Line tool"><svg viewBox="0 0 24 24" class="ic"><path d="M5 19 19 5"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="5" r="2"/></svg></button>
+      <button class="tool" data-tool="rect" title="Rectangle (R)" aria-label="Rectangle tool"><svg viewBox="0 0 24 24" class="ic"><rect x="4" y="5" width="16" height="14" rx="1.5"/></svg></button>
+      <button class="tool" data-tool="ellipse" title="Ellipse (O)" aria-label="Ellipse tool"><svg viewBox="0 0 24 24" class="ic"><ellipse cx="12" cy="12" rx="9" ry="6.5"/></svg></button>
+      <button class="tool" data-tool="text" title="Text (T)" aria-label="Text tool"><svg viewBox="0 0 24 24" class="ic"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
+      <button class="tool" data-tool="port" title="Port — click to add a connection point (A)" aria-label="Port tool"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+      <div class="rail-sep"></div>
+      <button class="tool" data-tool="pan" title="Pan — or hold Space / middle-drag (H)" aria-label="Pan tool"><svg viewBox="0 0 24 24" class="ic"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v7"/><path d="M10 10.5V6a2 2 0 0 0-4 0v9"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></button>
+      <div class="rail-foot"></div>
+      <button id="railSnap" class="tool tool-toggle" title="Snapping (S)" aria-label="Toggle snapping"><svg viewBox="0 0 24 24" class="ic"><path d="M6 15V6a6 6 0 0 1 12 0v9"/><path d="M6 15h4v4a2 2 0 0 1-4 0v-4zM14 15h4v4a2 2 0 0 1-4 0v-4z"/></svg></button>
+      <button id="railGrid" class="tool tool-toggle" title="Grid (G)" aria-label="Toggle grid"><svg viewBox="0 0 24 24" class="ic"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
+    </nav>
+
+    <!-- ============ component browser ============ -->
+    <aside id="browser">
+      <div class="browser-head">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" class="ic search-ic"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="search" type="text" placeholder="Search 201 symbols…" spellcheck="false" autocomplete="off" aria-label="Search symbols">
+          <kbd>/</kbd>
+        </div>
+        <div class="chips" id="browserFilters" role="tablist">
+          <button class="chip on" data-filter="all">All</button>
+          <button class="chip" data-filter="dirty">Edited <span class="chip-n" id="dirtyN">0</span></button>
+          <button class="chip" data-filter="fav">Starred <span class="chip-n" id="favN">0</span></button>
+        </div>
+        <div id="count" class="count"></div>
+      </div>
+      <div id="list" class="list" role="listbox" aria-label="Symbols"></div>
+    </aside>
+
+    <!-- ============ stage ============ -->
+    <main id="stage">
+      <div id="ctxbar" class="ctxbar" role="toolbar" aria-label="Context toolbar"></div>
+      <div id="canvasRow">
+        <div id="rulerCorner"></div>
+        <div id="rulerH"><svg id="rulerHSvg"></svg></div>
+        <div id="rulerV"><svg id="rulerVSvg"></svg></div>
+        <div id="canvasWrap">
+          <div id="canvas" tabindex="0">
+            <svg id="scene" aria-label="Symbol canvas"></svg>            <div id="measure" class="measure" hidden></div>
+            <div id="textEditWrap" class="text-edit-wrap" hidden><textarea id="textEdit" spellcheck="false"></textarea></div>
+            <div id="marquee" class="marquee" hidden></div>
+          </div>
+        </div>
+        <div id="zoomCluster">
+          <button id="zoomOut" class="icon-btn sm" title="Zoom out (−)" aria-label="Zoom out"><svg viewBox="0 0 24 24" class="ic"><path d="M5 12h14"/></svg></button>
+          <span id="zoomVal" class="zoom-val">100%</span>
+          <button id="zoomIn" class="icon-btn sm" title="Zoom in (+)" aria-label="Zoom in"><svg viewBox="0 0 24 24" class="ic"><path d="M12 5v14M5 12h14"/></svg></button>
+          <span class="zoom-sep"></span>
+          <button id="zoomFit" class="btn xs" title="Fit to view (F)">Fit</button>
+          <button id="zoom100" class="btn xs" title="Actual size (1)">1:1</button>
+        </div>
+      </div>
+      <footer id="statusbar">
+        <span id="stTool" class="st"></span>
+        <span class="st-sep"></span>
+        <span id="stSel" class="st"></span>
+        <span class="st-sep"></span>
+        <span id="stCoords" class="st mono"></span>
+        <span class="st-spacer"></span>
+        <span id="stWarn" class="st st-warn" hidden></span>
+        <span class="st-sep" id="stWarnSep" hidden></span>
+        <span id="stDirty" class="st st-click" title="Review unsaved edits"></span>
+        <span id="stAuto" class="st" hidden></span>
+        <span class="st-sep"></span>
+        <span id="stZoom" class="st mono"></span>
+      </footer>
+    </main>
+
+    <!-- ============ inspector ============ -->
+    <aside id="inspector" aria-label="Inspector"></aside>
+  </div>
+</div>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="recover" class="recover" hidden>
+  <div class="recover-card">
+    <div class="recover-text">
+      <b id="recoverTitle">Recovered unsaved edits</b>
+      <span id="recoverSub" class="recover-sub"></span>
+    </div>
+    <div class="recover-acts">
+      <button id="recoverRestore" class="btn btn-primary">Restore</button>
+      <button id="recoverDiscard" class="btn">Discard</button>
+    </div>
+  </div>
+</div>
+<div id="modal" class="modal" hidden>
+  <div class="modal-card">
+    <header class="modal-head"><h2 id="modalTitle">Keyboard shortcuts</h2><button id="modalClose" class="icon-btn" aria-label="Close"><svg viewBox="0 0 24 24" class="ic"><path d="M18 6 6 18M6 6l12 12"/></svg></button></header>
+    <div id="modalBody" class="modal-body"></div>
+  </div>
+</div>
+<div id="palette" class="palette" hidden>
+  <div class="palette-card">
+    <input id="paletteInput" type="text" placeholder="Type a command or symbol name…" spellcheck="false" autocomplete="off" aria-label="Command palette">
+    <div id="paletteList" class="palette-list" role="listbox"></div>
+  </div>
+</div>
+<div id="ctxMenu" class="ctxmenu" hidden role="menu"></div>
+
+<script src="pid-textmetrics.js?v=20260927"></script>
+<script src="pid-rules.js?v=1788022128"></script>
+<script src="pid-collide.js?v=1788022128"></script>
+<script src="geometric_objects.js?v=1788022128"></script>
+<script src="pid-symbols-bundle.js?v=1788022128"></script>
+<script src="pid-parser.js?v=1788022128"></script>
+<script src="pid-router.js?v=1788022128"></script>
+<script src="pid-validator.js?v=1788022128"></script>
+<script src="pid-renderer.js?v=1788025639"></script>
+<script src="pid-studio.js?v=4"></script>
+</body>
+</html>

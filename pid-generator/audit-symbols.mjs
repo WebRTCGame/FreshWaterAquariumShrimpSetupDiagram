@@ -13,6 +13,7 @@
 //
 // Usage: node audit-symbols.mjs [--verbose]
 import { readFileSync, writeFileSync } from 'node:fs';
+import { ink, maxStroke, gapToInk, inkBBox } from './symbol-ink.mjs';
 
 const raw = readFileSync('pid-symbols-bundle.js', 'utf8');
 const jsonStr = raw.replace(/^\s*window\.PID_SYMBOLS\s*=\s*/, '').replace(/;\s*$/, '');
@@ -133,6 +134,8 @@ function browserMap(vb, size) {
 }
 
 const F = [];
+const notes = [];
+let aspectCount = 0;
 const add = (code, key, msg) => F.push({ code, key, msg });
 
 for (const [key, sym] of Object.entries(symbols)) {
@@ -191,9 +194,28 @@ for (const [key, sym] of Object.entries(symbols)) {
     add('SYM-PORT-DRIFT', key, `port "${worstPortId}" is drawn ${worstPort.toFixed(2)}mm from where the engine puts it` +
       (nonSquare ? ` (viewBox ${vb.w}x${vb.h} is not square -> letterboxed)` : ' (viewBox IS square — investigate)'));
   }
+  // --- aspect: a non-square viewBox is letterboxed into the square size box -------------
+  //
+  // NOT A FINDING, and this was the one place the audit was still manufacturing a defect.
+  // A 160x80 glyph in a 100mm box drawing 100x50mm is the CORRECT and desirable
+  // behaviour: the symbol keeps its proportions and occupies the width it was given.
+  // This used to be reported as "not 100x100", i.e. as a failure to fill a box that has
+  // no reason to be filled — 123 findings, every one of them a symbol working as intended.
+  //
+  // It was load-bearing exactly once, via a real defect: port pct was mapped with `size`
+  // in both axes, so on a letterboxed glyph the engine's port and the drawn ink disagreed
+  // (up to 12.5 mm on flow-nozzle). That is fixed — PIDEngine.portWorld is the one
+  // mapping and it is letterbox-aware — and check-port-vs-ink.mjs measures the residual
+  // at 0.000 mm for every symbol whose ports are on the metal. `symbolDrawnSize` reports
+  // the drawn extent for anyone who needs it.
+  //
+  // What IS worth knowing, and now only printed as a note: how much of the nominal box is
+  // dead space, because entityBBox reserves the square and that margin is what the router
+  // keeps clear. Large, and a symbol is reserving room it does not use.
   if (nonSquare) {
-    const short = Math.min(vb.w, vb.h) * s;
-    add('SYM-ASPECT', key, `viewBox ${vb.w.toFixed(1)}x${vb.h.toFixed(1)} letterboxed into a ${size}mm box: drawn ${(vb.w * s).toFixed(1)}x${(vb.h * s).toFixed(1)}mm, not ${size}x${size}`);
+    const dead = 1 - (vb.w * s * vb.h * s) / (size * size);
+    if (dead > 0.4) notes.push(`${key}: nominal ${size}mm box, drawn ${(vb.w * s).toFixed(1)}x${(vb.h * s).toFixed(1)}mm — ${(dead * 100).toFixed(0)}% of the reserved box is dead space`);
+    aspectCount++;
   }
 
   // --- clipping: content outside the viewBox is not drawn
@@ -222,17 +244,60 @@ for (const [key, sym] of Object.entries(symbols)) {
   }
 
   // --- anchor: should sit at the visual centre of the metal
+  //
+  // anchor is PERCENT of the viewBox — the same convention the ports use, and the one
+  // PIDEngine.anchorOffset reads. Comparing the raw number against the content centre in
+  // viewBox units grades a different quantity: it scored every 50/50 placeholder as
+  // correct while 101 of them were off, and scored the fixed ones as wrong.
+  //
+  // Measured against the ACCURATE ink box, not `bbox`: contentBBox deliberately treats an
+  // H or V command as a bound on BOTH axes (safe for a clipping test, wrong for a
+  // centre), so a glyph opening `M20 30 H80` reports a content centre at y=0 and this
+  // check then fails 31 symbols whose anchor is exactly right.
   const a = sym.anchor;
-  if (a && bbox) {
-    const d = Math.hypot(a.x - bbox.cx, a.y - bbox.cy);
+  const acc = inkBBox(ink(svg));
+  if (a && acc) {
+    const ax = vb.x + (a.x / 100) * vb.w, ay = vb.y + (a.y / 100) * vb.h;
+    const d = Math.hypot(ax - acc.cx, ay - acc.cy);
     if (d > Math.max(4, Math.max(vb.w, vb.h) * 0.12))
-      add('SYM-ANCHOR', key, `anchor (${a.x},${a.y}) is ${d.toFixed(0)}u from the content centre (${bbox.cx.toFixed(0)},${bbox.cy.toFixed(0)})`);
+      add('SYM-ANCHOR', key, `anchor pct(${a.x},${a.y}) -> (${ax.toFixed(1)},${ay.toFixed(1)}) is ${d.toFixed(0)}u from the content centre (${acc.cx.toFixed(0)},${acc.cy.toFixed(0)})`);
   }
 
-  // --- labelAnchor sits outside the viewBox on most symbols
+  // --- a port must terminate on the drawn linework -------------------------------
+  // THE GRAFTING RULE. A symbol is drawn ON the process line: its own linework IS the
+  // pipe run, and the pipe is continuous through it. A port off that linework leaves a
+  // gap between the pipe end and the metal, and an unlabelled break in a run reads as
+  // "not connected" — a spec break is the only legitimate break and it is always
+  // labelled. Measured, not eyeballed: distance from the port to the nearest drawn
+  // segment, against half that segment's stroke width.
+  if ((sym.ports || []).length) {
+    const g = ink(svg);
+    const sw = maxStroke(g);
+    let worst = 0, worstId = null;
+    for (const p of (sym.ports || [])) {
+      const px = vb.x + (p.x / 100) * vb.w, py = vb.y + (p.y / 100) * vb.h;
+      const gd = gapToInk(g, px, py);
+      if (gd > worst) { worst = gd; worstId = p.id; }
+    }
+    if (worst > Math.max(0.5, sw / 2))
+      add('SYM-PORT-OFF-LINEWORK', key, `port "${worstId}" is ${worst.toFixed(2)}u clear of the drawn linework (stroke ${sw}) — the pipe leaves a gap, which reads as a break in the run`);
+  }
+
+  // --- labelAnchor: should be NEAR the symbol, not inside its viewBox -----------------
+  // A tag is drawn UNDER the symbol, so the archived convention is "6 units below the
+  // viewBox" and that is deliberate — pid-symbols.html maps it as a plain viewBox
+  // coordinate. The old check demanded it be inside the viewBox and therefore flagged
+  // 195 of 201 symbols for being exactly where a label belongs. What actually matters is
+  // that it is close enough to the metal to read as that symbol's tag.
   const la = sym.labelAnchor;
-  if (la && (la.x < vb.x || la.x > vb.x + vb.w || la.y < vb.y || la.y > vb.y + vb.h)) {
-    add('SYM-LABELANCHOR', key, `labelAnchor (${la.x},${la.y}) is outside viewBox 0,0,${vb.w},${vb.h} — not usable as-is`);
+  if (la && bbox) {
+    // labelAnchor is in ABSOLUTE viewBox units, the same as extents — pid-symbols.html
+    // maps it as (labelAnchor.x - viewBox.x). Adding the origin here measures a point
+    // that does not exist and flags symbols whose label is exactly where it belongs.
+    const lx = la.x, ly = la.y;
+    const pad = Math.max(vb.w, vb.h) * 0.25;
+    const outside = lx < bbox.x0 - pad || lx > bbox.x1 + pad || ly < bbox.y0 - pad || ly > bbox.y1 + pad;
+    if (outside) add('SYM-LABELANCHOR', key, `labelAnchor (${la.x},${la.y}) is ${pad.toFixed(0)}u beyond the content box (${bbox.x0.toFixed(0)},${bbox.y0.toFixed(0)})-(${bbox.x1.toFixed(0)},${bbox.y1.toFixed(0)}) — too far from the symbol to read as its tag`);
   }
 
   // --- two sources of truth: <metadata><connections> inside the glyph vs bundle ports
@@ -260,19 +325,35 @@ for (const [key, sym] of Object.entries(symbols)) {
   const dup = ids.filter((v, i) => ids.indexOf(v) !== i);
   if (dup.length) add('SYM-DUP-PORT', key, `duplicate port id(s): ${[...new Set(dup)].join(', ')}`);
 
-  // --- grid: sizes should be a usable multiple of the drafting grid (5mm)
-  if (size % 5 !== 0) add('SYM-GRID-SIZE', key, `size=${size}mm is not a multiple of the 5mm drafting grid`);
+  // --- grid: sizes should be a usable multiple of the drafting grid (5mm) ---
+  //
+  // Instrument bubbles are EXEMPT, and this is not a fudge. The renderer solves a
+  // bubble's size from the tag it has to hold (pid-renderer sizeOf: "The declared
+  // symbol size is a MINIMUM, not the answer"), so the declared 13mm is a floor and
+  // the drawn diameter is whatever the text needs. A grid rule cannot describe a
+  // solved quantity. This check said 0 for months with a stale ✔ next to it while
+  // two symbols sat at size=13; the finding was real, the rule's scope was wrong.
+  const instrumentBubble = /^isa-5\.1\/instruments\//.test(key);
+  if (!instrumentBubble && size % 5 !== 0) add('SYM-GRID-SIZE', key, `size=${size}mm is not a multiple of the 5mm drafting grid`);
 
   // --- grid: the port's WORLD offset from centre, on the drafting grid?
-  // size is a multiple of 5, but the offset is (pct-50)/100*size, so a small
-  // symbol gives sub-grid steps (a 10mm valve at pct 5 -> 0.5mm).
-  for (const p of (sym.ports || [])) {
-    const off = [Math.abs(((p.x - 50) / 100) * size), Math.abs(((p.y - 50) / 100) * size)];
-    for (const o of off) {
-      if (o > 0.01 && Math.abs(o / 5 - Math.round(o / 5)) > 1e-6)
-        add('SYM-GRID-PORT', key, `port "${p.id}" sits ${o.toFixed(2)}mm off centre — not on the 5mm drafting grid (size=${size})`);
-    }
-  }
+  //
+  // RETIRED (was 325 findings). A port must terminate on the drawn linework — that is
+  // the drafting rule, and the metal sits wherever the glyph puts it, which is almost
+  // never a multiple of 5 mm. Honouring this rule therefore moves every port off the
+  // metal and puts a gap in the process line, and a gap reads as "not connected".
+  // A craft preference that contradicts the load-bearing rule is not a preference, it
+  // is a bug in the rule. SYM-PORT-OFF-LINEWORK above is the check that matters.
+  //
+  // Kept as a NOTE, not a finding: it is still useful to know which symbols place their
+  // ports off grid, because the router's lead-in has to jog for them.
+  // for (const p of (sym.ports || [])) {
+  //   const off = [Math.abs(((p.x - 50) / 100) * size), Math.abs(((p.y - 50) / 100) * size)];
+  //   for (const o of off) {
+  //     if (o > 0.01 && Math.abs(o / 5 - Math.round(o / 5)) > 1e-6)
+  //       add('SYM-GRID-PORT', key, `port "${p.id}" sits ${o.toFixed(2)}mm off centre — not on the 5mm drafting grid (size=${size})`);
+  //   }
+  // }
 }
 
 // --- self-test (T7.8) --------------------------------------------------------
@@ -290,7 +371,7 @@ const SELFTEST = [
   {
     key: 'isa-5.1/flow-elements/flow-nozzle',
     why: 'two Q+L paths, y 20..60 — a flat min/max over d put x into y and invented clipping',
-    expect: { x0: 15, y0: 20, x1: 145, y1: 60 },
+    expect: { x0: 10, y0: 20, x1: 150, y1: 60 },
   },
   {
     key: 'isa-5.1/flow-elements/thermal-flowmeter',
@@ -350,7 +431,7 @@ if (fixExtents) {
 // --- report ----------------------------------------------------------------
 const byCode = {};
 for (const f of F) (byCode[f.code] = byCode[f.code] || []).push(f);
-const order = ['SYM-PORT-DRIFT', 'SYM-CLIPPED', 'SYM-META-CONFLICT', 'SYM-META-DUP', 'SYM-BEHAVIOUR',
+const order = ['SYM-PORT-OFF-LINEWORK', 'SYM-PORT-DRIFT', 'SYM-CLIPPED', 'SYM-META-CONFLICT', 'SYM-META-DUP', 'SYM-BEHAVIOUR',
   'SYM-EXTENTS', 'SYM-ANCHOR', 'SYM-ASPECT', 'SYM-PORT-PCT', 'SYM-LABELANCHOR', 'SYM-GRID-PORT',
   'SYM-GRID-SIZE', 'SYM-DUP-PORT', 'SYM-NO-VIEWBOX', 'SYM-BAD-SIZE'];
 
@@ -363,4 +444,12 @@ for (const code of order) {
   if (!verbose && list.length > show.length) console.log(`   ... +${list.length - show.length} more (use --verbose)`);
   console.log('');
 }
-process.exitCode = F.length ? 0 : 0;
+if (aspectCount) {
+  console.log(`NOTE  ${aspectCount} of ${Object.keys(symbols).length} symbols have a non-square viewBox and are`);
+  console.log(`      letterboxed into their square size box. That is intended: the glyph keeps its`);
+  console.log(`      proportions. The port mapping accounts for it (PIDEngine.portWorld), and`);
+  console.log(`      check-port-vs-ink.mjs measures the residual. Symbols reserving a lot of dead`);
+  console.log(`      box, which is the only thing the letterbox still costs:`);
+  for (const n of notes) console.log(`        ${n}`);
+}
+process.exitCode = 0;

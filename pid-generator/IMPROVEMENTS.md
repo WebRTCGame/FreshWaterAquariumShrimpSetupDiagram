@@ -902,6 +902,38 @@ consulted. It now reads the parser's own `tp.lineTap`, set from the `.line`
 suffix at parse time, so the flag means the same thing before and after topology
 resolution.
 
+### W9 — valveClear 16 -> 24, and the missing valveOffset key
+
+2026-10-11. `layout.valveOffset` was read by the valve snap pass but never
+existed in the registry (IMPROVEMENTS.md 0.5): `ruleParam` returned the 20mm
+fallback silently, indistinguishable from the registry working. Adding it makes
+the claim in pid-rules.js true.
+
+`layout.valveClear` was 16mm centre-to-centre, and the manifold cluster
+(V-103, V-105, PSV-101 off J-1) sits at ~20mm with 26mm label stacks — the
+snap pass could not find a free spot in its 40mm reach, so the three valves
+piled up and decrowd's 26mm gap came too late to spread them. Raising it to 24mm
+gives the snap room to work:
+
+| sheet | 16mm | 24mm | Δ |
+|---|---|---|---|
+| demo | 330 | 313 | **−17** |
+| spike | 873 | 839 | **−34** |
+| dense | 285 | 285 | 0 |
+| min | 50 | 50 | 0 |
+| split | 43 | 43 | 0 |
+| manifold | 261 | 242 | **−19** |
+| **corpus** | **1842** | **1797** | **−45** |
+
+The demo's `tapReachTotal` goes 88 -> 0: the bubbles drop straight onto their
+runs instead of 36-42mm sideways, which is the §3.3 instrument-tier defect in
+its most visible form. The cost is 6 short lead-in warnings on the demo (bends
+5.5-11.5mm from ports) because the valves now sit further along their flow
+paths. The score prices lead-in-short at 6/mm (capped at 200) and tap reach at
+0.2/mm, so the score over-weights the lead-ins relative to the tap reach — but
+the warnings are real and are the next thing to fix (a larger port lead-in
+minimum, or channel allocation per §3.2).
+
 ### W9 — the A* heap bug, the one-word fix the docs filed as Priority 0
 
 2026-10-11. `renderPid`'s A* router calls `heap.push({...})` raw at the

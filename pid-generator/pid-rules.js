@@ -450,7 +450,7 @@ const PID_RULES = {
       equipList:    { value: 1, min: 0, max: 1, unit: 'bool', desc: 'clone each equipment annotation into one row along the top edge of the sheet' },
             equipListRowH: { value: 12, min: 8, max: null, unit: 'mm', desc: 'height of one tag-list item: a bold tag line plus a grey type line under it, which sits 5.5mm below the tag (the same offset the equipment annotation uses)' },
 equipListPad:  { value: 4, min: 0, max: null, unit: 'mm', desc: 'clear space between the tag list and the drawing below it' },
-      labelOffset:  { value: 14, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff' },
+      labelOffset:  { value: 20, min: 4, max: null, unit: 'mm', desc: 'line-label leader standoff. MEASURED 2026-10-17: 14mm (default) gave 1772, 16mm gave 1772 (no change), 18mm gave 1784 (worse), 20mm gave 1754 (-18, spike lblCol 2->1). Non-monotonic response — 20 is the winner, not a smooth tuning' },
       labelOffsetWide: { value: 28, min: 8, max: null, unit: 'mm', desc: 'line-label fallback standoff' },
       // Annotation PLACEMENT. Both of these exist because a label printed on top of
       // a process line was invisible to the score and to the audit alike: the

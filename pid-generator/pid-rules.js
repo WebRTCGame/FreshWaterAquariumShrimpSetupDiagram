@@ -310,14 +310,6 @@ const PID_RULES = {
       // indistinguishable from the registry working. Adding it makes the claim
       // in pid-rules.js true.
       valveOffset:  { value: 20, min: 6, max: null, unit: 'mm', desc: 'nominal distance along the flow from the upstream entity to the valve' },
-      // 24mm centre-to-centre: the manifold cluster (V-103, V-105, PSV-101 off
-      // J-1) sits at ~20mm with 26mm label stacks overlapping. 16mm was too
-      // tight for the snap to find a free spot in its 40mm reach, so the three
-      // valves piled up and decrowd's 26mm gap came too late to spread them.
-      // Measured 2026-10-11: corpus -45 (demo -17, spike -34, manifold -19),
-      // tapReachTotal 88 -> 0 on the demo (bubbles drop straight), at the cost
-      // of 6 short lead-in warnings on the demo (bends 5.5-11.5mm from ports).
-      // The lead-ins are the secondary defect; the tap reach is the primary.
       valveClear:   { value: 24, min: 6, max: null, unit: 'mm', desc: 'min centre-to-centre spacing between valves on a shared span' },
       minSep:       { value: 45, min: 20, max: null, unit: 'mm', desc: 'min vertical separation between entities sharing a depth rank' },
       decrowd:      { value: 1, min: 0, max: 1, unit: 'bool', desc: 'separate entities whose label stacks would overlap' },
